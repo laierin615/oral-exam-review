@@ -35,7 +35,7 @@ const ids = new Set(TOPICS.map(t => t.id));
 if (ids.size !== TOPICS.length) warn('TOPICS 有重複的 id');
 const qids = new Set(QUESTIONS.map(q => q.id));
 if (qids.size !== QUESTIONS.length) warn('QUESTIONS 有重複的 id');
-TOPICS.forEach(t => { if (!SHORT[t.id]) warn(`主題 ${t.id} 沒有建築名稱（SHORT）`); });
+TOPICS.forEach(t => { if (!SHORT[t.id]) warn(`主題 ${t.id} 沒有主題簡稱（SHORT）`); });
 QUESTIONS.forEach(q => [q.topic, ...(q.also || [])].forEach(t => { if (!ids.has(t)) warn(`第 ${q.id} 題的主題 ${t} 不存在`); }));
 TOPICS.forEach(t => { if (!QUESTIONS.some(q => q.topic === t.id || (q.also || []).includes(t.id))) warn(`主題 ${t.id} 沒有任何口試題`); });
 TOPICS.forEach((t, i) => { if (!chunks(topicScript(t, i)).length) warn(`主題 ${t.id} 朗讀稿是空的`); });

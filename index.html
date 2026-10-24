@@ -3,24 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>評量部落口試特訓</title>
+<title>評量筆記・口試特訓</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=LXGW+WenKai+TC:wght@400&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
-/* 版面概念：一份「答案卷」——手機單欄、試卷抬頭與頁籤黏在上方，背誦時答案先遮住，批改用紅筆與螢光筆，朗讀播放列固定在底部 */
+/* 閱讀優先：大字、留白、主題心智圖，讀懂後遮住答案主動回想。 */
 :root {
-  --paper: #E8DAB8;
-  --sheet: #FFF9EA;
-  --ink: #33261A;
-  --ink-soft: #76624A;
-  --rule: #E0CDA4;
-  --accent: #2C78C2;
-  --accent-soft: #DDEBF8;
+  --paper: #F5F4EF;
+  --sheet: #FFFFFF;
+  --ink: #263F3B;
+  --ink-soft: #566C66;
+  --rule: #DCE4DE;
+  --accent: #24665A;
+  --accent-soft: #EAF3EC;
   --redpen: #C7372B;
-  --hit: #3C9530;
-  --partial: #B07610;
+  --hit: #34752A;
+  --partial: #855D12;
   --hl: #FFE27A;
   --miss-bg: rgba(199, 55, 43, .12);
   --partial-bg: rgba(176, 118, 16, .15);
@@ -48,8 +49,8 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: #191510; --sheet: #2A2218; --ink: #F2E8D5; --ink-soft: #BBA98C; --rule: #4A3D2B;
-    --accent: #7DB6EE; --accent-soft: #233548; --redpen: #FF8576; --hit: #84D26A; --partial: #EDBE5C;
+    --paper: #142320; --sheet: #1D302B; --ink: #E6EFE9; --ink-soft: #B2C5BB; --rule: #3D554B;
+    --accent: #9AD5BC; --accent-soft: #2B473B; --redpen: #FF8576; --hit: #84D26A; --partial: #EDBE5C;
     --hl: rgba(255, 214, 90, .30); --miss-bg: rgba(255, 133, 118, .16); --partial-bg: rgba(237, 190, 92, .16);
     --hit-bg: rgba(132, 210, 106, .15); --curve: #7DB6EE; --curve-fill: rgba(125, 182, 238, .14); --shade: rgba(125, 182, 238, .36);
     --outline: #0E0A06; --wood: #7A4A22; --wood-dark: #4A2C11; --grass: #3D6A25; --grass-dot: rgba(255, 255, 255, .07);
@@ -58,8 +59,8 @@
   }
 }
 :root[data-theme="dark"] {
-  --paper: #191510; --sheet: #2A2218; --ink: #F2E8D5; --ink-soft: #BBA98C; --rule: #4A3D2B;
-  --accent: #7DB6EE; --accent-soft: #233548; --redpen: #FF8576; --hit: #84D26A; --partial: #EDBE5C;
+  --paper: #142320; --sheet: #1D302B; --ink: #E6EFE9; --ink-soft: #B2C5BB; --rule: #3D554B;
+  --accent: #9AD5BC; --accent-soft: #2B473B; --redpen: #FF8576; --hit: #84D26A; --partial: #EDBE5C;
   --hl: rgba(255, 214, 90, .30); --miss-bg: rgba(255, 133, 118, .16); --partial-bg: rgba(237, 190, 92, .16);
   --hit-bg: rgba(132, 210, 106, .15); --curve: #7DB6EE; --curve-fill: rgba(125, 182, 238, .14); --shade: rgba(125, 182, 238, .36);
   --outline: #0E0A06; --wood: #7A4A22; --wood-dark: #4A2C11; --grass: #3D6A25; --grass-dot: rgba(255, 255, 255, .07);
@@ -67,7 +68,7 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7; -webkit-text-size-adjust: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 18.0px; line-height: 1.7; -webkit-text-size-adjust: 100%; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
 .wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 56px; }
 button, input, textarea, select { font: inherit; color: inherit; }
@@ -78,41 +79,41 @@ h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-
 .ico { width: 16px; height: 16px; flex: none; }
 
 .mast { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
-.eyebrow { font-size: 12px; letter-spacing: .1em; color: var(--ink-soft); }
+.eyebrow { font-size: 16px; letter-spacing: .1em; color: var(--ink-soft); }
 .mast h1 { font-size: clamp(24px, 6vw, 34px); }
-.rules { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.rules { display: flex; flex-wrap: wrap; gap: 6px; font-size: 16px; }
 .rules span { border: 1px solid var(--rule); background: var(--sheet); padding: 2px 10px; border-radius: 999px; }
 .rules b { color: var(--accent); }
 
 .tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 8; background: var(--paper); display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--rule); padding-top: 6px; }
-.tab { flex: 1; max-width: 220px; border: 1px solid transparent; border-bottom: none; background: none; padding: 10px 14px; border-radius: 8px 8px 0 0; color: var(--ink-soft); font-weight: 500; margin-bottom: -1px; font-size: 15px; }
+.tab { flex: 1; max-width: 220px; border: 1px solid transparent; border-bottom: none; background: none; padding: 10px 14px; border-radius: 8px 8px 0 0; color: var(--ink-soft); font-weight: 500; margin-bottom: -1px; font-size: 18.0px; }
 .tab[aria-selected="true"] { background: var(--sheet); border-color: var(--rule); color: var(--ink); font-weight: 700; }
-.tab small { font-family: var(--f-mono); font-weight: 400; font-size: 12px; color: var(--ink-soft); margin-left: 4px; }
+.tab small { font-family: var(--f-mono); font-weight: 400; font-size: 16px; color: var(--ink-soft); margin-left: 4px; }
 
-.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 14px; font-size: 14px; min-height: 38px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 14px; font-size: 16.8px; min-height: 38px; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--sheet); font-weight: 700; padding-inline: 18px; }
 .btn.ghost { border-color: var(--accent); color: var(--accent); }
 .btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
 .btn.known { background: var(--hit-bg); border-color: var(--hit); color: var(--hit); font-weight: 700; }
-.link { background: none; border: none; color: var(--accent); padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
-.meta { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.link { background: none; border: none; color: var(--accent); padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 16.8px; }
+.meta { font-size: 16px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
 .sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; min-width: 0; }
 
 /* ---------- 重點背誦 ---------- */
 .notes-top { display: grid; gap: 12px; margin: 16px 0; }
 @media (min-width: 900px) { .notes-top { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; } }
-.howto { margin: 6px 0 12px; padding-left: 20px; font-size: 14px; display: grid; gap: 2px; }
+.howto { margin: 6px 0 12px; padding-left: 20px; font-size: 16.8px; display: grid; gap: 2px; }
 .memobar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.toc a { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink); text-decoration: none; border: 1px solid var(--rule); background: var(--paper); padding: 4px 10px 4px 4px; border-radius: 999px; }
-.toc a span { font-family: var(--f-mono); font-size: 11.5px; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0 6px; }
+.toc a { display: inline-flex; align-items: center; gap: 6px; font-size: 16.2px; color: var(--ink); text-decoration: none; border: 1px solid var(--rule); background: var(--paper); padding: 4px 10px 4px 4px; border-radius: 999px; }
+.toc a span { font-family: var(--f-mono); font-size: 16px; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0 6px; }
 .toc a.ok span { background: var(--hit); color: var(--sheet); }
 .toc a.cur { border-color: var(--accent); }
-.voicebox h2 { font-size: 16px; }
-.voicebox .row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: center; margin-top: 8px; font-size: 13.5px; }
-.voicebox select { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 6px 8px; font-size: 14px; }
-.voicebox .hint { font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; }
-.voicebox .warn { font-size: 13px; color: var(--redpen); margin: 8px 0 0; }
+.voicebox h2 { font-size: 19.2px; }
+.voicebox .row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: center; margin-top: 8px; font-size: 16.2px; }
+.voicebox select { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 6px 8px; font-size: 16.8px; }
+.voicebox .hint { font-size: 16px; color: var(--ink-soft); margin: 8px 0 0; }
+.voicebox .warn { font-size: 16px; color: var(--redpen); margin: 8px 0 0; }
 input[type=range] { width: 100%; accent-color: var(--accent); }
 
 .topics { display: grid; gap: 18px; }
@@ -120,149 +121,149 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .topic.playing { box-shadow: 0 0 0 2px var(--accent); }
 .topic.isknown { border-color: var(--hit); }
 .thead { display: flex; gap: 12px; align-items: flex-start; }
-.tno { font-family: var(--f-mono); font-weight: 600; font-size: 22px; color: var(--accent); line-height: 1.2; }
+.tno { font-family: var(--f-mono); font-weight: 600; font-size: 26.4px; color: var(--accent); line-height: 1.2; }
 .isknown .tno { color: var(--hit); }
-.tmod { font-size: 12px; color: var(--ink-soft); letter-spacing: .06em; }
-.thead h2 { font-size: 20px; }
+.tmod { font-size: 16px; color: var(--ink-soft); letter-spacing: .06em; }
+.thead h2 { font-size: 24.0px; }
 .tacts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-.open { margin: 0 0 14px; padding: 12px 14px; background: var(--accent-soft); border-radius: 8px; font-family: var(--f-display); font-weight: 600; font-size: 16.5px; line-height: 1.7; }
-.open .tag { display: block; font-family: var(--f-body); font-size: 11.5px; font-weight: 700; letter-spacing: .12em; color: var(--accent); margin-bottom: 2px; }
+.open { margin: 0 0 14px; padding: 12px 14px; background: var(--accent-soft); border-radius: 8px; font-family: var(--f-display); font-weight: 600; font-size: 19.8px; line-height: 1.7; }
+.open .tag { display: block; font-family: var(--f-body); font-size: 16px; font-weight: 700; letter-spacing: .12em; color: var(--accent); margin-bottom: 2px; }
 .fig { margin: 0 0 14px; }
 .pts { display: grid; gap: 10px; margin: 0; }
 .pts > div { border-left: 3px solid var(--rule); padding-left: 12px; }
 .pts dt { font-weight: 700; color: var(--ink); }
-.pts dd { margin: 2px 0 0; color: var(--ink); font-size: 14.5px; }
+.pts dd { margin: 2px 0 0; color: var(--ink); font-size: 17.4px; }
 .traps { margin-top: 14px; border: 1px dashed var(--redpen); border-radius: 8px; padding: 10px 12px; }
-.traps b { color: var(--redpen); font-size: 13px; letter-spacing: .1em; }
-.traps ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; }
+.traps b { color: var(--redpen); font-size: 16px; letter-spacing: .1em; }
+.traps ul { margin: 4px 0 0; padding-left: 18px; font-size: 16.8px; display: grid; gap: 3px; }
 .cover { position: relative; display: block; border: 1px dashed var(--accent); border-radius: 8px; background: var(--paper); cursor: pointer; min-height: 44px; overflow: hidden; }
 .cover .blur { display: block; filter: blur(7px); opacity: .55; user-select: none; pointer-events: none; padding: 4px 8px; max-height: 120px; overflow: hidden; }
-.cover .cap { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--accent); text-align: center; padding: 4px; }
+.cover .cap { position: absolute; inset: 0; display: grid; place-items: center; font-size: 16px; font-weight: 700; color: var(--accent); text-align: center; padding: 4px; }
 
 /* 圖解元件 */
 .tl { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
-.tl-step { border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 8px; padding: 8px 10px; background: var(--sheet); font-size: 13px; min-width: 0; }
-.tl-step .when { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-soft); }
-.tl-step .nm { font-family: var(--f-display); font-weight: 700; font-size: 16px; }
-.tl-step .who { display: inline-block; margin-top: 4px; font-size: 11.5px; padding: 0 6px; border-radius: 4px; background: var(--partial-bg); color: var(--partial); font-weight: 700; }
-.tl-axis { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 12px; color: var(--ink-soft); }
+.tl-step { border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 8px; padding: 8px 10px; background: var(--sheet); font-size: 16px; min-width: 0; }
+.tl-step .when { font-family: var(--f-mono); font-size: 16px; color: var(--ink-soft); }
+.tl-step .nm { font-family: var(--f-display); font-weight: 700; font-size: 19.2px; }
+.tl-step .who { display: inline-block; margin-top: 4px; font-size: 16px; padding: 0 6px; border-radius: 4px; background: var(--partial-bg); color: var(--partial); font-weight: 700; }
+.tl-axis { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 16px; color: var(--ink-soft); }
 .tl-axis i { flex: 1; height: 2px; background: linear-gradient(90deg, var(--rule), var(--accent)); }
 .two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 @media (min-width: 560px) { .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
 .panel { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; min-width: 0; }
-.panel h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-.panel h3 small { font-family: var(--f-body); font-weight: 500; font-size: 12px; color: var(--accent); }
-.panel ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 2px; }
+.panel h3 { font-size: 18.0px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.panel h3 small { font-family: var(--f-body); font-weight: 500; font-size: 16px; color: var(--accent); }
+.panel ul { margin: 6px 0 0; padding-left: 18px; font-size: 16.2px; display: grid; gap: 2px; }
 .sbars { display: grid; gap: 4px; margin-top: 8px; }
-.sbar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 62px; gap: 6px; align-items: center; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sbar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 62px; gap: 6px; align-items: center; font-size: 16px; font-variant-numeric: tabular-nums; }
 .sbar .tr { height: 12px; background: var(--paper); border-radius: 3px; position: relative; }
 .sbar .tr i { position: absolute; inset: 0 auto 0 0; background: var(--curve); border-radius: 3px; opacity: .75; }
 .sbar .tr i.fail { background: var(--redpen); }
 .sbar .tr .cut { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--redpen); }
-.sbar b { font-weight: 600; font-size: 12px; }
+.sbar b { font-weight: 600; font-size: 16px; }
 .tree { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 @media (min-width: 560px) { .tree { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); } }
 .branch { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; min-width: 0; }
 .branch > .hd { background: var(--accent-soft); padding: 7px 10px; font-weight: 700; font-family: var(--f-display); }
-.branch > .hd small { display: block; font-family: var(--f-body); font-weight: 400; font-size: 12px; color: var(--ink-soft); }
-.leaf { padding: 7px 10px; border-top: 1px solid var(--rule); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
-.leaf .to { font-size: 12.5px; font-weight: 700; color: var(--hit); background: var(--hit-bg); padding: 0 7px; border-radius: 4px; }
+.branch > .hd small { display: block; font-family: var(--f-body); font-weight: 400; font-size: 16px; color: var(--ink-soft); }
+.leaf { padding: 7px 10px; border-top: 1px solid var(--rule); font-size: 16.2px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.leaf .to { font-size: 16px; font-weight: 700; color: var(--hit); background: var(--hit-bg); padding: 0 7px; border-radius: 4px; }
 .targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 @media (min-width: 640px) { .targets { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.target { border: 1px solid var(--rule); border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; min-width: 0; }
+.target { border: 1px solid var(--rule); border-radius: 8px; padding: 8px; text-align: center; font-size: 16px; min-width: 0; }
 .target svg { width: 100%; max-width: 130px; height: auto; display: block; margin: 0 auto 4px; }
-.target.no { opacity: .55; }
+.target.no { opacity: 1; }
 .target b { display: block; }
 .target small { color: var(--ink-soft); }
 .rbars { display: grid; gap: 6px; }
-.rbar { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; }
+.rbar { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 16px; }
 .rbar .tr { height: 18px; background: var(--paper); border-radius: 4px; overflow: hidden; }
-.rbar .tr i { display: flex; align-items: center; height: 100%; padding-left: 8px; font-style: normal; font-size: 11.5px; color: var(--sheet); background: var(--curve); font-weight: 700; white-space: nowrap; }
+.rbar .tr i { display: flex; align-items: center; height: 100%; padding-left: 8px; font-style: normal; font-size: 16px; color: var(--sheet); background: var(--curve); font-weight: 700; white-space: nowrap; }
 .rbar .tr i.low { background: var(--redpen); }
 .factors { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
-.factor { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
-.factor b { display: block; font-family: var(--f-display); font-size: 14.5px; }
+.factor { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 16px; }
+.factor b { display: block; font-family: var(--f-display); font-size: 17.4px; }
 .stairs { display: flex; align-items: flex-end; gap: 4px; height: 150px; }
-.stair { flex: 1; min-width: 0; background: var(--accent-soft); border: 1px solid var(--rule); border-bottom: none; border-radius: 6px 6px 0 0; display: flex; flex-direction: column; align-items: center; padding-top: 6px; font-weight: 700; font-size: 14px; }
-.stair small { font-weight: 400; font-size: 10.5px; color: var(--ink-soft); }
+.stair { flex: 1; min-width: 0; background: var(--accent-soft); border: 1px solid var(--rule); border-bottom: none; border-radius: 6px 6px 0 0; display: flex; flex-direction: column; align-items: center; padding-top: 6px; font-weight: 700; font-size: 16.8px; }
+.stair small { font-weight: 400; font-size: 16px; color: var(--ink-soft); }
 .stair.top { background: var(--accent); color: var(--sheet); }
 .stair.top small { color: var(--sheet); }
-.oldrow { display: flex; gap: 4px; border-top: 2px solid var(--ink); padding-top: 4px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+.oldrow { display: flex; gap: 4px; border-top: 2px solid var(--ink); padding-top: 4px; font-size: 16px; color: var(--ink-soft); text-align: center; }
 .oldrow span { flex: 1; min-width: 0; }
 .oldrow .chg { color: var(--redpen); font-weight: 700; }
 .kgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
-.kcell { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
-.kcell b { display: block; font-family: var(--f-display); font-size: 14.5px; }
+.kcell { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 16px; }
+.kcell b { display: block; font-family: var(--f-display); font-size: 17.4px; }
 .kcell .eg { color: var(--accent); font-weight: 700; }
 .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; }
-.flow .box { flex: 1 1 120px; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; min-width: 0; }
-.flow .box b { display: block; font-family: var(--f-display); font-size: 15px; }
+.flow .box { flex: 1 1 120px; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 16px; min-width: 0; }
+.flow .box b { display: block; font-family: var(--f-display); font-size: 18.0px; }
 .flow .box.mid { background: var(--accent-soft); border-color: var(--accent); }
 .flow .arr { align-self: center; color: var(--accent); font-weight: 700; }
 .shifts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
-.shift { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.shift { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 16px; }
 .shift .ft { font-weight: 700; }
 .shift .ft s { color: var(--ink-soft); font-weight: 400; }
 .dec { display: grid; gap: 6px; }
-.decrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13.5px; }
+.decrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 16.2px; }
 .decrow .ans { font-weight: 700; color: var(--hit); background: var(--hit-bg); border-radius: 4px; padding: 1px 8px; white-space: nowrap; }
-.decrow small { display: block; color: var(--ink-soft); font-size: 12px; }
+.decrow small { display: block; color: var(--ink-soft); font-size: 16px; }
 
 /* 互動：偏態、常態、試題分析、檔案評量 */
 .chartrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
 @media (min-width: 900px) { .chartrow { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
 svg.chart { width: 100%; height: auto; display: block; touch-action: none; }
-svg text { font-family: var(--f-body); fill: var(--ink-soft); font-size: 13px; }
+svg text { font-family: var(--f-body); fill: var(--ink-soft); font-size: 16px; }
 svg .mono { font-family: var(--f-mono); }
 .presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-.presets button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 12px; font-size: 13px; min-height: 32px; }
+.presets button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 12px; font-size: 16px; min-height: 32px; }
 .presets button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
-.rangecap { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); }
-.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
+.rangecap { display: flex; justify-content: space-between; font-size: 16px; color: var(--ink-soft); }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 16.8px; margin: 0; }
 .facts dt { color: var(--ink-soft); }
 .facts dd { margin: 0; font-weight: 500; }
-.facts dd.key { font-family: var(--f-display); font-size: 17px; font-weight: 700; color: var(--accent); }
+.facts dd.key { font-family: var(--f-display); font-size: 20.4px; font-weight: 700; color: var(--accent); }
 .facts .mono { font-family: var(--f-mono); }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.field label { display: block; font-size: 12px; color: var(--ink-soft); letter-spacing: .04em; }
-.field input { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 5px 8px; font-family: var(--f-mono); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.field small { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-soft); }
-.readout { margin-top: 12px; font-size: 14px; line-height: 1.75; }
+.field label { display: block; font-size: 16px; color: var(--ink-soft); letter-spacing: .04em; }
+.field input { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 5px 8px; font-family: var(--f-mono); font-size: 21.6px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.field small { font-family: var(--f-mono); font-size: 16px; color: var(--ink-soft); }
+.readout { margin-top: 12px; font-size: 16.8px; line-height: 1.75; }
 .readout .alert { display: block; margin-top: 6px; color: var(--redpen); font-weight: 700; }
-.note { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+.note { font-size: 16px; color: var(--ink-soft); margin-top: 6px; }
 .calc { display: grid; gap: 10px; }
 .calc .vals { display: flex; flex-wrap: wrap; gap: 8px; }
 .calc .val { border: 1px solid var(--rule); border-radius: 8px; padding: 6px 12px; min-width: 120px; }
-.calc .val span { display: block; font-size: 12px; color: var(--ink-soft); }
-.calc .val b { font-family: var(--f-mono); font-size: 22px; }
-.calc .verdict { font-size: 14px; }
+.calc .val span { display: block; font-size: 16px; color: var(--ink-soft); }
+.calc .val b { font-family: var(--f-mono); font-size: 26.4px; }
+.calc .verdict { font-size: 16.8px; }
 .calc .verdict b.bad { color: var(--redpen); } .calc .verdict b.good { color: var(--hit); }
 .scroll { overflow-x: auto; }
-table.cmp { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13.5px; }
+table.cmp { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 16.2px; }
 .cmp th, .cmp td { border-bottom: 1px solid var(--rule); padding: 8px; text-align: left; vertical-align: top; }
-.cmp thead th { font-family: var(--f-display); font-size: 14px; border-bottom: 2px solid var(--ink); }
+.cmp thead th { font-family: var(--f-display); font-size: 16.8px; border-bottom: 2px solid var(--ink); }
 .cmp thead th.pf { color: var(--hit); }
 .cmp td.pf { background: var(--hit-bg); }
 .cmp td.dim { font-weight: 700; white-space: nowrap; }
-.cmp td.dim em { display: block; font-style: normal; font-weight: 500; font-size: 12px; color: var(--accent); }
-.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-soft); margin-bottom: 8px; cursor: pointer; }
+.cmp td.dim em { display: block; font-style: normal; font-weight: 500; font-size: 16px; color: var(--accent); }
+.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 16.2px; color: var(--ink-soft); margin-bottom: 8px; cursor: pointer; }
 .sortgame { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 12px; }
-.sortgame h3 { font-size: 15px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
-.sortgame h3 small { font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+.sortgame h3 { font-size: 18.0px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sortgame h3 small { font-family: var(--f-mono); font-size: 16px; color: var(--ink-soft); font-weight: 400; }
 .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; margin-top: 10px; }
 .item { border: 1px solid var(--rule); border-radius: 8px; padding: 9px 11px; display: grid; gap: 6px; min-width: 0; }
 .item.right { border-color: var(--hit); background: var(--hit-bg); }
 .item.wrong { border-color: var(--redpen); background: var(--miss-bg); }
-.item .name { font-weight: 500; font-size: 14px; }
+.item .name { font-weight: 500; font-size: 16.8px; }
 .item .acts { display: flex; gap: 6px; }
-.item .acts button { flex: 1; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; font-size: 13.5px; padding: 6px 0; }
-.item .why { font-size: 12.5px; }
+.item .acts button { flex: 1; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; font-size: 16.2px; padding: 6px 0; }
+.item .why { font-size: 16px; }
 .item .why b.r { color: var(--hit); } .item .why b.w { color: var(--redpen); }
 
 /* ---------- 口試練習 ---------- */
 .pbar { display: grid; gap: 10px; margin: 16px 0 12px; }
 .pfilter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.pfilter select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 10px; font-size: 14px; min-height: 38px; max-width: 100%; }
+.pfilter select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 10px; font-size: 16.8px; min-height: 38px; max-width: 100%; }
 .pfilter select#qsel { flex: 1 1 200px; min-width: 0; }
 .progress { display: flex; gap: 3px; flex-wrap: wrap; }
 .progress i { width: 12px; height: 12px; border-radius: 3px; background: var(--rule); }
@@ -271,168 +272,226 @@ table.cmp { border-collapse: collapse; width: 100%; min-width: 560px; font-size:
 .progress i.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
 .grid2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
 @media (min-width: 980px) { .grid2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .sticky { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 60px); } }
-.qhead { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); }
-.qhead .num { font-family: var(--f-mono); font-weight: 600; color: var(--accent); font-size: 14px; }
+.qhead { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 16px; color: var(--ink-soft); }
+.qhead .num { font-family: var(--f-mono); font-weight: 600; color: var(--accent); font-size: 16.8px; }
 .qhead .type { border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; }
-.qtext { font-family: var(--f-display); font-size: 18px; font-weight: 600; margin: 6px 0 12px; line-height: 1.6; }
+.qtext { font-family: var(--f-display); font-size: 21.6px; font-weight: 600; margin: 6px 0 12px; line-height: 1.6; }
 .hintbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
 .kwhint { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.kwhint span { font-size: 13px; padding: 1px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
-.answer { width: 100%; min-height: 238px; resize: vertical; border: 1px solid var(--rule); border-radius: 6px; padding: 0 12px; font-family: var(--f-hand); font-size: 17px; line-height: 34px;
+.kwhint span { font-size: 16px; padding: 1px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.answer { width: 100%; min-height: 238px; resize: vertical; border: 1px solid var(--rule); border-radius: 6px; padding: 0 12px; font-family: var(--f-hand); font-size: 20.4px; line-height: 34px;
   background-color: var(--sheet); background-image: linear-gradient(transparent 33px, var(--rule) 33px); background-size: 100% 34px; background-attachment: local; }
 .answer::placeholder { color: var(--ink-soft); }
-.samplenote { font-size: 13px; color: var(--partial); margin: 0 0 6px; }
+.samplenote { font-size: 16px; color: var(--partial); margin: 0 0 6px; }
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
-.timer { font-family: var(--f-mono); font-size: 14px; }
+.timer { font-family: var(--f-mono); font-size: 16.8px; }
 .spacer { flex: 1; }
-.tip { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0; }
+.tip { font-size: 16px; color: var(--ink-soft); margin: 10px 0 0; }
 .empty { color: var(--ink-soft); text-align: center; padding: 36px 10px; }
-.stale { font-size: 13px; color: var(--partial); background: var(--partial-bg); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px; }
+.stale { font-size: 16px; color: var(--partial); background: var(--partial-bg); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px; }
 .score { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: center; padding-bottom: 14px; border-bottom: 1px dashed var(--rule); }
-.score .big { grid-row: span 2; font-family: var(--f-mono); font-size: 42px; font-weight: 600; line-height: 1; color: var(--redpen); }
-.score .big small { font-size: 15px; color: var(--ink-soft); }
-.bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 46px; gap: 8px; align-items: center; font-size: 12.5px; }
+.score .big { grid-row: span 2; font-family: var(--f-mono); font-size: 50.4px; font-weight: 600; line-height: 1; color: var(--redpen); }
+.score .big small { font-size: 18.0px; color: var(--ink-soft); }
+.bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 46px; gap: 8px; align-items: center; font-size: 16px; }
 .track { height: 8px; background: var(--rule); border-radius: 4px; overflow: hidden; }
 .track i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
 .bar .pt { font-family: var(--f-mono); text-align: right; }
-.secttl { font-family: var(--f-display); font-size: 15px; margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.secttl small { font-family: var(--f-body); font-weight: 400; color: var(--ink-soft); font-size: 12.5px; }
+.secttl { font-family: var(--f-display); font-size: 18.0px; margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.secttl small { font-family: var(--f-body); font-weight: 400; color: var(--ink-soft); font-size: 16px; }
 .kwlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.kwlist li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; }
-.pill { font-size: 12px; font-weight: 700; text-align: center; padding: 1px 0; border-radius: 4px; }
+.kwlist li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 16.8px; }
+.pill { font-size: 16px; font-weight: 700; text-align: center; padding: 1px 0; border-radius: 4px; }
 .pill.hit { color: var(--hit); background: var(--hit-bg); }
 .pill.partial { color: var(--partial); background: var(--partial-bg); }
 .pill.miss { color: var(--redpen); background: var(--miss-bg); }
-.kwlist .lack { display: block; font-size: 12.5px; color: var(--redpen); }
-.advice { margin: 0; padding-left: 20px; font-size: 14px; display: grid; gap: 4px; }
+.kwlist .lack { display: block; font-size: 16px; color: var(--redpen); }
+.advice { margin: 0; padding-left: 20px; font-size: 16.8px; display: grid; gap: 4px; }
 .advice li::marker { color: var(--redpen); }
-.marked { white-space: pre-wrap; font-size: 15px; line-height: 1.95; border-left: 3px solid var(--rule); padding-left: 12px; margin: 0; overflow-wrap: anywhere; }
-.marked.hand { font-family: var(--f-hand); font-size: 16px; }
+.marked { white-space: pre-wrap; font-size: 18.0px; line-height: 1.95; border-left: 3px solid var(--rule); padding-left: 12px; margin: 0; overflow-wrap: anywhere; }
+.marked.hand { font-family: var(--f-hand); font-size: 19.2px; }
 .m-hit { background: var(--hl); color: inherit; border-radius: 2px; }
 .m-partial { background: none; color: inherit; text-decoration: underline wavy var(--partial); text-underline-offset: 4px; }
 .mm-hit { background: var(--hit-bg); color: inherit; border-radius: 2px; }
 .mm-partial { background: var(--partial-bg); color: inherit; border-radius: 2px; }
 .mm-miss { background: var(--miss-bg); color: var(--redpen); font-weight: 700; border-radius: 2px; }
-.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--ink-soft); font-weight: 400; font-family: var(--f-body); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 16px; color: var(--ink-soft); font-weight: 400; font-family: var(--f-body); }
 .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
 .chk { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.chk span { font-size: 12.5px; padding: 1px 9px; border-radius: 4px; border: 1px solid var(--rule); }
+.chk span { font-size: 16px; padding: 1px 9px; border-radius: 4px; border: 1px solid var(--rule); }
 .chk .ok { color: var(--hit); border-color: var(--hit); }
 .chk .no { color: var(--redpen); border-color: var(--redpen); }
-.disclaim { font-size: 12px; color: var(--ink-soft); margin: 14px 0 0; }
+.disclaim { font-size: 16px; color: var(--ink-soft); margin: 14px 0 0; }
 
-/* ---------- 部落風：木框、按鈕、資源列 ---------- */
-.mast { display: grid; gap: 10px; background: linear-gradient(var(--wood), var(--wood-dark)); border: 3px solid var(--outline); border-radius: 14px; padding: 12px 14px;
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, .22), 0 4px 0 rgba(0, 0, 0, .25); color: #FFF6E0; }
-.mastrow { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 20px; }
-.mast .eyebrow { color: #F3DDB5; }
-.mast h1, .gtitle { font-family: var(--f-game); font-weight: 900; color: #FFFFFF; letter-spacing: .02em;
-  text-shadow: 0 3px 0 var(--outline), 2px 0 0 var(--outline), -2px 0 0 var(--outline), 0 -2px 0 var(--outline); }
-.mast .rules span { border: 1.5px solid var(--outline); background: #FFF6E0; color: #33261A; }
-.mast .rules b { color: #2C78C2; }
-.resbar { display: flex; flex-wrap: wrap; gap: 6px; }
-.res { display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, .38); border-radius: 999px; padding: 2px 11px 2px 2px; font-weight: 700; font-size: 13.5px; color: #FFFFFF; font-variant-numeric: tabular-nums; }
-.res svg { width: 24px; height: 24px; flex: none; }
-.btn { border: 2px solid var(--outline); border-radius: 10px; font-weight: 700; min-height: 40px; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .16); }
-.btn:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .16); }
-.btn.primary, .btn.blue, .btn.red, .btn.gold { color: var(--on-btn); border-color: var(--outline); font-weight: 800; text-shadow: 0 1px 0 rgba(0, 0, 0, .4); }
-.btn.primary { background: var(--btn-green); }
-.btn.blue { background: var(--btn-blue); }
-.btn.red { background: var(--btn-red); }
-.btn.gold { background: var(--btn-gold); color: #33261A; text-shadow: none; }
-.btn.ghost { border-color: var(--accent); }
-.sheet { border: 2px solid var(--rule); box-shadow: 0 3px 0 var(--rule); }
-.tab { font-family: var(--f-game); font-weight: 700; }
-.tab[aria-selected="true"] { border: 2px solid var(--outline); border-bottom: none; font-weight: 900; }
-.tab .badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 4px; border-radius: 999px; background: var(--btn-red); color: #FFFFFF; font-family: var(--f-mono); font-size: 12px; border: 1.5px solid var(--outline); padding: 0 5px; }
-.stars { display: inline-flex; gap: 2px; vertical-align: middle; }
-.stars svg { width: 22px; height: 22px; display: block; }
-.stars.big svg { width: 50px; height: 50px; }
-.stars.mid svg { width: 28px; height: 28px; }
-
-/* ---------- 村莊 ---------- */
-.vtop { display: grid; gap: 12px; margin: 16px 0 12px; }
-@media (min-width: 900px) { .vtop { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; } }
-.vtop h2 { font-size: 18px; font-family: var(--f-game); font-weight: 900; }
-.xp { height: 14px; border: 2px solid var(--outline); border-radius: 999px; background: var(--paper); overflow: hidden; margin: 8px 0 4px; }
-.xp i { display: block; height: 100%; background: linear-gradient(#7BD24A, var(--btn-green)); transition: width .4s; }
-.suggest { margin-top: 10px; display: grid; gap: 6px; }
-.suggest .btn { justify-content: center; min-height: 48px; font-size: 16px; }
-.quests { display: grid; gap: 6px; margin-top: 8px; }
-.quest { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 14px; padding: 6px 8px; border-radius: 8px; background: var(--paper); }
-.quest .ck { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--outline); display: grid; place-items: center; font-weight: 900; background: var(--sheet); }
-.quest.done .ck { background: var(--btn-green); color: #FFFFFF; }
-.quest .rw { font-family: var(--f-mono); font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
-.streak { margin-top: 8px; font-size: 13.5px; color: var(--ink-soft); }
-.map { background-color: var(--grass); background-image: radial-gradient(var(--grass-dot) 2px, transparent 2.5px); background-size: 22px 22px;
-  border: 3px solid var(--outline); border-radius: 16px; padding: 14px 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 6px; box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .08); }
-@media (min-width: 640px) { .map { grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 18px; } }
-.bld { position: relative; background: none; border: 2px solid transparent; border-radius: 12px; padding: 2px 0 4px; display: grid; justify-items: center; gap: 3px; min-width: 0; }
-.bld[aria-pressed="true"] { background: rgba(255, 255, 255, .28); border-color: #FFFFFF; }
-.bld svg { width: 100%; max-width: 112px; height: auto; display: block; }
-.bld .nm { font-size: 12.5px; font-weight: 800; color: #FFFFFF; line-height: 1.25; text-align: center; padding: 0 2px;
-  text-shadow: 0 1px 0 var(--outline), 1px 0 0 var(--outline), -1px 0 0 var(--outline), 0 -1px 0 var(--outline); }
-.bld .st { font-size: 11px; font-weight: 800; padding: 0 7px; border-radius: 999px; border: 1.5px solid var(--outline); background: #FFF6E0; color: #33261A; white-space: nowrap; }
-.bld .st.new { background: #E4DCCB; color: #5F513F; }
-.bld .st.dmg { background: var(--btn-red); color: #FFFFFF; animation: pulse 1.2s ease-in-out infinite; }
-.bld .st.max { background: var(--gold); }
-@keyframes pulse { 50% { transform: scale(1.1); } }
-.bsheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; padding: 0 max(12px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
-.bsheet .in { max-width: 640px; margin: 0 auto; background: var(--sheet); border: 3px solid var(--outline); border-radius: 16px; padding: 12px 14px; box-shadow: 0 -4px 24px rgba(0, 0, 0, .3); display: grid; gap: 8px; }
-.bsheet .hd { display: flex; gap: 10px; align-items: flex-start; }
-.bsheet .hd svg.b { width: 64px; height: auto; flex: none; }
-.bsheet h3 { font-family: var(--f-game); font-weight: 900; font-size: 17px; }
-.bsheet p { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-soft); }
-.bsheet .acts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-.bsheet .acts .btn { justify-content: center; padding-inline: 6px; font-size: 14px; }
-.tbadge { display: inline-block; font-size: 12px; font-weight: 800; padding: 0 8px; border-radius: 999px; border: 1.5px solid var(--outline); background: #FFF6E0; color: #33261A; margin-left: 6px; vertical-align: 2px; }
-.tbadge.dmg { background: var(--btn-red); color: #FFFFFF; }
-.tbadge.new { background: #E4DCCB; color: #5F513F; }
-.toc a.dmg span { background: var(--btn-red); color: #FFFFFF; }
-
-/* ---------- 攻擊（背誦） ---------- */
-.battle { position: fixed; inset: 0; z-index: 30; background: rgba(20, 14, 8, .74); overflow-y: auto; display: grid; place-items: center;
-  padding: max(16px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
-.bcard { width: 100%; max-width: 580px; background: var(--sheet); border: 3px solid var(--outline); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 0 rgba(0, 0, 0, .35); }
-.bhead { background: linear-gradient(var(--wood), var(--wood-dark)); padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
-.bhead h2 { flex: 1; min-width: 0; font-size: 17px; }
-.bbody { padding: 16px; display: grid; gap: 12px; }
-.dbar { height: 16px; border: 2px solid var(--outline); border-radius: 999px; background: var(--paper); overflow: hidden; }
-.dbar i { display: block; height: 100%; background: linear-gradient(#FF8A3D, var(--btn-red)); transition: width .3s; }
-.bstep { font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; margin-top: 4px; }
-.bq { font-family: var(--f-display); font-weight: 700; font-size: 20px; line-height: 1.5; }
-.bprompt { font-size: 14.5px; color: var(--ink-soft); margin-top: -6px; }
-.bans { background: var(--paper); border-radius: 10px; border: 2px dashed var(--rule); padding: 12px 14px; font-size: 15.5px; line-height: 1.85; }
-.bans ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
-.bacts { display: flex; flex-wrap: wrap; gap: 8px; }
-.bacts .btn { flex: 1 1 140px; justify-content: center; min-height: 50px; font-size: 16px; }
-.bres { justify-items: center; text-align: center; }
-.bres .big { font-family: var(--f-game); font-weight: 900; font-size: 28px; line-height: 1.2; }
-.bres .reward { font-weight: 800; color: var(--elixir); }
-.bres .msg { margin: 0; font-size: 15px; }
-.bres .bans { text-align: left; width: 100%; }
-
-/* ---------- 對戰（口試） ---------- */
-.victory { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 10px; border: 2px solid var(--outline); background: linear-gradient(var(--wood), var(--wood-dark)); color: #FFF6E0; margin-bottom: 12px; font-size: 13.5px; }
-.victory .gtitle { font-size: 20px; }
-.victory .gold { font-weight: 800; color: var(--gold); }
-.progress i.s1 { background: var(--partial); }
-.progress i.s2 { background: var(--hit); }
-.progress i.s3 { background: var(--gold); box-shadow: inset 0 0 0 1.5px var(--outline); }
-
+/* ---------- 部落風：已改為閱讀版，舊資料保留相容 ---------- */
 /* ---------- 底部播放列 ---------- */
 .player { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--sheet); border-top: 1px solid var(--rule); box-shadow: 0 -6px 20px rgba(0, 0, 0, .08);
   padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
 .player .in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 8px; }
-.player .now { flex: 1; min-width: 0; font-size: 13px; }
-.player .now b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
-.player .now span { color: var(--ink-soft); font-family: var(--f-mono); font-size: 12px; }
+.player .now { flex: 1; min-width: 0; font-size: 16px; }
+.player .now b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16.8px; }
+.player .now span { color: var(--ink-soft); font-family: var(--f-mono); font-size: 16px; }
 .pbtn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule); background: var(--sheet); display: grid; place-items: center; padding: 0; flex: none; }
 .pbtn.main { background: var(--accent); border-color: var(--accent); color: var(--sheet); width: 46px; height: 46px; }
-.player select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 4px; font-family: var(--f-mono); font-size: 13px; }
-footer { margin-top: 30px; font-size: 12px; color: var(--ink-soft); }
+.player select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 4px; font-family: var(--f-mono); font-size: 16px; }
+footer { margin-top: 30px; font-size: 16px; color: var(--ink-soft); }
 @media (max-width: 420px) { .player .hide-sm { display: none; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+/* ---------- 閱讀版：舒適行長、心智圖與回想工具 ---------- */
+body { margin: 0; font-size: 18px; line-height: 1.85; }
+.wrap { max-width: 980px; padding-top: 32px; }
+h1, h2, h3 { overflow-wrap: anywhere; }
+button, a, input, select, textarea { touch-action: manipulation; }
+button, select, input:not([type=range]) { min-height: 44px; }
+input[type=range] { min-height: 40px; }
+button, select { max-width: 100%; }
+.presets button, .item .acts button { min-height: 44px; }
+.btn, .link { font-size: 16px; min-height: 44px; }
+.btn { line-height: 1.6; justify-content: center; box-shadow: none; font-weight: 500; }
+.btn.primary, .btn.blue, .btn.red, .btn.gold { color: var(--sheet); background: var(--accent); border-color: var(--accent); }
+.btn.red { color: var(--redpen); background: var(--sheet); border-color: var(--redpen); }
+.mast { display: block; padding: 16px 0 28px; border-bottom: 1px solid var(--rule); }
+.mastrow { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.eyebrow { letter-spacing: .05em; font-size: 16px; margin: 0; }
+.mast h1 { font-size: clamp(32px, 7vw, 48px); margin: 24px 0 12px; }
+.mast h1 span { display: block; color: var(--ink-soft); font-size: .65em; margin-top: 12px; font-weight: 600; }
+.mast-desc { max-width: 34em; font-size: 19px; }
+.mast-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--ink-soft); font-size: 16px; }
+.theme-control { display: flex; gap: 8px; align-items: center; font-size: 16px; }
+.theme-control select { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 4px 8px; font-size: 16px; }
+.tabs { padding-block: 8px 0; margin-top: 0; gap: 0; }
+.tab { font-size: 17px; padding: 14px 4px; border: 0; border-radius: 0; margin: 0; }
+.tab[aria-selected=true] { background: transparent; color: var(--accent); border: 0; border-bottom: 3px solid var(--accent); }
+.notes-top { grid-template-columns: 1fr; margin-top: 28px; gap: 16px; }
+.sheet { padding: 24px; border-radius: 14px; box-shadow: none; }
+.notes-top > .sheet:first-child { background: transparent; border: 0; padding: 0; }
+.notes-top h2 { font-size: 24px !important; }
+.howto { font-size: 18px; gap: 6px; margin-block: 16px 24px; }
+.toc { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-top: 20px; }
+.toc a { font-size: 16px; min-height: 48px; padding: 10px; border-radius: 8px; background: var(--sheet); align-items: flex-start; }
+.toc a span { font-size: 16px; flex: none; }
+.voicebox { margin-bottom: 16px; }
+.voicebox .hint, .voicebox .warn, .voicebox .row { font-size: 16px; }
+.voicebox select { font-size: 16px; }
+.reading-search { display: grid; gap: 6px; margin-top: 24px; }
+.reading-search label { font-weight: 700; font-size: 16px; }
+.reading-search input { width: 100%; min-width: 0; font-size: 18px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 14px; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 16px; }
+.topics { gap: 32px; }
+.topic { padding: 32px; scroll-margin-top: 88px; }
+.thead { gap: 16px; }
+.tno { font-size: 26px; line-height: 1.4; }
+.tmod { font-size: 16px; letter-spacing: 0; }
+.thead h2 { font-size: 26px; margin-top: 8px; }
+.study-status { display: inline-block; margin-left: 8px; font-size: 16px; color: var(--accent); }
+.tacts { gap: 8px; margin-block: 20px 28px; }
+.open { font-size: 20px; line-height: 1.9; padding: 20px; margin-bottom: 28px; }
+.open .tag { font-size: 16px; margin-bottom: 8px; letter-spacing: .04em; }
+.reading-label { font-family: var(--f-body); font-size: 18px; margin: 28px 0 16px; }
+.pts { gap: 28px; }
+.pts > div { padding-left: 16px; }
+.pts dt { font-size: 19px; }
+.pts dd { font-size: 18px; margin-top: 8px; line-height: 1.95; }
+.traps { margin-top: 28px; padding: 16px; }
+.traps b { font-size: 17px; }
+.traps ul { font-size: 18px; gap: 10px; }
+.concept-map { margin: 28px 0; padding: 20px; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper); }
+.concept-map figcaption { font-size: 16px; color: var(--ink-soft); margin-bottom: 16px; }
+.map-root { border-radius: 8px; padding: 12px; background: var(--accent-soft); color: var(--accent); font-size: 20px; font-weight: 700; text-align: center; }
+.map-branches { display: grid; gap: 12px; padding: 20px 0 0 16px; border-left: 2px solid var(--rule); margin-left: 20px; }
+.map-node { display: flex; align-items: baseline; gap: 12px; position: relative; padding: 10px 12px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; font-size: 17px; }
+.map-node::before { content: ''; position: absolute; width: 16px; border-top: 2px solid var(--rule); left: -18px; top: 24px; }
+.map-node span { color: var(--accent); font-family: var(--f-mono); flex: none; }
+.match-tool { margin-top: 28px; border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+summary { cursor: pointer; min-height: 44px; font-size: 18px; font-weight: 700; }
+.match-prompt { font-size: 18px; }
+.match-options { display: grid; gap: 8px; }
+.match-options .btn { text-align: left; justify-content: flex-start; padding: 12px; }
+.match-result { padding: 16px; margin-top: 16px; background: var(--accent-soft); border-radius: 8px; font-size: 18px; }
+.review-page { margin-top: 32px; }
+.section-intro h2 { font-size: 28px; margin-top: 12px; }
+.section-intro p { max-width: 36em; }
+.reading-path { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-block: 24px; }
+.reading-path > div { display: grid; gap: 8px; background: var(--accent-soft); padding: 16px; border-radius: 12px; }
+.reading-path span { color: var(--accent); font-family: var(--f-mono); font-size: 24px; }
+.reading-path b { font-size: 18px; }
+.review-list { display: grid; gap: 16px; }
+.review-list .meta { margin-top: 0; }
+.review-list h3 { font-size: 22px; }
+.review-list .tacts { margin-bottom: 0; }
+.battle { position: fixed; inset: 0; z-index: 30; overflow-y: auto; background: var(--paper); padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+.bcard { width: 100%; max-width: 680px; margin: 24px auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: 14px; }
+.bhead { padding: 16px; display: flex; gap: 8px; align-items: flex-start; border-bottom: 1px solid var(--rule); }
+.bhead h2 { flex: 1; font-size: 22px; }
+.bbody { padding: 24px; display: grid; gap: 20px; }
+.bq { font-size: 24px; font-weight: 700; }
+.bprompt, .bans { font-size: 19px; }
+.bans { background: var(--accent-soft); padding: 16px; border-radius: 8px; }
+.bans ul { margin: 0; padding-left: 20px; }
+.bacts { display: flex; flex-wrap: wrap; gap: 12px; }
+.bacts .btn { flex: 1 1 120px; min-height: 48px; font-size: 18px; }
+.bstep { font-size: 16px; color: var(--ink-soft); }
+.bres .big { font-size: 28px; font-weight: 700; }
+.dbar { height: 6px; background: var(--rule); border-radius: 4px; overflow: hidden; }
+.dbar i { display: block; height: 100%; background: var(--accent); }
+.note, .meta, .tip, .disclaim, footer, .secttl small, .legend { font-size: 16px; }
+.pbar { margin-top: 24px; }
+.pfilter select { font-size: 16px; min-width: 0; }
+.qtext { font-size: 23px; }
+.answer { font-size: 20px; line-height: 38px; background-image: none; padding-block: 8px; }
+.marked, .marked.hand { font-family: var(--f-body); font-size: 18px; }
+.score { display: flex; flex-direction: column; gap: 16px; }
+.bar { grid-template-columns: minmax(0,1fr) 60px; font-size: 16px; }
+.bar > span:first-child { grid-column: 1 / -1; }
+.kwlist li { grid-template-columns: 80px minmax(0,1fr); font-size: 18px; }
+.pill, .kwlist .lack, .chk span { font-size: 16px; }
+.advice, .secttl { font-size: 18px; }
+.fig .sbar { grid-template-columns: 24px minmax(0,1fr) 72px; }
+.fig .rbar { grid-template-columns: 110px minmax(0,1fr); }
+.fig .rbar .tr { height: auto; min-height: 28px; }
+.fig .rbar .tr i { white-space: normal; min-width: 78px; }
+.fig .targets { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.fig .target { font-size: 17px; }
+.fig .target small { font-size: 16px; }
+.fig .field input { font-size: 20px; min-width: 0; width: 100%; }
+.fig .stairs { height: auto; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.fig .stair { height: auto !important; padding: 12px 4px; border-bottom: 1px solid var(--rule); font-size: 18px; }
+.fig .stair small { font-size: 16px; overflow-wrap: anywhere; }
+.fig .oldrow { margin-top: 12px; flex-wrap: wrap; font-size: 16px; }
+.fig .oldrow span { flex: 1 1 25%; }
+.fig .chart { min-width: 540px; }
+.chart-scroll { overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid var(--rule); border-radius: 8px; }
+.chart-hint { font-size: 16px; color: var(--ink-soft); margin: 8px 0; }
+.fig .decrow { grid-template-columns: minmax(0,1fr); }
+.fig .flow .arr { display: none; }
+.player .in { flex-wrap: wrap; max-width: 948px; }
+.player .now { flex: 1 1 100%; }
+.player .now b, .player .now span, .player select { font-size: 16px; }
+.player .pbtn { width: 44px; height: 44px; }
+.player .pbtn.main { width: 46px; height: 46px; }
+@media (max-width: 600px) {
+  .wrap { padding-top: 16px; }
+  .sheet, .topic { padding: 20px 16px; }
+  .toc { grid-template-columns: minmax(0,1fr); }
+  .mast h1 { margin-top: 20px; }
+  .tno { font-size: 24px; }
+  .thead { gap: 10px; }
+  .thead h2 { font-size: 24px; }
+  .open { padding: 16px; }
+  .concept-map { padding: 12px; }
+  .map-branches { margin-left: 8px; }
+  .reading-path { grid-template-columns: 1fr; gap: 8px; }
+  .reading-path > div { display: flex; align-items: center; gap: 16px; padding: 12px 16px; }
+  .pfilter { flex-wrap: wrap; }
+  .pfilter select { flex: 1; }
+  .facts { grid-template-columns: minmax(0,1fr); gap: 4px; }
+  .facts dd { margin: 0 0 12px; }
+  .fig .tl, .fig .factors, .fig .kgrid, .fig .shifts { grid-template-columns: minmax(0,1fr); }
+  .fig .flow { flex-direction: column; }
+  .fig .flow .box { flex: auto; }
+  .bcard { margin-top: 0; }
+  .bbody { padding: 20px 16px; }
+}
+
 </style>
 </head>
 <body>
@@ -1497,7 +1556,7 @@ function SkewFig() {
   const lines = [['Mo 眾數', st.mode, T + 10, '2 0', 'var(--ink)'], ['Md 中位數', st.median, T + 28, '6 3', 'var(--ink)'], ['M 平均數', st.mean, T + 46, '2 3', 'var(--redpen)']];
   return html`<div className="chartrow">
     <div>
-      <svg className="chart" viewBox=${`0 0 ${W} ${H}`} role="img" aria-label=${info.name + '的分數分布圖'}>
+      <p className="chart-hint">圖表可左右滑動，拖動下方滑桿觀察變化。</p><div className="chart-scroll"><svg className="chart" viewBox=${`0 0 ${W} ${H}`} role="img" aria-label=${info.name + '的分數分布圖'}>
         <path d=${path + `L${X(100)},${B}L${X(0)},${B}Z`} fill="var(--curve-fill)" stroke="none"></path>
         <path d=${path} fill="none" stroke="var(--curve)" strokeWidth="2.5"></path>
         <line x1=${X(0)} x2=${X(100)} y1=${B} y2=${B} stroke="var(--ink-soft)" strokeWidth="1"></line>
@@ -1509,7 +1568,7 @@ function SkewFig() {
         </g>`)}
         ${kind === 'left' && html`<text x=${X(1)} y=${B - 10} style=${{ fill: 'var(--redpen)', fontWeight: 700 }}>← 長尾巴在左</text>`}
         ${kind === 'right' && html`<text x=${X(99)} y=${B - 10} textAnchor="end" style=${{ fill: 'var(--redpen)', fontWeight: 700 }}>長尾巴在右 →</text>`}
-      </svg>
+      </svg></div>
       <div className="presets" role="group" aria-label="快速切換">
         <button aria-pressed=${kind === 'left'} onClick=${() => setS(-0.8)}>題目太簡單</button>
         <button aria-pressed=${kind === 'normal'} onClick=${() => setS(0)}>難度適中</button>
@@ -1583,7 +1642,7 @@ function NormalFig() {
     </div>
     <div className="chartrow">
       <div>
-        <svg ref=${svgRef} className="chart" viewBox=${`0 0 ${W} 284`} role="img" aria-label="常態分配曲線與分數對照"
+        <p className="chart-hint">圖表可左右滑動；下方欄位可直接換算分數。</p><div className="chart-scroll"><svg ref=${svgRef} className="chart" viewBox=${`0 0 ${W} 284`} role="img" aria-label="常態分配曲線與分數對照"
           onPointerDown=${e => { drag.current = true; e.currentTarget.setPointerCapture(e.pointerId); fromEvent(e); }}
           onPointerMove=${e => { if (drag.current) fromEvent(e); }}
           onPointerUp=${() => { drag.current = false; }} onPointerCancel=${() => { drag.current = false; }}>
@@ -1591,18 +1650,18 @@ function NormalFig() {
           ${shade && html`<path d=${shade} fill="var(--shade)"></path>`}
           ${[-3, -1, 0, 1, 3].map(v => html`<line key=${v} x1=${X(v)} x2=${X(v)} y1=${Y(phi(v))} y2=${B} stroke="var(--rule)" strokeWidth=${v === 0 ? 1.5 : 1}></line>`)}
           ${[-2, 2].map(v => html`<line key=${'c' + v} x1=${X(v)} x2=${X(v)} y1=${T - 8} y2=${B} stroke="var(--redpen)" strokeDasharray="4 3" strokeWidth="1"></line>`)}
-          <text x=${X(-2) + 4} y=${T - 14} style=${{ fill: 'var(--redpen)', fontSize: '11px' }}>IQ≤70 資源班</text>
-          <text x=${X(2) - 4} y=${T - 14} textAnchor="end" style=${{ fill: 'var(--redpen)', fontSize: '11px' }}>IQ≥130 資優班</text>
-          ${bands.map(([a, b, lab]) => { const mid = (a + b) / 2; const inside = Math.abs(mid) < 2; return html`<text key=${a} x=${X(mid)} y=${inside ? B - 10 : Y(phi(mid)) - 8} textAnchor="middle" className="mono" style=${{ fontSize: '10.5px', fill: 'var(--ink)' }}>${lab}</text>`; })}
+          <text x=${X(-2) + 4} y=${T - 14} style=${{ fill: 'var(--redpen)', fontSize: '15px' }}>IQ≤70 資源班</text>
+          <text x=${X(2) - 4} y=${T + 6} textAnchor="end" style=${{ fill: 'var(--redpen)', fontSize: '15px' }}>IQ≥130 資優班</text>
+          ${bands.map(([a, b, lab]) => { const mid = (a + b) / 2; const inside = Math.abs(mid) < 2; return html`<text key=${a} x=${X(mid)} y=${inside ? B - 10 : Y(phi(mid)) - 8} textAnchor="middle" className="mono" style=${{ fontSize: '14px', fill: 'var(--ink)' }}>${lab}</text>`; })}
           <path d=${curve} fill="none" stroke="var(--curve)" strokeWidth="2.5"></path>
           <line x1=${X(-3.5)} x2=${X(3.5)} y1=${B} y2=${B} stroke="var(--ink-soft)"></line>
           ${rows.map(([name, ticks], ri) => html`<g key=${name}>
-            <text x=${4} y=${B + 22 + ri * 22} style=${{ fill: 'var(--ink)', fontWeight: 700, fontSize: '12px' }}>${name}</text>
-            ${ticks.map(([v, lab]) => html`<text key=${v} x=${X(v)} y=${B + 22 + ri * 22} textAnchor="middle" className="mono" style=${{ fontSize: '11.5px' }}>${lab}</text>`)}
+            <text x=${4} y=${B + 22 + ri * 22} style=${{ fill: 'var(--ink)', fontWeight: 700, fontSize: '15px' }}>${name}</text>
+            ${ticks.map(([v, lab]) => html`<text key=${v} x=${X(v)} y=${B + 22 + ri * 22} textAnchor="middle" className="mono" style=${{ fontSize: '14px' }}>${lab}</text>`)}
           </g>`)}
           <line x1=${X(z)} x2=${X(z)} y1=${Y(phi(z))} y2=${B + 92} stroke="var(--redpen)" strokeWidth="2"></line>
           <circle cx=${X(z)} cy=${Y(phi(z))} r="9" fill="var(--sheet)" stroke="var(--redpen)" strokeWidth="2.5" style=${{ cursor: 'ew-resize' }}></circle>
-        </svg>
+        </svg></div>
         <label htmlFor="zrange" className="meta">拖動曲線上的紅點，或用這條滑桿</label>
         <input id="zrange" type="range" min="-3.5" max="3.5" step="0.01" value=${z} onInput=${e => { setZ(+e.target.value); setNote(''); }} onChange=${e => { setZ(+e.target.value); setNote(''); }} />
       </div>
@@ -1651,12 +1710,12 @@ const FIGS = {
 
 /* ---------- 村莊：建築名稱與間隔複習 ---------- */
 const SHORT = {
-  process: '四階評量所', reference: '參照雙塔', standard: '標準化工坊', perform: '表現兵營', relval: '信效靶場',
-  validity: '效度三塔', reliability: '信度礦場', skew: '偏態山丘', normal: '常態鐘樓', item: '試題實驗室',
-  bloom: 'Bloom 階梯塔', trend: '趨勢瞭望台', performance: '實作工坊', portfolio: '檔案館', observe: '觀察哨',
+  process: '評量四類', reference: '兩種參照', standard: '測驗編製', perform: '表現測驗', relval: '信度與效度',
+  validity: '效度分類', reliability: '信度分類', skew: '偏態分布', normal: '常態換算', item: '試題分析',
+  bloom: '教育目標', trend: '評量趨勢', performance: '實作評量', portfolio: '檔案評量', observe: '觀察工具',
 };
 TOPICS.forEach(t => { t.short = SHORT[t.id]; });
-// 3 星建好後，第 1、3、7、14 天會受損，要再打 3 星修復
+// 舊 stage 保留為間隔複習階段；不刪除舊版資源與作答資料。
 const INTERVALS = [0, 1, 3, 7, 14];
 const MAX_LV = 4;
 const fmtDate = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1664,184 +1723,38 @@ const today = () => fmtDate(new Date());
 const addDays = (s, n) => { const [y, m, d] = s.split('-').map(Number); return fmtDate(new Date(y, m - 1, d + n)); };
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
 const mdText = s => s ? `${+s.slice(5, 7)}/${+s.slice(8, 10)}` : '';
-const scoreStars = s => s >= 90 ? 3 : s >= 80 ? 2 : s >= 50 ? 1 : 0;
-
-function useGame() {
-  const [village, setVillage] = useState(() => {
-    const v = load('village', null); if (v) return v;
-    // 舊版「我背熟了」直接當成 Lv.1
-    const k = load('known', {}); const out = {}; const t = today();
-    Object.keys(k).forEach(id => { if (k[id]) out[id] = { stage: 1, due: addDays(t, 1), best: 3 }; });
-    return out;
-  });
-  const [res, setRes] = useState(() => load('res', { gold: 0, elixir: 0 }));
-  const [daily, setDaily] = useState(() => load('daily', null));
-  const [streak, setStreak] = useState(() => load('streak', { last: null, n: 0 }));
-  const [qstars, setQstars] = useState(() => load('qstars', {}));
-  useEffect(() => save('village', village), [village]);
-  useEffect(() => save('res', res), [res]);
-  useEffect(() => save('daily', daily), [daily]);
-  useEffect(() => save('streak', streak), [streak]);
-  useEffect(() => save('qstars', qstars), [qstars]);
-
-  const t = today();
-  const fresh = () => ({ date: t, attacks: 0, repairs: 0, battles: 0, claimed: {} });
-  const day = daily && daily.date === t ? daily : fresh();
+const studyLabel = st => st.kind === 'new' ? '尚未完成回想' : st.kind === 'dmg' ? '待複習' : '已熟悉';
+function initialProgress() {
+  const saved = load('village', null);
+  if (saved) return saved;
+  const known = load('known', {}), out = {};
+  Object.keys(known).forEach(id => { if (known[id]) out[id] = { stage: 1, due: addDays(today(), 1), best: 3 }; });
+  return out;
+}
+function useStudy() {
+  const [village, setVillage] = useState(initialProgress);
+  // 只在原本有舊版 known 或有 village 時保留等值資料；不清空任何其他鍵。
+  useEffect(() => { if (Object.keys(village).length) save('village', village); }, [village]);
+  const qstars = load('qstars', {});
   const status = id => {
-    const b = village[id];
-    if (!b || !b.stage) return { stage: 0, kind: 'new' };
-    if (b.due && t >= b.due) return { stage: b.stage, kind: 'dmg', due: b.due };
-    return { stage: b.stage, kind: 'ok', due: b.due, left: daysBetween(t, b.due) };
+    const v = village[id];
+    if (!v) return { stage: 0, kind: 'new' };
+    if (v.needsReview || (v.due && today() >= v.due)) return { ...v, kind: 'dmg' };
+    return { ...v, kind: v.stage ? 'ok' : 'new' };
   };
-  const damagedN = TOPICS.filter(x => status(x.id).kind === 'dmg').length;
-  const builtN = TOPICS.filter(x => status(x.id).stage > 0).length;
-  const repairGoal = Math.min(2, damagedN + day.repairs);
-  const quests = [
-    { id: 'attack', label: '攻擊 3 次（背誦 3 個主題）', cur: Math.min(day.attacks, 3), goal: 3, reward: 100 },
-    repairGoal ? { id: 'repair', label: `修好 ${repairGoal} 棟受損建築`, cur: Math.min(day.repairs, repairGoal), goal: repairGoal, reward: 150 }
-      : { id: 'repair', label: '修好受損建築（今天沒有受損）', cur: 0, goal: 0, reward: 0 },
-    { id: 'battle', label: '口試對戰 2 場', cur: Math.min(day.battles, 2), goal: 2, reward: 100 },
-  ];
-  // 任務完成自動領金幣
-  useEffect(() => {
-    const done = quests.filter(q => q.reward && q.cur >= q.goal && !day.claimed[q.id]);
-    if (!done.length) return;
-    setRes(r => ({ ...r, gold: r.gold + done.reduce((a, q) => a + q.reward, 0) }));
-    setDaily({ ...day, claimed: { ...day.claimed, ...Object.fromEntries(done.map(q => [q.id, true])) } });
-  }, [day.attacks, day.repairs, day.battles]);
-
-  const bump = keys => setDaily(d => { const b = d && d.date === t ? d : fresh(); const n = { ...b }; keys.forEach(k => { n[k] = b[k] + 1; }); return n; });
-  const touchStreak = () => setStreak(s => s.last === t ? s : { last: t, n: s.last === addDays(t, -1) ? s.n + 1 : 1 });
-
-  function recordAttack(id, stars, pct) {
-    const st = status(id);
-    const prev = village[id] || { stage: 0, due: null, best: 0 };
-    let kind = 'none', next = null;
-    if (stars === 3) {
-      if (st.stage === 0) { next = { stage: 1, due: addDays(t, INTERVALS[1]) }; kind = 'built'; }
-      else if (st.kind === 'dmg') { const s = Math.min(MAX_LV, st.stage + 1); next = { stage: s, due: addDays(t, INTERVALS[s]) }; kind = 'repaired'; }
-      else kind = 'early';
-    }
-    setVillage(v => ({ ...v, [id]: { ...prev, ...(next || {}), best: Math.max(prev.best || 0, stars) } }));
-    const elixir = stars * 50 + Math.round(pct / 2);
-    setRes(r => ({ ...r, elixir: r.elixir + elixir }));
-    bump(kind === 'repaired' ? ['attacks', 'repairs'] : ['attacks']);
-    touchStreak();
-    return { kind, prevKind: st.kind, elixir, stage: next ? next.stage : st.stage, due: next ? next.due : st.due };
+  function recordRecall(id, complete) {
+    const prev = village[id] || { stage: 0, best: 0 }, st = status(id);
+    const stage = complete ? (st.kind === 'ok' ? prev.stage : Math.min(MAX_LV, (prev.stage || 0) + 1)) : (prev.stage || 0);
+    const due = complete ? (st.kind === 'ok' ? prev.due : addDays(today(), INTERVALS[stage])) : today();
+    setVillage(v => ({ ...v, [id]: { ...prev, stage, due, best: Math.max(prev.best || 0, complete ? 3 : 0), needsReview: !complete, lastReview: today() } }));
+    return { due, complete };
   }
-  function recordBattle(qid, score) {
-    const stars = scoreStars(score); const prevBest = qstars[qid] || 0;
-    const newBest = stars > prevBest;
-    const gold = stars * 30 + (newBest ? (stars - prevBest) * 50 : 0);
-    if (newBest) setQstars(q => ({ ...q, [qid]: stars }));
-    setRes(r => ({ ...r, gold: r.gold + gold }));
-    bump(['battles']); touchStreak();
-    return { stars, gold, newBest };
-  }
-  const streakN = streak.last === t || streak.last === addDays(t, -1) ? streak.n : 0;
-  return { status, res, day, quests, streakN, th: 1 + builtN, builtN, damagedN, qstars, recordAttack, recordBattle };
+  return { status, qstars, recordRecall, builtN: TOPICS.filter(t => status(t.id).stage > 0).length,
+    dueN: TOPICS.filter(t => status(t.id).kind === 'dmg').length };
 }
 
-/* ---------- 遊戲圖示 ---------- */
-const O = 'var(--outline)';
-const StarSvg = ({ on }) => html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.4l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.2l-5.9 3.3 1.3-6.6L2.5 9.3l6.6-.8z" fill=${on ? 'var(--gold)' : 'rgba(0,0,0,.25)'} stroke=${O} strokeWidth="1.6" strokeLinejoin="round"></path></svg>`;
-const Stars = ({ n, size }) => html`<span className=${'stars' + (size ? ' ' + size : '')} role="img" aria-label=${n + ' 顆星'}>${[0, 1, 2].map(k => html`<${StarSvg} key=${k} on=${k < n} />`)}</span>`;
-const CoinI = () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="var(--gold)" stroke=${O} strokeWidth="2"></circle><circle cx="12" cy="12" r="5.5" fill="none" stroke="#B9851A" strokeWidth="2"></circle></svg>`;
-const ElixirI = () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5C9 7.5 5.5 11 5.5 15a6.5 6.5 0 0 0 13 0c0-4-3.5-7.5-6.5-12.5z" fill="var(--elixir)" stroke=${O} strokeWidth="2" strokeLinejoin="round"></path><ellipse cx="9.5" cy="14" rx="1.6" ry="2.6" fill="rgba(255,255,255,.55)"></ellipse></svg>`;
-const HallI = () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="var(--btn-blue)" stroke=${O} strokeWidth="2"></circle><path d="M6.5 17.5v-6l5.5-4 5.5 4v6z" fill="#FFF6E0" stroke=${O} strokeWidth="1.6" strokeLinejoin="round"></path><rect x="10.5" y="13" width="3" height="4.5" fill=${O}></rect></svg>`;
-const FlameI = () => html`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="var(--btn-red)" stroke=${O} strokeWidth="2"></circle><path d="M12 5.5c1 3 4 4.5 4 8a4 4 0 0 1-8 0c0-1.8 1-3 2-4 0 1.5.6 2.3 1.4 2.6C11 10.3 11 8 12 5.5z" fill="#FFD25A" stroke=${O} strokeWidth="1.4" strokeLinejoin="round"></path></svg>`;
-
-/* ---------- 建築（原創 SVG，等級越高材質越好） ---------- */
-const ROOF = ['#D9412B', '#2F8FDB', '#8E5BD0', '#E07A1F', '#2E9E8F'];
-const WALL = ['#D8CBB0', '#C98B4E', '#B9C0C8', '#B9C0C8', '#F2C14E'];
-function Building({ i, stage, dmg, className }) {
-  const v = i % 5;
-  const roof = stage === 0 ? '#B3A891' : ROOF[(i * 2) % 5];
-  const wall = WALL[stage];
-  const P = { stroke: O, strokeWidth: 2.5, strokeLinejoin: 'round' };
-  const dark = '#3A2A18', door = '#6B3E19';
-  const body = [
-    () => html`<rect ...${P} x="34" y="30" width="32" height="54" fill=${wall}></rect><path ...${P} d="M27 33L50 5L73 33Z" fill=${roof}></path><rect x="45" y="44" width="10" height="13" rx="5" fill=${dark}></rect><rect ...${P} x="43" y="67" width="14" height="17" fill=${door}></rect>`,
-    () => html`<rect ...${P} x="18" y="48" width="64" height="36" fill=${wall}></rect><path ...${P} d="M9 52L50 19L91 52Z" fill=${roof}></path><rect ...${P} x="42" y="62" width="16" height="22" fill=${door}></rect><rect x="24" y="58" width="12" height="10" fill=${dark}></rect><rect x="64" y="58" width="12" height="10" fill=${dark}></rect>`,
-    () => html`<line x1="50" y1="8" x2="50" y2="32" stroke=${O} strokeWidth="2.5"></line><path ...${P} d="M50 8L68 13L50 19Z" fill=${roof}></path><rect ...${P} x="16" y="40" width="68" height="44" fill=${wall}></rect>${[16, 34, 52, 70].map(x => html`<rect key=${x} ...${P} x=${x} y="30" width="14" height="12" fill=${wall}></rect>`)}<path ...${P} d="M40 84V68a10 10 0 0 1 20 0V84Z" fill=${door}></path>`,
-    () => html`<rect ...${P} x="22" y="50" width="56" height="34" fill=${wall}></rect><path ...${P} d="M17 52A33 31 0 0 1 83 52Z" fill=${roof}></path><circle cx="50" cy="12" r="4" fill=${roof} stroke=${O} strokeWidth="2"></circle><rect ...${P} x="43" y="64" width="14" height="20" fill=${door}></rect>`,
-    () => html`<rect ...${P} x="16" y="38" width="26" height="46" fill=${wall}></rect><rect ...${P} x="58" y="38" width="26" height="46" fill=${wall}></rect><rect ...${P} x="40" y="56" width="20" height="14" fill=${wall}></rect><path ...${P} d="M12 40L29 14L46 40Z" fill=${roof}></path><path ...${P} d="M54 40L71 14L88 40Z" fill=${roof}></path><rect x="24" y="52" width="10" height="12" rx="5" fill=${dark}></rect><rect x="66" y="52" width="10" height="12" rx="5" fill=${dark}></rect>`,
-  ][v];
-  return html`<svg className=${className} viewBox="0 0 100 96" aria-hidden="true">
-    <ellipse cx="50" cy="87" rx="40" ry="7" fill="rgba(0,0,0,.24)"></ellipse>
-    <g opacity=${stage === 0 ? 0.55 : 1} strokeDasharray=${stage === 0 ? '5 3' : undefined}>${body()}</g>
-    ${stage === 0 && html`<path d="M22 84L40 50M40 84L22 50M60 84L78 50M78 84L60 50" stroke="#8A6A3F" strokeWidth="3" strokeLinecap="round"></path>`}
-    ${stage >= 3 && html`<path ...${P} d="M80 9l2.4 5 5.4.6-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.6z" fill="var(--gold)"></path>`}
-    ${dmg && html`<g><path d="M38 60l6 6-4 6 6 6" fill="none" stroke=${O} strokeWidth="2.5" strokeLinecap="round"></path><circle cx="62" cy="20" r="9" fill="rgba(80,80,80,.8)"></circle><circle cx="72" cy="11" r="7" fill="rgba(80,80,80,.7)"></circle><circle cx="54" cy="10" r="6" fill="rgba(80,80,80,.6)"></circle></g>`}
-    ${stage > 0 && html`<g><circle cx="15" cy="16" r="11" fill="var(--btn-blue)" stroke=${O} strokeWidth="2.5"></circle><text x="15" y="21" textAnchor="middle" style=${{ fill: '#FFFFFF', fontWeight: 900, fontSize: '14px', fontFamily: 'var(--f-mono)' }}>${stage}</text></g>`}
-  </svg>`;
-}
-function statusText(st) {
-  if (st.kind === 'new') return { cls: 'new', tag: '未建造', long: '還沒建造：攻擊拿到 3 星，就能建好 Lv.1。' };
-  if (st.kind === 'dmg') return { cls: 'dmg', tag: '受損！', long: `受損中（${mdText(st.due)} 該複習了）：再打一次 3 星就能修好並升級。` };
-  const max = st.stage >= MAX_LV;
-  return { cls: max ? 'max' : '', tag: `${st.left} 天後複習`, long: `Lv.${st.stage}${max ? '（最高級）' : ''}完好，${mdText(st.due)} 會受損，到時回來修。提早攻擊可以練習，但不會升級。` };
-}
-
-/* ---------- 村莊頁 ---------- */
-function Village({ game, onAttack, onRead, onPractice, playerOn }) {
-  const [sel, setSel] = useState(null);
-  const next = TOPICS.find(t => game.status(t.id).kind === 'dmg') || TOPICS.find(t => game.status(t.id).kind === 'new');
-  const selT = TOPICS.find(t => t.id === sel);
-  const selI = TOPICS.indexOf(selT);
-  useEffect(() => {
-    if (!sel) return;
-    const f = e => { if (e.key === 'Escape') setSel(null); };
-    addEventListener('keydown', f); return () => removeEventListener('keydown', f);
-  }, [sel]);
-  return html`<div style=${{ paddingBottom: sel ? '190px' : 0 }}>
-    <div className="vtop">
-      <section className="sheet">
-        <h2>大本營 Lv.${game.th}</h2>
-        <div className="xp" role="progressbar" aria-valuemin="0" aria-valuemax=${TOPICS.length} aria-valuenow=${game.builtN} aria-label="已建造建築"><i style=${{ width: (game.builtN / TOPICS.length * 100) + '%' }}></i></div>
-        <span className="meta">已建造 ${game.builtN}／${TOPICS.length} 棟・受損 ${game.damagedN} 棟</span>
-        <ol className="howto">
-          <li>點建築 →「攻擊」：答案先遮住，自己開口講，再揭曉答案，誠實判定有沒有講對。</li>
-          <li>開場句、所有重點、易錯陷阱都講對＝3 星，才能建造或修復。</li>
-          <li>建好的建築過 1、3、7、14 天會受損，回來再打 3 星修好，每修一次升一級。</li>
-        </ol>
-        ${next ? html`<div className="suggest"><button className="btn red" onClick=${() => onAttack(next.id)}>攻擊${game.status(next.id).kind === 'dmg' ? '受損的' : '下一棟'}：${next.short}</button></div>`
-          : html`<p className="meta">全部建築都完好！可以到「對戰」打口試題，或等建築受損再來修。</p>`}
-      </section>
-      <section className="sheet">
-        <h2>今日任務</h2>
-        <div className="quests">${game.quests.map(q => { const done = q.goal > 0 ? q.cur >= q.goal : true; return html`<div key=${q.id} className=${'quest' + (done ? ' done' : '')}>
-          <span className="ck" aria-hidden="true">${done ? '✓' : ''}</span><span>${q.label}</span>
-          <span className="rw">${q.goal > 0 ? `${q.cur}/${q.goal}` : ''}${q.reward ? `・${game.day.claimed[q.id] ? '已領' : '+' + q.reward + ' 金'}` : ''}</span></div>`; })}</div>
-        <p className="streak">連續練習 ${game.streakN} 天。每天攻擊或對戰至少一次就能延續。</p>
-      </section>
-    </div>
-    <div className="map" aria-label="評量部落地圖">
-      ${TOPICS.map((t, i) => { const st = game.status(t.id); const tx = statusText(st);
-        return html`<button key=${t.id} className="bld" aria-pressed=${sel === t.id} aria-label=${`${t.short}，${tx.tag}${st.stage ? '，Lv.' + st.stage : ''}`} onClick=${() => setSel(sel === t.id ? null : t.id)}>
-          <${Building} i=${i} stage=${st.stage} dmg=${st.kind === 'dmg'} />
-          <span className="nm">${t.short}</span><span className=${'st ' + tx.cls}>${tx.tag}</span>
-        </button>`; })}
-    </div>
-    ${selT && html`<div className="bsheet" style=${{ bottom: playerOn ? '72px' : 0 }} role="dialog" aria-label=${selT.short}>
-      <div className="in">
-        <div className="hd">
-          <${Building} className="b" i=${selI} stage=${game.status(sel).stage} dmg=${game.status(sel).kind === 'dmg'} />
-          <div style=${{ flex: 1, minWidth: 0 }}><h3>${selT.short}</h3><div className="meta">${String(selI + 1).padStart(2, '0')}・${selT.title}</div><p>${statusText(game.status(sel)).long}</p></div>
-          <button className="pbtn" aria-label="關閉" onClick=${() => setSel(null)}><${StopI} /></button>
-        </div>
-        <div className="acts">
-          <button className="btn red" onClick=${() => onAttack(sel)}>攻擊背誦</button>
-          <button className="btn blue" onClick=${() => onRead(sel)}>看圖鑑</button>
-          <button className="btn" onClick=${() => onPractice(sel)}>口試題</button>
-        </div>
-      </div>
-    </div>`}
-  </div>`;
-}
-
-/* ---------- 攻擊：逐關遮住答案，自己講完再揭曉 ---------- */
-function Attack({ id, game, tts, onClose, onRead }) {
+/* ---------- 主動回想：答案先遮住，再逐步自評 ---------- */
+function RecallSession({ id, game, tts, onClose, onRead }) {
   const t = TOPICS.find(x => x.id === id);
   const steps = useMemo(() => [
     { sec: 0, title: '口試開場句', prompt: '開口說出這個主題的口試開場句。', ans: t.open },
@@ -1853,13 +1766,21 @@ function Attack({ id, game, tts, onClose, onRead }) {
   const [marks, setMarks] = useState([]);
   const [result, setResult] = useState(null);
   const btnRef = useRef(null);
-  const starsOf = m => [0, 1, 2].filter(sec => steps.every((s, k) => s.sec !== sec || m[k] === true)).length;
-  const pctOf = m => Math.round(m.filter(Boolean).length / steps.length * 100);
+  const pctOf = m => Math.round(m.length / steps.length * 100);
   useEffect(() => {
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
-    const f = e => { if (e.key === 'Escape') onClose(); };
+    const origin = document.activeElement;
+    const f = e => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'Tab') {
+        const nodes = [...document.querySelectorAll('.battle button:not(:disabled), .battle a[href]')];
+        const first = nodes[0], last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
+    };
     addEventListener('keydown', f);
-    return () => { document.body.style.overflow = prev; removeEventListener('keydown', f); };
+    return () => { document.body.style.overflow = prev; removeEventListener('keydown', f); if (origin?.isConnected) origin.focus(); };
   }, []);
   useEffect(() => { if (btnRef.current) btnRef.current.focus(); }, [i, shown, result]);
   const step = steps[i];
@@ -1869,36 +1790,29 @@ function Attack({ id, game, tts, onClose, onRead }) {
     if (tts.player) tts.stop();
     const m = [...marks]; m[i] = ok; setMarks(m);
     if (i + 1 < steps.length) { setI(i + 1); setShown(false); return; }
-    const stars = starsOf(m), pct = pctOf(m);
-    setResult({ stars, pct, wrong: steps.filter((s, k) => !m[k]), ...game.recordAttack(id, stars, pct) });
+    const complete = m.length === steps.length && m.every(Boolean);
+    setResult({ wrong: steps.filter((s, k) => !m[k]), ...game.recordRecall(id, complete) });
   };
   const restart = () => { setI(0); setShown(false); setMarks([]); setResult(null); };
-  let msg = '';
-  if (result) {
-    const r = result;
-    if (r.kind === 'built') msg = `建造完成！${t.short} 升到 Lv.1。${mdText(r.due)} 會受損，記得回來修。`;
-    else if (r.kind === 'repaired') msg = `修復完成！升到 Lv.${r.stage}${r.stage >= MAX_LV ? '（最高級）' : ''}。下次複習：${mdText(r.due)}。`;
-    else if (r.kind === 'early') msg = `建築本來就完好，這次算練習，等級不變。下次複習：${mdText(r.due)}。`;
-    else if (r.prevKind === 'new') msg = `還差 ${3 - r.stars} 星才能建造。看一下沒講對的地方，再打一次。`;
-    else if (r.prevKind === 'dmg') msg = '還沒修好：要拿到 3 星才能修復。';
-    else msg = `這次沒拿到 3 星，等級不變；${mdText(r.due)} 前再練一次比較保險。`;
-  }
-  const head = result ? '戰鬥結束' : '攻擊';
+  const msg = !result ? '' : result.complete
+    ? `這次全部講對了。下次複習：${mdText(result.due)}。`
+    : '先看需要補強的內容，再遮住答案說一次。這個主題已加入待複習。';
+  const head = result ? '回想結果' : '回想練習';
   return html`<div className="battle" role="dialog" aria-modal="true" aria-label=${`${head}：${t.short}`}>
     <div className="bcard">
       <div className="bhead">
         <h2 className="gtitle">${head}：${t.short}</h2>
-        <${Stars} n=${result ? result.stars : starsOf(marks)} />
-        <button className="pbtn" aria-label="撤退，回村莊" onClick=${onClose}><${StopI} /></button>
+
+        <button className="pbtn" aria-label="關閉回想練習" onClick=${onClose}><${StopI} /></button>
       </div>
       ${!result ? html`<div className="bbody">
         <div>
           <div className="dbar"><i style=${{ width: pctOf(marks) + '%' }}></i></div>
-          <div className="bstep">第 ${i + 1}／${steps.length} 關・摧毀率 ${pctOf(marks)}%・★開場句 ★全部重點 ★易錯陷阱</div>
+          <div className="bstep">第 ${i + 1}／${steps.length} 項・開場句 → 重點 → 易錯提醒</div>
         </div>
         <div className="bq">${step.title}</div>
         <div className="bprompt">${step.prompt}</div>
-        ${!shown ? html`<button ref=${btnRef} className="btn gold" style=${{ minHeight: '54px', justifyContent: 'center', fontSize: '17px' }} onClick=${() => setShown(true)}>我講完了，揭曉答案</button>`
+        ${!shown ? html`<button ref=${btnRef} className="btn primary" style=${{ minHeight: '54px', justifyContent: 'center', fontSize: '17px' }} onClick=${() => setShown(true)}>我講完了，揭曉答案</button>`
           : html`<div className="bans">${Array.isArray(step.ans) ? html`<ul>${step.ans.map(x => html`<li key=${x}>${x}</li>`)}</ul>` : step.ans}</div>
             <div className="bacts">
               <button ref=${btnRef} className="btn primary" onClick=${() => judge(true)}>講對了</button>
@@ -1907,24 +1821,59 @@ function Attack({ id, game, tts, onClose, onRead }) {
             <div><button className="link" disabled=${!tts.supported} onClick=${() => speaking ? tts.pause() : tts.play([{ key: 'atk', label: `${t.short}：${step.title}`, text: ansText(step.ans) }])}>${speaking ? '停止朗讀' : '聽答案'}</button></div>`}
         <p className="note" style=${{ margin: 0 }}>判定要誠實：關鍵字和意思都講到才算「講對了」。</p>
       </div>` : html`<div className="bbody bres">
-        <${Stars} n=${result.stars} size="big" />
-        <div className="big">${result.stars === 3 ? '3 星大勝！' : result.stars > 0 ? `${result.stars} 星` : '攻擊失敗'}</div>
-        <div>摧毀率 ${result.pct}%・<span className="reward">+${result.elixir} 聖水</span></div>
+
+        <div className="big">${result.complete ? '這次都記住了' : '再複習一下'}</div>
+        <div>能獨立說出的項目：${marks.filter(Boolean).length}／${steps.length}</div>
         <p className="msg">${msg}</p>
         ${result.wrong.length > 0 && html`<div className="bans"><b>沒講對的地方</b><ul>${result.wrong.map(s => html`<li key=${s.title}><b>${s.title}</b>：${ansText(s.ans).replace(/\n/g, ' ')}</li>`)}</ul></div>`}
         <div className="bacts" style=${{ width: '100%' }}>
-          <button ref=${btnRef} className="btn primary" onClick=${restart}>再打一次</button>
-          <button className="btn blue" onClick=${() => onRead(id)}>看圖鑑</button>
-          <button className="btn" onClick=${onClose}>回村莊</button>
+          <button ref=${btnRef} className="btn primary" onClick=${restart}>再回想一次</button>
+          <button className="btn blue" onClick=${() => onRead(id)}>回到閱讀</button>
+          <button className="btn" onClick=${onClose}>結束練習</button>
         </div>
       </div>`}
     </div>
   </div>`;
 }
 
+/* ---------- 概念圖與配對：內容直接取自既有主題 ---------- */
+function ConceptMap({ t }) {
+  return html`<figure className="concept-map" aria-label=${t.title + '重點心智圖'}>
+    <figcaption>把重點連起來</figcaption><div className="map-root">${t.title}</div>
+    <div className="map-branches">${t.pts.map(([h], i) => html`<div className="map-node" key=${h}><span>${String(i + 1).padStart(2, '0')}</span><b>${h}</b></div>`)}</div>
+    <p className="note">看著這些關鍵詞，試著用自己的話串成一段說明。</p>
+  </figure>`;
+}
+function ConceptMatch({ t }) {
+  const [i, setI] = useState(0), [choice, setChoice] = useState(null);
+  const options = useMemo(() => t.pts.map((p, n) => n).sort((a, b) => ((a + 2) % t.pts.length) - ((b + 2) % t.pts.length)), [t.id]);
+  return html`<details className="match-tool"><summary>概念配對｜這段說明是哪個概念？</summary>
+    <p className="note">直接用課堂重點練習，選完會顯示對照答案。</p>
+    <p className="match-prompt">${t.pts[i][1]}</p>
+    <div className="match-options">${options.map(n => html`<button className=${'btn ' + (choice === n ? 'on' : '')} key=${n} disabled=${choice !== null} onClick=${() => setChoice(n)}>${t.pts[n][0]}</button>`)}</div>
+    ${choice !== null && html`<div className="match-result" role="status"><b>${choice === i ? '配對正確' : '再辨認一次'}：${t.pts[i][0]}</b><p>${t.pts[i][1]}</p>
+      <button className="btn" onClick=${() => { setI((i + 1) % t.pts.length); setChoice(null); }}>下一個概念</button></div>`}
+  </details>`;
+}
+function Review({ game, onAttack, onRead }) {
+  const [filter, setFilter] = useState('due');
+  const items = TOPICS.filter(t => filter === 'all' || (filter === 'due' ? game.status(t.id).kind === 'dmg' : game.status(t.id).kind === 'new'));
+  return html`<section className="review-page">
+    <div className="section-intro"><p className="eyebrow">先回想，再看答案</p><h2>把讀過的，變成說得出的。</h2><p>每個主題依序練開場句、重點與易錯提醒。全部能獨立說出後，安排下次複習。</p></div>
+    <div className="reading-path" aria-label="回想步驟">${[['01','遮住答案'],['02','自己說一遍'],['03','對照並補強']].map(([n,x]) => html`<div key=${n}><span>${n}</span><b>${x}</b></div>`)}</div>
+    <p className="note">已熟悉 ${game.builtN}／15 個主題，待複習 ${game.dueN} 個。複習間隔為 1、3、7、14 天；提早練習不延後原日期。</p>
+    <div className="filter-row" role="group" aria-label="回想主題篩選">${[['due','待複習'],['new','尚未完成'],['all','全部主題']].map(([v,l]) => html`<button className=${'btn ' + (filter === v ? 'on' : '')} aria-pressed=${filter === v} onClick=${() => setFilter(v)} key=${v}>${l}</button>`)}</div>
+    ${!items.length && html`<p className="sheet">${filter === 'due' ? '目前沒有到期的主題。可先選「尚未完成」，或從全部主題練習。' : '這個分類目前沒有主題，可以切換到全部主題。'}</p>`}
+    <div className="review-list">${items.map(t => { const st = game.status(t.id); return html`<article className="sheet" key=${t.id}><p className="meta">${studyLabel(st)}${st.due ? '・複習日期 ' + mdText(st.due) : ''}</p><h3>${t.title}</h3><div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想</button><button className="btn" onClick=${() => onRead(t.id)}>先讀重點</button></div></article>`; })}</div>
+  </section>`;
+}
+
 /* ---------- 圖鑑頁：15 個主題完整重點 ---------- */
 function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
   const items = useMemo(() => TOPICS.map((t, i) => ({ key: 'topic-' + t.id, label: `${String(i + 1).padStart(2, '0')} ${t.title}`, text: topicScript(t, i) })), []);
+  const [selected, setSelected] = useState('all');
+  const [query, setQuery] = useState('');
+  const [onlyDue, setOnlyDue] = useState(false);
   const cur = tts.currentKey;
   useEffect(() => {
     if (tts.player && tts.player.scroll && tts.player.playing && cur && cur.startsWith('topic-')) {
@@ -1933,6 +1882,7 @@ function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
   }, [cur]);
   useEffect(() => {
     if (!focus) return;
+    setSelected(focus); setQuery(''); setOnlyDue(false);
     const tm = setTimeout(() => { const el = document.getElementById('topic-' + focus); if (el) el.scrollIntoView({ block: 'start' }); clearFocus(); }, 30);
     return () => clearTimeout(tm);
   }, [focus]);
@@ -1940,19 +1890,21 @@ function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
   return html`<div>
     <div className="notes-top">
       <section className="sheet">
-        <h2 style=${{ fontSize: '17px' }}>圖鑑：15 個主題完整重點</h2>
+        <h2 style=${{ fontSize: '17px' }}>15 個主題，慢慢讀懂</h2>
         <ol className="howto">
-          <li>先在圖鑑看懂圖解，或按「朗讀」用聽的。</li>
-          <li>覺得記住了，就按「攻擊背誦」，不看答案自己講一遍。</li>
-          <li>拿到 3 星，村莊就會蓋好這棟建築。</li>
+          <li>看開場句掌握全貌，再搭配圖解讀重點。</li>
+          <li>讀完一小段，先用概念配對檢查理解。</li>
+          <li>按「回想練習」，遮住答案自己講一遍。</li>
         </ol>
         <div className="memobar">
           <button className=${'btn ' + (allPlaying ? 'on' : 'blue')} disabled=${!tts.supported} onClick=${() => allPlaying ? tts.pause() : tts.play(items, 0, 0, { scroll: true })}>
             ${allPlaying ? html`<${PauseI} />暫停` : html`<${Speaker} />連續播放全部`}</button>
         </div>
+        <div className="reading-search"><label htmlFor="topic-search">找一個想讀的概念</label><input id="topic-search" type="search" placeholder="搜尋主題、關鍵詞…" value=${query} onChange=${e => { setQuery(e.target.value); setSelected('all'); }} /></div>
+        <div className="filter-row"><button className="btn" onClick=${() => { setSelected('all'); setQuery(''); setOnlyDue(false); }}>看全部主題</button><button className=${'btn ' + (onlyDue ? 'on' : '')} aria-pressed=${onlyDue} onClick=${() => { setOnlyDue(v => !v); setSelected('all'); }}>只看待複習</button></div>
         <nav className="toc" aria-label="主題目錄">
           ${TOPICS.map((t, i) => { const st = game.status(t.id); return html`<a key=${t.id} href=${'#topic-' + t.id} className=${(st.kind === 'ok' ? 'ok ' : st.kind === 'dmg' ? 'dmg ' : '') + (cur === 'topic-' + t.id ? 'cur' : '')}
-            onClick=${e => { e.preventDefault(); const el = document.getElementById('topic-' + t.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}><span>${String(i + 1).padStart(2, '0')}</span>${t.title}</a>`; })}
+            onClick=${e => { e.preventDefault(); setSelected(t.id); setQuery(''); setOnlyDue(false); setTimeout(() => document.getElementById('topic-' + t.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); }}><span>${String(i + 1).padStart(2, '0')}</span>${t.title}</a>`; })}
         </nav>
       </section>
       <section className="sheet voicebox" aria-label="朗讀設定">
@@ -1972,22 +1924,25 @@ function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
         </div>`}
       </section>
     </div>
+    ${!TOPICS.some(t => (selected === 'all' || t.id === selected) && (!onlyDue || game.status(t.id).kind === 'dmg') && (!query.trim() || [t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) && html`<p className="sheet" role="status">沒有符合的主題。試試其他關鍵詞，或按「看全部主題」。</p>`}
     <div className="topics">
       ${TOPICS.map((t, i) => {
         const key = 'topic-' + t.id;
         const playing = cur === key && tts.player && tts.player.playing;
         const n = QUESTIONS.filter(q => inTopic(q, t.id)).length;
-        const st = game.status(t.id); const tx = statusText(st);
+        const st = game.status(t.id);
+        if ((selected !== 'all' && selected !== t.id) || (onlyDue && st.kind !== 'dmg') || (query.trim() && ![t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) return null;
         return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '') + (st.kind === 'ok' ? ' isknown' : '')} id=${key} key=${t.id}>
-          <header className="thead"><span className="tno">${String(i + 1).padStart(2, '0')}</span><div><div className="tmod">${t.mod}・${t.short}<span className=${'tbadge ' + tx.cls}>${st.stage ? `Lv.${st.stage}・` : ''}${tx.tag}</span></div><h2>${t.title}</h2></div></header>
+          <header className="thead"><span className="tno">${String(i + 1).padStart(2, '0')}</span><div><div className="tmod">${t.mod}<span className="study-status">${studyLabel(st)}</span></div><h2>${t.title}</h2></div></header>
           <div className="tacts">
             <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([items[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
-            <button className="btn red" onClick=${() => onAttack(t.id)}>攻擊背誦</button>
+            <button className="btn red" onClick=${() => onAttack(t.id)}>回想練習</button>
             <button className="btn" onClick=${() => onPractice(t.id)}>口試題（${n}）→</button>
           </div>
           <div className="open"><span className="tag">口試開場這樣講</span>${t.open}</div>
-          <div className="fig">${FIGS[t.fig]()}</div>
+          <h3 className="reading-label">看圖理解</h3><div className="fig">${FIGS[t.fig]()}</div><${ConceptMap} t=${t} /><h3 className="reading-label">拆開來讀</h3>
           <dl className="pts">${t.pts.map(([h, d]) => html`<div key=${h}><dt>${h}</dt><dd>${d}</dd></div>`)}</dl>
+          <${ConceptMatch} t=${t} />
           ${t.traps.length > 0 && html`<div className="traps"><b>易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
         </article>`;
       })}
@@ -2007,7 +1962,6 @@ function Practice({ tts, game, topic, setTopic }) {
   const [hints, setHints] = useState(false);
   const [sec, setSec] = useState(0);
   const [running, setRunning] = useState(false);
-  const [battle, setBattle] = useState({});
   const list = useMemo(() => QUESTIONS.filter(q => inTopic(q, topic)), [topic]);
   const q = list.find(x => x.id === qid) || list[0];
   const pos = list.indexOf(q);
@@ -2027,20 +1981,18 @@ function Practice({ tts, game, topic, setTopic }) {
   const setText = v => setDrafts(d => ({ ...d, [q.id]: v }));
   const doGrade = () => {
     const total = grade(q, text).total;
-    // 同一份回答重複批改不重複算對戰
-    if (graded[q.id] !== text && text.trim()) { const r = game.recordBattle(q.id, total); setBattle(b => ({ ...b, [q.id]: r })); }
     setGraded(g => ({ ...g, [q.id]: text })); setScores(s => ({ ...s, [q.id]: total })); setRunning(false);
   };
   const draw = () => {
     if (list.length < 2) return;
-    // 優先抽還沒拿 3 星的題目
-    const weak = list.filter(x => x.id !== q.id && !((game.qstars[x.id] || 0) >= 3));
+    // 優先抽需要補強的題目；舊版最佳紀錄仍計入。
+    const weak = list.filter(x => x.id !== q.id && !((scores[x.id] || 0) >= 90 || (game.qstars[x.id] || 0) >= 3));
     const pool = weak.length ? weak : list.filter(x => x.id !== q.id);
     go(pool[Math.floor(Math.random() * pool.length)].id);
   };
   const mmss = `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
   const charCount = text.replace(/\s/g, '').length;
-  const doneN = Object.keys(scores).length, goodN = QUESTIONS.filter(x => (game.qstars[x.id] || 0) >= 3).length;
+  const doneN = Object.keys(scores).length, goodN = QUESTIONS.filter(x => ((scores[x.id] || 0) >= 90 || (game.qstars[x.id] || 0) >= 3)).length;
   const qKey = 'q-' + q.id, mKey = 'm-' + q.id;
   const speaking = k => tts.currentKey === k && tts.player && tts.player.playing;
 
@@ -2072,8 +2024,8 @@ function Practice({ tts, game, topic, setTopic }) {
         <button className="btn" aria-label="下一題" disabled=${pos >= list.length - 1} onClick=${() => go(list[pos + 1].id)}>›</button>
       </div>
       <div>
-        <div className="progress" aria-label="練習進度">${list.map(x => html`<i key=${x.id} title=${x.id + '. ' + x.category} className=${(game.qstars[x.id] ? 's' + game.qstars[x.id] : scores[x.id] != null ? 'done' : '') + (x.id === q.id ? ' cur' : '')}></i>`)}</div>
-        <span className="meta">全部 ${QUESTIONS.length} 題：已練 ${doneN} 題，3 星 ${goodN} 題。50 分 1 星、80 分 2 星、90 分 3 星（金色方塊）。隨機抽題會優先抽還沒拿 3 星的題目。</span>
+        <div className="progress" aria-label="練習進度">${list.map(x => html`<i key=${x.id} title=${x.id + '. ' + x.category} className=${(scores[x.id] != null || game.qstars[x.id] ? 'done' : '') + (x.id === q.id ? ' cur' : '')}></i>`)}</div>
+        <span className="meta">全部 ${QUESTIONS.length} 題：已練 ${doneN} 題，曾達 90 分 ${goodN} 題。隨機抽題會優先抽需要補強的題目。</span>
       </div>
     </div>
     <div className="grid2">
@@ -2091,7 +2043,7 @@ function Practice({ tts, game, topic, setTopic }) {
         <textarea id="answer" className="answer" value=${text} onChange=${e => setText(e.target.value)}
           placeholder="先講關鍵字，再講定義，最後舉課堂例子……"></textarea>
         <div className="toolbar">
-          <button className="btn primary" onClick=${doGrade}>批改（開戰）</button>
+          <button className="btn primary" onClick=${doGrade}>檢查回答</button>
           <button className="btn" onClick=${() => setText('')}>清空</button>
           <span className="spacer"></span>
           <span className="meta">${charCount} 字</span>
@@ -2099,13 +2051,12 @@ function Practice({ tts, game, topic, setTopic }) {
           <button className="btn" onClick=${() => setRunning(r => !r)}>${running ? '暫停' : '計時'}</button>
           <button className="btn" onClick=${() => { setSec(0); setRunning(false); }}>歸零</button>
         </div>
-        <p className="tip">口說作答：iPhone、Android 點輸入框後按鍵盤上的麥克風；Mac 連按兩下 Fn 開啟聽寫。講完直接按「批改」，拿到星星和金幣。草稿只存在這台裝置。</p>
+        <p className="tip">口說作答：iPhone、Android 點輸入框後按鍵盤上的麥克風；Mac 連按兩下 Fn 開啟聽寫。講完按「檢查回答」，看看有沒有漏掉重點。草稿只存在這台裝置。</p>
       </section>
 
       <section className="sheet" aria-label="批改結果" aria-live="polite">
-        ${!result ? html`<div className="empty">講完按「批改」，這裡會用紅筆標出漏掉的關鍵字，並對照滿分範本。</div>` : html`<div>
-          ${stale && html`<div className="stale">回答已修改，按「批改」更新結果。</div>`}
-          ${battle[q.id] && !stale && html`<div className="victory"><span className="gtitle">${battle[q.id].stars ? '勝利！' : '戰敗'}</span><${Stars} n=${battle[q.id].stars} size="mid" /><span className="gold">+${battle[q.id].gold} 金幣</span>${battle[q.id].newBest && battle[q.id].stars > 0 && html`<span>新紀錄！</span>`}</div>`}
+        ${!result ? html`<div className="empty">講完按「檢查回答」，這裡會用紅筆標出漏掉的關鍵字，並對照滿分範本。</div>` : html`<div>
+          ${stale && html`<div className="stale">回答已修改，按「檢查回答」更新結果。</div>`}
           <div className="score">
             <div className="big">${result.total}<small> / 100</small></div>
             <div className="bar"><span>基本分・關鍵字</span><span className="track"><i style=${{ width: (result.base / 50 * 100) + '%' }}></i></span><span className="pt">${Math.round(result.base)}/50</span></div>
@@ -2159,46 +2110,37 @@ function Player({ tts }) {
 }
 
 function App() {
-  const TABS = ['village', 'notes', 'practice'];
-  const [tab, setTabRaw] = useState(() => { const h = (location.hash || '').slice(1); return TABS.includes(h) ? h : (TABS.includes(load('tab', 'village')) ? load('tab', 'village') : 'village'); });
-  const [topic, setTopic] = useState(() => load('ptopic', 'all'));
+  const TABS = ['notes', 'review', 'practice'];
+  const [tab, setTabRaw] = useState(() => { const h = (location.hash || '').slice(1); const old = load('tab', 'notes'); return TABS.includes(h) ? h : TABS.includes(old) ? old : 'notes'; });
+  const [topic, setTopic] = useState(() => { const p = load('ptopic', 'all'); return p === 'all' || TOPICS.some(t => t.id === p) ? p : 'all'; });
   const [attack, setAttack] = useState(null);
   const [focus, setFocus] = useState(null);
-  const tts = useTTS();
-  const game = useGame();
+  const [theme, setTheme] = useState(() => load('theme', 'system'));
+  const tts = useTTS(), game = useStudy();
   useEffect(() => save('tab', tab), [tab]);
   useEffect(() => save('ptopic', topic), [topic]);
-  const setTab = t => { setTabRaw(t); window.scrollTo({ top: 0 }); };
+  useEffect(() => { if (theme === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = theme; save('theme', theme); }, [theme]);
+  const setTab = t => { tts.stop(); setTabRaw(t); window.scrollTo({ top: 0 }); };
   const startAttack = id => { if (tts.player) tts.stop(); setAttack(id); };
   const closeAttack = () => { if (tts.player) tts.stop(); setAttack(null); };
   const read = id => { closeAttack(); setTab('notes'); setFocus(id); };
   const practice = id => { setTopic(id); setTab('practice'); };
-  return html`<div style=${{ paddingBottom: tts.player ? '84px' : 0 }}>
+  return html`<div style=${{ paddingBottom: tts.player ? '170px' : 0 }}>
     <header className="mast">
-      <div className="mastrow">
-        <div>
-          <div className="eyebrow">國小教育測驗與學習評量（114-3）・期中口試</div>
-          <h1>評量部落・口試特訓</h1>
-        </div>
-        <div className="resbar" aria-label="資源">
-          <span className="res"><${HallI} />大本營 Lv.${game.th}</span>
-          <span className="res"><${CoinI} />${game.res.gold}</span>
-          <span className="res"><${ElixirI} />${game.res.elixir}</span>
-          <span className="res"><${FlameI} />連續 ${game.streakN} 天</span>
-        </div>
-      </div>
-      <div className="rules"><span>期中考採 <b>口試</b></span><span>先講 <b>核心關鍵字</b> 拿基本分</span><span>再講 <b>定義＋生活實例</b> 拿滿分</span></div>
+      <div className="mastrow"><p className="eyebrow">國小教育測驗與學習評量・期中口試</p>
+        <label className="theme-control">外觀<select aria-label="外觀" value=${theme} onChange=${e => setTheme(e.target.value)}><option value="system">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select></label></div>
+      <h1>評量筆記<span>讀懂，再說出來。</span></h1>
+      <p className="mast-desc">一次讀懂一個概念，用圖解整理，再用自己的話說一遍。</p>
+      <div className="mast-meta"><span>15 個理論主題</span><span>46 題口試練習</span><span>${game.dueN} 個主題待複習</span></div>
     </header>
-    <div className="tabs" role="tablist">
-      <button className="tab" role="tab" aria-selected=${tab === 'village'} onClick=${() => setTab('village')}>村莊${game.damagedN > 0 ? html`<span className="badge" aria-label=${game.damagedN + ' 棟受損'}>${game.damagedN}</span>` : html`<small>${game.builtN}/15</small>`}</button>
-      <button className="tab" role="tab" aria-selected=${tab === 'notes'} onClick=${() => setTab('notes')}>圖鑑<small>15</small></button>
-      <button className="tab" role="tab" aria-selected=${tab === 'practice'} onClick=${() => setTab('practice')}>對戰<small>${QUESTIONS.length}</small></button>
-    </div>
-    ${tab === 'village' && html`<${Village} game=${game} onAttack=${startAttack} onRead=${read} onPractice=${practice} playerOn=${!!tts.player} />`}
+    <nav className="tabs" aria-label="學習分頁">
+      ${[['notes','主題閱讀'],['review','回想練習'],['practice','口試練習']].map(([v,l]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} key=${v} onClick=${() => setTab(v)}>${l}</button>`)}
+    </nav>
     ${tab === 'notes' && html`<${Notes} tts=${tts} game=${game} onPractice=${practice} onAttack=${startAttack} focus=${focus} clearFocus=${() => setFocus(null)} />`}
+    ${tab === 'review' && html`<${Review} game=${game} onAttack=${startAttack} onRead=${read} />`}
     ${tab === 'practice' && html`<${Practice} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} />`}
-    <footer>內容依課堂知識庫與題庫整理。建築與圖示為原創繪製；朗讀使用這台裝置內建的語音；村莊進度、資源與作答草稿只存在這台裝置。</footer>
-    ${attack && html`<${Attack} key=${attack} id=${attack} game=${game} tts=${tts} onClose=${closeAttack} onRead=${read} />`}
+    <footer>內容依課堂知識庫與題庫整理。朗讀使用裝置內建語音。熟悉程度、複習日期、答題紀錄與草稿只存在這個瀏覽器；舊版進度已接續保留。</footer>
+    ${attack && html`<${RecallSession} key=${attack} id=${attack} game=${game} tts=${tts} onClose=${closeAttack} onRead=${read} />`}
     <${Player} tts=${tts} />
   </div>`;
 }
