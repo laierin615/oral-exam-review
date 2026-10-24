@@ -1,0 +1,1814 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>測驗評量期中特訓</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* 版面概念：一份「答案卷」——手機單欄、試卷抬頭與頁籤黏在上方，背誦時答案先遮住，批改用紅筆與螢光筆，朗讀播放列固定在底部 */
+:root {
+  --paper: #F3F5F4;
+  --sheet: #FFFFFF;
+  --ink: #1C2433;
+  --ink-soft: #5A6476;
+  --rule: #DCE1E6;
+  --accent: #2B4C8C;
+  --accent-soft: #E3EAF7;
+  --redpen: #BF3A2E;
+  --hit: #2C7A57;
+  --partial: #A86F14;
+  --hl: #FFE27A;
+  --miss-bg: rgba(191, 58, 46, .12);
+  --partial-bg: rgba(168, 111, 20, .14);
+  --hit-bg: rgba(44, 122, 87, .13);
+  --curve: #2B4C8C;
+  --curve-fill: rgba(43, 76, 140, .14);
+  --shade: rgba(43, 76, 140, .38);
+  --f-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --f-hand: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", var(--f-body);
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13171D; --sheet: #1B2028; --ink: #E5E8ED; --ink-soft: #9AA4B4; --rule: #2E3541;
+    --accent: #93AEE9; --accent-soft: #233150; --redpen: #F07C6E; --hit: #6CCB9C; --partial: #E2B15C;
+    --hl: rgba(255, 214, 90, .30); --miss-bg: rgba(240, 124, 110, .16); --partial-bg: rgba(226, 177, 92, .16);
+    --hit-bg: rgba(108, 203, 156, .15); --curve: #93AEE9; --curve-fill: rgba(147, 174, 233, .14); --shade: rgba(147, 174, 233, .36);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13171D; --sheet: #1B2028; --ink: #E5E8ED; --ink-soft: #9AA4B4; --rule: #2E3541;
+  --accent: #93AEE9; --accent-soft: #233150; --redpen: #F07C6E; --hit: #6CCB9C; --partial: #E2B15C;
+  --hl: rgba(255, 214, 90, .30); --miss-bg: rgba(240, 124, 110, .16); --partial-bg: rgba(226, 177, 92, .16);
+  --hit-bg: rgba(108, 203, 156, .15); --curve: #93AEE9; --curve-fill: rgba(147, 174, 233, .14); --shade: rgba(147, 174, 233, .36);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.7; -webkit-text-size-adjust: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 18px 56px; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { opacity: .45; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.35; }
+.ico { width: 16px; height: 16px; flex: none; }
+
+.mast { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+.eyebrow { font-size: 12px; letter-spacing: .1em; color: var(--ink-soft); }
+.mast h1 { font-size: clamp(24px, 6vw, 34px); }
+.rules { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+.rules span { border: 1px solid var(--rule); background: var(--sheet); padding: 2px 10px; border-radius: 999px; }
+.rules b { color: var(--accent); }
+
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 8; background: var(--paper); display: flex; gap: 4px; margin-top: 14px; border-bottom: 1px solid var(--rule); padding-top: 6px; }
+.tab { flex: 1; max-width: 220px; border: 1px solid transparent; border-bottom: none; background: none; padding: 10px 14px; border-radius: 8px 8px 0 0; color: var(--ink-soft); font-weight: 500; margin-bottom: -1px; font-size: 15px; }
+.tab[aria-selected="true"] { background: var(--sheet); border-color: var(--rule); color: var(--ink); font-weight: 700; }
+.tab small { font-family: var(--f-mono); font-weight: 400; font-size: 12px; color: var(--ink-soft); margin-left: 4px; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 14px; font-size: 14px; min-height: 38px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--sheet); font-weight: 700; padding-inline: 18px; }
+.btn.ghost { border-color: var(--accent); color: var(--accent); }
+.btn.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.btn.known { background: var(--hit-bg); border-color: var(--hit); color: var(--hit); font-weight: 700; }
+.link { background: none; border: none; color: var(--accent); padding: 0; text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.meta { font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; min-width: 0; }
+
+/* ---------- 重點背誦 ---------- */
+.notes-top { display: grid; gap: 12px; margin: 16px 0; }
+@media (min-width: 900px) { .notes-top { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: start; } }
+.howto { margin: 6px 0 12px; padding-left: 20px; font-size: 14px; display: grid; gap: 2px; }
+.memobar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.toc a { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink); text-decoration: none; border: 1px solid var(--rule); background: var(--paper); padding: 4px 10px 4px 4px; border-radius: 999px; }
+.toc a span { font-family: var(--f-mono); font-size: 11.5px; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0 6px; }
+.toc a.ok span { background: var(--hit); color: var(--sheet); }
+.toc a.cur { border-color: var(--accent); }
+.voicebox h2 { font-size: 16px; }
+.voicebox .row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px; align-items: center; margin-top: 8px; font-size: 13.5px; }
+.voicebox select { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 6px 8px; font-size: 14px; }
+.voicebox .hint { font-size: 12.5px; color: var(--ink-soft); margin: 8px 0 0; }
+.voicebox .warn { font-size: 13px; color: var(--redpen); margin: 8px 0 0; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+
+.topics { display: grid; gap: 18px; }
+.topic { scroll-margin-top: calc(env(safe-area-inset-top, 0px) + 64px); }
+.topic.playing { box-shadow: 0 0 0 2px var(--accent); }
+.topic.isknown { border-color: var(--hit); }
+.thead { display: flex; gap: 12px; align-items: flex-start; }
+.tno { font-family: var(--f-mono); font-weight: 600; font-size: 22px; color: var(--accent); line-height: 1.2; }
+.isknown .tno { color: var(--hit); }
+.tmod { font-size: 12px; color: var(--ink-soft); letter-spacing: .06em; }
+.thead h2 { font-size: 20px; }
+.tacts { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.open { margin: 0 0 14px; padding: 12px 14px; background: var(--accent-soft); border-radius: 8px; font-family: var(--f-display); font-weight: 600; font-size: 16.5px; line-height: 1.7; }
+.open .tag { display: block; font-family: var(--f-body); font-size: 11.5px; font-weight: 700; letter-spacing: .12em; color: var(--accent); margin-bottom: 2px; }
+.fig { margin: 0 0 14px; }
+.pts { display: grid; gap: 10px; margin: 0; }
+.pts > div { border-left: 3px solid var(--rule); padding-left: 12px; }
+.pts dt { font-weight: 700; color: var(--ink); }
+.pts dd { margin: 2px 0 0; color: var(--ink); font-size: 14.5px; }
+.traps { margin-top: 14px; border: 1px dashed var(--redpen); border-radius: 8px; padding: 10px 12px; }
+.traps b { color: var(--redpen); font-size: 13px; letter-spacing: .1em; }
+.traps ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 3px; }
+.cover { position: relative; display: block; border: 1px dashed var(--accent); border-radius: 8px; background: var(--paper); cursor: pointer; min-height: 44px; overflow: hidden; }
+.cover .blur { display: block; filter: blur(7px); opacity: .55; user-select: none; pointer-events: none; padding: 4px 8px; max-height: 120px; overflow: hidden; }
+.cover .cap { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--accent); text-align: center; padding: 4px; }
+
+/* 圖解元件 */
+.tl { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.tl-step { border: 1px solid var(--rule); border-top: 4px solid var(--accent); border-radius: 8px; padding: 8px 10px; background: var(--sheet); font-size: 13px; min-width: 0; }
+.tl-step .when { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-soft); }
+.tl-step .nm { font-family: var(--f-display); font-weight: 700; font-size: 16px; }
+.tl-step .who { display: inline-block; margin-top: 4px; font-size: 11.5px; padding: 0 6px; border-radius: 4px; background: var(--partial-bg); color: var(--partial); font-weight: 700; }
+.tl-axis { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 12px; color: var(--ink-soft); }
+.tl-axis i { flex: 1; height: 2px; background: linear-gradient(90deg, var(--rule), var(--accent)); }
+.two { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 560px) { .two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.panel { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.panel h3 { font-size: 15px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.panel h3 small { font-family: var(--f-body); font-weight: 500; font-size: 12px; color: var(--accent); }
+.panel ul { margin: 6px 0 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 2px; }
+.sbars { display: grid; gap: 4px; margin-top: 8px; }
+.sbar { display: grid; grid-template-columns: 34px minmax(0, 1fr) 62px; gap: 6px; align-items: center; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sbar .tr { height: 12px; background: var(--paper); border-radius: 3px; position: relative; }
+.sbar .tr i { position: absolute; inset: 0 auto 0 0; background: var(--curve); border-radius: 3px; opacity: .75; }
+.sbar .tr i.fail { background: var(--redpen); }
+.sbar .tr .cut { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--redpen); }
+.sbar b { font-weight: 600; font-size: 12px; }
+.tree { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 560px) { .tree { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); } }
+.branch { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; min-width: 0; }
+.branch > .hd { background: var(--accent-soft); padding: 7px 10px; font-weight: 700; font-family: var(--f-display); }
+.branch > .hd small { display: block; font-family: var(--f-body); font-weight: 400; font-size: 12px; color: var(--ink-soft); }
+.leaf { padding: 7px 10px; border-top: 1px solid var(--rule); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.leaf .to { font-size: 12.5px; font-weight: 700; color: var(--hit); background: var(--hit-bg); padding: 0 7px; border-radius: 4px; }
+.targets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 640px) { .targets { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.target { border: 1px solid var(--rule); border-radius: 8px; padding: 8px; text-align: center; font-size: 13px; min-width: 0; }
+.target svg { width: 100%; max-width: 130px; height: auto; display: block; margin: 0 auto 4px; }
+.target.no { opacity: .55; }
+.target b { display: block; }
+.target small { color: var(--ink-soft); }
+.rbars { display: grid; gap: 6px; }
+.rbar { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 13px; }
+.rbar .tr { height: 18px; background: var(--paper); border-radius: 4px; overflow: hidden; }
+.rbar .tr i { display: flex; align-items: center; height: 100%; padding-left: 8px; font-style: normal; font-size: 11.5px; color: var(--sheet); background: var(--curve); font-weight: 700; white-space: nowrap; }
+.rbar .tr i.low { background: var(--redpen); }
+.factors { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+.factor { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.factor b { display: block; font-family: var(--f-display); font-size: 14.5px; }
+.stairs { display: flex; align-items: flex-end; gap: 4px; height: 150px; }
+.stair { flex: 1; min-width: 0; background: var(--accent-soft); border: 1px solid var(--rule); border-bottom: none; border-radius: 6px 6px 0 0; display: flex; flex-direction: column; align-items: center; padding-top: 6px; font-weight: 700; font-size: 14px; }
+.stair small { font-weight: 400; font-size: 10.5px; color: var(--ink-soft); }
+.stair.top { background: var(--accent); color: var(--sheet); }
+.stair.top small { color: var(--sheet); }
+.oldrow { display: flex; gap: 4px; border-top: 2px solid var(--ink); padding-top: 4px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+.oldrow span { flex: 1; min-width: 0; }
+.oldrow .chg { color: var(--redpen); font-weight: 700; }
+.kgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
+.kcell { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.kcell b { display: block; font-family: var(--f-display); font-size: 14.5px; }
+.kcell .eg { color: var(--accent); font-weight: 700; }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; }
+.flow .box { flex: 1 1 120px; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; min-width: 0; }
+.flow .box b { display: block; font-family: var(--f-display); font-size: 15px; }
+.flow .box.mid { background: var(--accent-soft); border-color: var(--accent); }
+.flow .arr { align-self: center; color: var(--accent); font-weight: 700; }
+.shifts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-top: 10px; }
+.shift { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.shift .ft { font-weight: 700; }
+.shift .ft s { color: var(--ink-soft); font-weight: 400; }
+.dec { display: grid; gap: 6px; }
+.decrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; font-size: 13.5px; }
+.decrow .ans { font-weight: 700; color: var(--hit); background: var(--hit-bg); border-radius: 4px; padding: 1px 8px; white-space: nowrap; }
+.decrow small { display: block; color: var(--ink-soft); font-size: 12px; }
+
+/* 互動：偏態、常態、試題分析、檔案評量 */
+.chartrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (min-width: 900px) { .chartrow { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+svg.chart { width: 100%; height: auto; display: block; touch-action: none; }
+svg text { font-family: var(--f-body); fill: var(--ink-soft); font-size: 13px; }
+svg .mono { font-family: var(--f-mono); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.presets button { border: 1px solid var(--rule); background: var(--sheet); border-radius: 999px; padding: 4px 12px; font-size: 13px; min-height: 32px; }
+.presets button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.rangecap { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 14px; margin: 0; }
+.facts dt { color: var(--ink-soft); }
+.facts dd { margin: 0; font-weight: 500; }
+.facts dd.key { font-family: var(--f-display); font-size: 17px; font-weight: 700; color: var(--accent); }
+.facts .mono { font-family: var(--f-mono); }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.field label { display: block; font-size: 12px; color: var(--ink-soft); letter-spacing: .04em; }
+.field input { width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 5px 8px; font-family: var(--f-mono); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.field small { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-soft); }
+.readout { margin-top: 12px; font-size: 14px; line-height: 1.75; }
+.readout .alert { display: block; margin-top: 6px; color: var(--redpen); font-weight: 700; }
+.note { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+.calc { display: grid; gap: 10px; }
+.calc .vals { display: flex; flex-wrap: wrap; gap: 8px; }
+.calc .val { border: 1px solid var(--rule); border-radius: 8px; padding: 6px 12px; min-width: 120px; }
+.calc .val span { display: block; font-size: 12px; color: var(--ink-soft); }
+.calc .val b { font-family: var(--f-mono); font-size: 22px; }
+.calc .verdict { font-size: 14px; }
+.calc .verdict b.bad { color: var(--redpen); } .calc .verdict b.good { color: var(--hit); }
+.scroll { overflow-x: auto; }
+table.cmp { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 13.5px; }
+.cmp th, .cmp td { border-bottom: 1px solid var(--rule); padding: 8px; text-align: left; vertical-align: top; }
+.cmp thead th { font-family: var(--f-display); font-size: 14px; border-bottom: 2px solid var(--ink); }
+.cmp thead th.pf { color: var(--hit); }
+.cmp td.pf { background: var(--hit-bg); }
+.cmp td.dim { font-weight: 700; white-space: nowrap; }
+.cmp td.dim em { display: block; font-style: normal; font-weight: 500; font-size: 12px; color: var(--accent); }
+.switch { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-soft); margin-bottom: 8px; cursor: pointer; }
+.sortgame { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 12px; }
+.sortgame h3 { font-size: 15px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.sortgame h3 small { font-family: var(--f-mono); font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 8px; margin-top: 10px; }
+.item { border: 1px solid var(--rule); border-radius: 8px; padding: 9px 11px; display: grid; gap: 6px; min-width: 0; }
+.item.right { border-color: var(--hit); background: var(--hit-bg); }
+.item.wrong { border-color: var(--redpen); background: var(--miss-bg); }
+.item .name { font-weight: 500; font-size: 14px; }
+.item .acts { display: flex; gap: 6px; }
+.item .acts button { flex: 1; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; font-size: 13.5px; padding: 6px 0; }
+.item .why { font-size: 12.5px; }
+.item .why b.r { color: var(--hit); } .item .why b.w { color: var(--redpen); }
+
+/* ---------- 口試練習 ---------- */
+.pbar { display: grid; gap: 10px; margin: 16px 0 12px; }
+.pfilter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pfilter select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 10px; font-size: 14px; min-height: 38px; max-width: 100%; }
+.pfilter select#qsel { flex: 1 1 200px; min-width: 0; }
+.progress { display: flex; gap: 3px; flex-wrap: wrap; }
+.progress i { width: 12px; height: 12px; border-radius: 3px; background: var(--rule); }
+.progress i.done { background: var(--partial); }
+.progress i.good { background: var(--hit); }
+.progress i.cur { outline: 2px solid var(--accent); outline-offset: 1px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (min-width: 980px) { .grid2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .sticky { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 60px); } }
+.qhead { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-soft); }
+.qhead .num { font-family: var(--f-mono); font-weight: 600; color: var(--accent); font-size: 14px; }
+.qhead .type { border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; }
+.qtext { font-family: var(--f-display); font-size: 18px; font-weight: 600; margin: 6px 0 12px; line-height: 1.6; }
+.hintbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.kwhint { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.kwhint span { font-size: 13px; padding: 1px 9px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.answer { width: 100%; min-height: 238px; resize: vertical; border: 1px solid var(--rule); border-radius: 6px; padding: 0 12px; font-family: var(--f-hand); font-size: 17px; line-height: 34px;
+  background-color: var(--sheet); background-image: linear-gradient(transparent 33px, var(--rule) 33px); background-size: 100% 34px; background-attachment: local; }
+.answer::placeholder { color: var(--ink-soft); }
+.samplenote { font-size: 13px; color: var(--partial); margin: 0 0 6px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.timer { font-family: var(--f-mono); font-size: 14px; }
+.spacer { flex: 1; }
+.tip { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 0; }
+.empty { color: var(--ink-soft); text-align: center; padding: 36px 10px; }
+.stale { font-size: 13px; color: var(--partial); background: var(--partial-bg); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px; }
+.score { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 16px; align-items: center; padding-bottom: 14px; border-bottom: 1px dashed var(--rule); }
+.score .big { grid-row: span 2; font-family: var(--f-mono); font-size: 42px; font-weight: 600; line-height: 1; color: var(--redpen); }
+.score .big small { font-size: 15px; color: var(--ink-soft); }
+.bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 46px; gap: 8px; align-items: center; font-size: 12.5px; }
+.track { height: 8px; background: var(--rule); border-radius: 4px; overflow: hidden; }
+.track i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
+.bar .pt { font-family: var(--f-mono); text-align: right; }
+.secttl { font-family: var(--f-display); font-size: 15px; margin: 16px 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.secttl small { font-family: var(--f-body); font-weight: 400; color: var(--ink-soft); font-size: 12.5px; }
+.kwlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.kwlist li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; }
+.pill { font-size: 12px; font-weight: 700; text-align: center; padding: 1px 0; border-radius: 4px; }
+.pill.hit { color: var(--hit); background: var(--hit-bg); }
+.pill.partial { color: var(--partial); background: var(--partial-bg); }
+.pill.miss { color: var(--redpen); background: var(--miss-bg); }
+.kwlist .lack { display: block; font-size: 12.5px; color: var(--redpen); }
+.advice { margin: 0; padding-left: 20px; font-size: 14px; display: grid; gap: 4px; }
+.advice li::marker { color: var(--redpen); }
+.marked { white-space: pre-wrap; font-size: 15px; line-height: 1.95; border-left: 3px solid var(--rule); padding-left: 12px; margin: 0; overflow-wrap: anywhere; }
+.marked.hand { font-family: var(--f-hand); font-size: 16px; }
+.m-hit { background: var(--hl); color: inherit; border-radius: 2px; }
+.m-partial { background: none; color: inherit; text-decoration: underline wavy var(--partial); text-underline-offset: 4px; }
+.mm-hit { background: var(--hit-bg); color: inherit; border-radius: 2px; }
+.mm-partial { background: var(--partial-bg); color: inherit; border-radius: 2px; }
+.mm-miss { background: var(--miss-bg); color: var(--redpen); font-weight: 700; border-radius: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--ink-soft); font-weight: 400; font-family: var(--f-body); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
+.chk { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chk span { font-size: 12.5px; padding: 1px 9px; border-radius: 4px; border: 1px solid var(--rule); }
+.chk .ok { color: var(--hit); border-color: var(--hit); }
+.chk .no { color: var(--redpen); border-color: var(--redpen); }
+.disclaim { font-size: 12px; color: var(--ink-soft); margin: 14px 0 0; }
+
+/* ---------- 底部播放列 ---------- */
+.player { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--sheet); border-top: 1px solid var(--rule); box-shadow: 0 -6px 20px rgba(0, 0, 0, .08);
+  padding: 8px max(16px, env(safe-area-inset-right, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.player .in { max-width: 1120px; margin: 0 auto; display: flex; align-items: center; gap: 8px; }
+.player .now { flex: 1; min-width: 0; font-size: 13px; }
+.player .now b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+.player .now span { color: var(--ink-soft); font-family: var(--f-mono); font-size: 12px; }
+.pbtn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--rule); background: var(--sheet); display: grid; place-items: center; padding: 0; flex: none; }
+.pbtn.main { background: var(--accent); border-color: var(--accent); color: var(--sheet); width: 46px; height: 46px; }
+.player select { border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 4px; font-family: var(--f-mono); font-size: 13px; }
+footer { margin-top: 30px; font-size: 12px; color: var(--ink-soft); }
+@media (max-width: 420px) { .player .hide-sm { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+const { useState, useEffect, useMemo, useRef } = React;
+const html = htm.bind(React.createElement);
+
+/* ---------- 本機暫存（只存在這台瀏覽器） ---------- */
+const KEY = 'exam-review-v2:';
+function load(k, d) { try { const v = localStorage.getItem(KEY + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+function save(k, v) { try { localStorage.setItem(KEY + k, JSON.stringify(v)); } catch (e) {} }
+
+/* ---------- 重點背誦：15 個主題（依課堂知識庫模組一～五） ---------- */
+const TOPICS = [
+  { id: 'process', mod: '模組一・測驗分類', title: '依教學歷程：四種評量', fig: 'timeline',
+    open: '依教學歷程，評量分成安置性、形成性、診斷性、總結性四種，差別在「什麼時候做」和「為了什麼做」。',
+    pts: [
+      ['安置性｜教學前', '了解學生的起點行為、先備知識與舊經驗，對應教案準備活動的引起動機、銜接舊經驗。例如開學第一週的單元前測。'],
+      ['形成性｜教學中', '用隨堂小考、學習單、課堂問答確認學生學會沒有，作為老師立即調整下一節教學策略的依據。'],
+      ['診斷性｜教學中或教學後', '針對反覆出現困難的學生做錯題分析，找出迷思概念與學習盲點，進行補救教學或提出轉介證明。'],
+      ['總結性｜教學後', '段考、期末考，評定整體學習成就、提供成績等第。'],
+    ],
+    traps: ['全班形成性評量考不好，責任在老師，代表教學策略要調整，所以平時小考就算計分，比重也應該很低。', '總結性評量的責任在學生。', '假日帶回家的學習單，需要家長共同參與、共同承擔學習責任。'] },
+  { id: 'reference', mod: '模組一・測驗分類', title: '常模參照 vs. 標準參照', fig: 'reference',
+    open: '口訣「常模比高低，標準看過關」：常模參照看在團體中的相對位置，標準參照看有沒有達到事先決定的門檻。',
+    pts: [
+      ['常模參照｜相對位置', '和常模團體比較，分出高低排名。重視鑑別度與高信度，適用於總結性評量、範圍廣、異質性大的團體。例如學測、國中會考、教甄前 20% 進複試、PR 值。'],
+      ['標準（效標）參照｜絕對門檻', '依教學前事先決定的學習目標與表現標準，判斷通過與否，不和別人比。最適合精熟學習，適用於形成性與診斷性評量。例如教檢 60 分及格、駕照、全民英檢、游泳 1～10 級、實作成績 1～6 級。'],
+    ],
+    traps: ['標準參照在及格邊緣是「一刀切」，60 分過、59 分不過，所以信度通常較低，主要看效度。', '有「分級」不代表是常模參照：游泳 1～10 級、實作 1～6 級都是標準參照。'] },
+  { id: 'standard', mod: '模組一・測驗分類', title: '標準化測驗 vs. 教師自編測驗', fig: 'standard',
+    open: '標準化測驗由專業單位統一編製、施測、計分並建立常模；非標準化測驗是老師依自己班級的需求自編。',
+    pts: [
+      ['標準化測驗', '編製、施測程序、計分標準與常模都一致，全台灣花蓮、台南、台北考同一份。優點是公平、客觀、可以跨區比較，連分數也能標準化；缺點是容易窄化教學。'],
+      ['非標準化（教師自編）測驗', '依班級特定需求與教學目標設計，只在自己班上施測，彈性高、能反映個別差異。例如自編英語隨堂考、「羅東夜市」踏查學習單。'],
+    ],
+    traps: ['「標準化」講的是編製過程，「標準參照」講的是分數怎麼解釋，兩組概念不要混在一起。'] },
+  { id: 'perform', mod: '模組一・測驗分類', title: '最大表現 vs. 典型表現（Cronbach）', fig: 'performTree',
+    open: 'Cronbach 依作答表現分兩種：最大表現要「盡力考到最好」、有對錯；典型表現只要「誠實作答」、沒有對錯。',
+    pts: [
+      ['最大表現測驗', '測能力極限或學習成果。成就測驗（如段考，測已學過的內容）最重視內容效度；性向測驗、智力測驗（測未來潛能）最重視預測效度。'],
+      ['典型表現測驗', '測平常真實的樣子。情意測驗、人格問卷（內外向）、興趣量表、生活適應量表、工作滿意度調查、學習動機量表，最重視建構（構念）效度。'],
+    ],
+    traps: ['題目一出現「學習動機量表、焦慮量表、自我概念量表、人格問卷」，就是典型表現測驗，配建構（構念）效度。'] },
+  { id: 'relval', mod: '模組二・信度與效度', title: '信度與效度的關係', fig: 'targets',
+    open: '效度是正確性，受系統誤差影響；信度是穩定性與一致性，受隨機誤差影響。編測驗要先求效度，再談信度。',
+    pts: [
+      ['效度＝正確性', '能真實測出想測的特質的程度，受系統誤差影響。'],
+      ['信度＝穩定、一致、可靠', '測驗結果穩不穩定，受隨機誤差影響。公式 X＝T＋E：觀察分數等於真實分數加誤差。'],
+      ['四句必背', '效度高，信度一定高；信度低，效度一定低；信度高，效度不一定高；所以信度是效度的必要條件，不是充分條件。'],
+    ],
+    traps: ['飛鏢全部穩穩射在左下角：很集中（信度高），卻偏離紅心（效度低）。', '不會有「信度低、效度高」這種情況。'] },
+  { id: 'validity', mod: '模組二・信度與效度', title: '三大效度', fig: 'validityTree',
+    open: '效度分三大類：內容效度、效標關聯效度（又分同時效度和預測效度）、建構效度。',
+    pts: [
+      ['內容效度', '試題有沒有涵蓋教學目標與教材範圍，也就是所教即所考。成就測驗最重視，編製時用雙向細目表確保。'],
+      ['效標關聯效度', '和外在公認有效的效標求相關。同時效度：新測驗和魏氏智力量表、全國學力測驗同時施測，看能不能取代；預測效度：用現在的分數預測未來表現，有時間差，例如性向測驗、模擬考預測會考。'],
+      ['建構（構念）效度', '測量理論上的抽象心理特質，例如學習動機、焦慮、自我概念、人格。'],
+    ],
+    traps: ['成就測驗配內容效度，性向測驗配預測效度，典型表現量表配建構效度。'] },
+  { id: 'reliability', mod: '模組二・信度與效度', title: '信度種類與影響因素', fig: 'relBars',
+    open: '再測信度通常最高，評分者信度最低；影響信度的三大因素是題數、難度、團體異質性。',
+    pts: [
+      ['再測信度（重測信度、穩定係數）', '同一份考卷隔一段時間（如兩週）對同一批人再考一次，像「影分身」，通常是所有信度中最高的。'],
+      ['複本信度與內部一致性', '複本信度：難度、結構相似的 A、B 兩卷，像雙胞胎。內部一致性信度：折半信度、Cronbach α。'],
+      ['評分者信度', '多位評分者對同一份作業、申論題、實作表現評分的一致程度。受月暈效應等主觀因素影響，差距大，是所有信度中最低的。'],
+      ['影響信度的三大因素', '題數：適度增加同質性題目，信度提高。難度：適中（P 約 0.50）時信度最高。團體異質性：差異越大、標準差越大，信度越高；資優班、音樂班、體育班同質性高，信度會降低。'],
+    ],
+    traps: ['同質性高的班級信度「降低」，不是提高。'] },
+  { id: 'skew', mod: '模組三・分數分布', title: '偏態：看長尾巴在哪邊', fig: 'skew',
+    open: '看長尾巴在哪邊：尾巴在左是左偏（負偏），題目太簡單、天花板效應；尾巴在右是右偏（正偏），題目太難、地板效應。',
+    pts: [
+      ['常態分配', '對稱的鐘形曲線，難度適中（P 約 0.50），平均數＝中位數＝眾數。'],
+      ['左偏態（負偏態）', '多數人擠在高分區，長尾拖向低分區。題目太簡單，稱為天花板效應（高限效應）。眾數 > 中位數 > 平均數，因為極低分把平均數拉低。'],
+      ['右偏態（正偏態）', '多數人擠在低分區，長尾拖向高分區。題目太難，稱為地板效應（低限效應）。平均數 > 中位數 > 眾數，因為極高分把平均數拉高。'],
+    ],
+    traps: ['偏態的名字看「尾巴」在哪邊，不是看人擠在哪邊。', '平均數永遠被拉向尾巴那一側。'] },
+  { id: 'normal', mod: '模組三・分數分布', title: '常態分配與分數轉換', fig: 'normal',
+    open: 'Z＝(X−M)÷S；T＝50＋10Z；魏氏 IQ＝100＋15Z；PR 代表贏過百分之多少的人，沒有 0 也沒有 100。',
+    pts: [
+      ['面積比例', '平均數上下 1 個標準差占 68.26%（單側 34.13%），上下 2 個標準差占 95.44%（1 到 2 個標準差單側 13.59%），上下 3 個標準差占 99.72%（2 到 3 個標準差單側 2.14%）。'],
+      ['課堂考題：小英', '自我概念量表 T＝40，代入 40＝50＋10Z，Z＝−1，低於平均 1 個標準差，PR 約 16。'],
+      ['課堂考題：教甄', 'T＝70，Z＝+2，PR 97.72，排名前 2.28%。宜蘭縣錄取率 2% 會落榜，花蓮縣錄取率 3% 會錄取。'],
+      ['特教安置切點', '上下超過 2 個標準差需要特殊教育安置：IQ ≥ 130（Z ≥ +2）資優班，IQ ≤ 70（Z ≤ −2）資源班。'],
+    ],
+    traps: ['PR 永遠介於 1 到 99，沒有 0 和 100。'] },
+  { id: 'item', mod: '模組三・試題分析', title: '試題分析：難度 P 與鑑別度 D', fig: 'item',
+    open: '掐頭去尾取前後 27% 分高低分組；難度 P＝(PH＋PL)÷2，0.50 最好；鑑別度 D＝PH−PL，越大越好，負值代表題目有問題。',
+    pts: [
+      ['分組方式', '「掐頭去尾法」：全體成績前 27% 為高分組（PH），後 27% 為低分組（PL）。'],
+      ['難度 P', '也就是通過率，最佳值 0.50，理想範圍 0.40 到 0.60。難度適中時，信度與鑑別度最高。'],
+      ['鑑別度 D', '正值越大，代表越能區分高分組和低分組。'],
+      ['負鑑別度', '高分組答錯、低分組反而答對，通常是題目出錯、標準答案給錯，或高分組誤解題意。'],
+    ],
+    traps: ['P 越大代表題目越「簡單」（通過率越高），不是越難。'] },
+  { id: 'bloom', mod: '模組四・教育目標', title: 'Bloom 修訂版與雙向細目表', fig: 'bloom',
+    open: '修訂版認知歷程由低到高是「記、了、應、分、評、創」；知識向度分事實、概念、程序、後設認知四種。',
+    pts: [
+      ['修訂重點（2001 年 Anderson 等人）', '名詞改成動詞；舊版最上面是「綜合、評鑑」，新版改成「評鑑、創造」，最高兩層對調，綜合改為創造。評鑑是依規準判斷好壞並做決策，例如比較畢業旅行去日本或墾丁的經費與效益。'],
+      ['四大知識向度', '事實知識：具體名詞細節，例如動物園裡的豬、狗、斑馬。概念知識：抽象分類，例如「哺乳類」。程序知識：有固定步驟的方法，例如四則運算、釣魚的方法、使用量筒。後設認知知識：策略與自我知識，例如考前看考古題抓方向、避開塞車路線，哲學上對應存在主義。'],
+      ['雙向細目表', '「教材內容（單元）」乘上「認知歷程目標」的命題藍圖，用來確保內容效度。各單元配分要均衡，各認知層次比例不強求相等。編製測驗的第一步是確定測驗目的。'],
+    ],
+    traps: ['紙筆測驗多停在記憶、了解、應用，頂多到分析；評鑑、創造多靠實作或檔案評量。'] },
+  { id: 'trend', mod: '模組五・多元評量', title: '現代評量四大趨勢與動態評量', fig: 'trend',
+    open: '四大趨勢：靜態到動態、虛假到真實、單一到多元，再加上電腦適性測驗；動態評量的流程是「前測、教學介入、後測」。',
+    pts: [
+      ['動態評量', '費爾斯坦（Feuerstein）提出，理論基礎是維高斯基（Vygotsky）的近側發展區（ZPD）。前測、教學介入（中介、鷹架）、後測，評估學習潛能，能避免文化不利等非認知因素干擾、強化正向自我概念。缺點是很耗時，一個個案常要 12～16 週，信效度也待加強。'],
+      ['真實性評量', '在真實生活脈絡中解決問題，例如讓低年級學生到商店買東西評量算數能力。傳統紙筆測驗被稱為虛假評量。'],
+      ['多元評量', '例如科學閱讀課：閱讀省思 30%、小組辯論 30%、專題報告 40%。可以包含紙筆測驗，只要紙筆不是唯一工具，所以兼有主觀與客觀資訊。'],
+      ['電腦適性測驗（CAT）', '例如托福、英檢，電腦依作答情形動態調整題目難度，估算真實能力。'],
+    ],
+    traps: ['另類評量興起的原因：奧蘇貝爾（Ausubel）有意義的學習、傳統評量缺失、標準化測驗窄化教學。', '另類評量「不能」提高信度。'] },
+  { id: 'performance', mod: '模組五・多元評量', title: '實作評量', fig: 'perfVs',
+    open: '實作評量（表現本位評量）要學生實際動手做出來；優點是情境相關、不受語文能力干擾，限制是耗時、評分者信度低。',
+    pts: [
+      ['形式與實例', '操作、展演、試教、音樂會、寫論文、申論題、書面報告。例如用皺紋紙和鐵線做康乃馨、帶一年級去郵局寄信、李老師請特教學生實際撥電話給老師評打電話技巧。'],
+      ['作品評量三大類', '書面（文章、報告）、視覺（統計圖表、概念圖、繪畫、展覽）、學習檔案（過程與作品樣本）。'],
+      ['優點', '比標準化測驗更能提供有效解釋、引導有意義的學習、情境相關（脈絡化）、較不受語文能力干擾，例如瘖啞人士仍能展現繪畫或廚藝。'],
+      ['限制', '耗時花錢、情境不易控制、能力標準難界定、評分不客觀，評分者信度低。'],
+    ],
+    traps: ['要降低主觀，就搭配評分規準（Rubrics）。'] },
+  { id: 'portfolio', mod: '模組五・多元評量', title: '檔案評量 vs. 一般作品集', fig: 'portfolio',
+    open: '檔案評量是弱結構化、有目的地篩選、歷程與結果並重、評分標準事前確定，而且一定要有學生省思、家長回饋、教師回饋。',
+    pts: [
+      ['弱結構化', '師生共建，學生參與選件；老師完全決定就變成強結構化的作品集。'],
+      ['有目的篩選、歷程加結果', '配合教學目標挑選作品，看進步軌跡；兼具形成性與總結性，與自己比、不與他人排名，適用所有兒童。'],
+      ['三大必備元素', '學生自我省思、家長參與回饋、教師評量回饋，並安排同儕觀摩分享。'],
+    ],
+    traps: ['全班都一樣的行政雜件不能放：營養午餐菜單、緊急通報流程圖、齲齒塗氟單、行事曆、作息表、戶外教學通知單。', '學生自己設計並附省思的營養午餐學習單，可以放。'] },
+  { id: 'observe', mod: '模組五・多元評量', title: '觀察與評定工具', fig: 'tools',
+    open: '只看有沒有用檢核表；要分等級用評定量表；要事先公告向度和等級描述用評分規準；評情意用軼事紀錄法。',
+    pts: [
+      ['檢核表', '只有是或否、有或無，做到就打勾，沒有等級高低。例如出國必帶物品清單、一年級新生分離焦慮「有沒有哭」。'],
+      ['評定量表（等級量表）', '品質差距明顯、可以分好幾個等級時使用。例如書法、圖畫作品、1～5 分滿意度問卷。'],
+      ['評分規準（Rubrics）', '評分向度和等級描述組成的雙向表格，事先告訴學生期待的標準，學生可以據此修改作業，提高實作評量的客觀與公平。'],
+      ['軼事紀錄法與取樣法', '軼事紀錄像寫個案小傳記，記錄自然情境中的重要行為，最適合情意評量。事件取樣：特定事件發生才記錄始末，例如爭吵；時間取樣：固定時間間隔觀察；實距紀錄：記錄行為持續多久。'],
+      ['等第法 vs. 心象法', '等第法先把美術作品、茶葉、蘭花分堆，再評出金、銀、銅牌；心象法以評審心中過往的標準評，本屆都沒達標就「優等從缺」。'],
+    ],
+    traps: ['檢核表沒有等級；一旦要分等級，就是評定量表。'] },
+];
+
+/* ---------- 口試題庫 ---------- */
+// groups：每個關鍵字拆成幾個「必須講到的概念」，每個概念列出可接受的說法（可用正規表示式）
+const STD_REF = ['標準參照', '效標參照', '標準.{0,5}參照'];
+const CONSTRUCT = ['建構效度', '構念效度', '建構.{0,4}效度', '構念.{0,4}效度'];
+const QUESTIONS = [
+  { id: 1, topic: 'relval', type: '比較', category: '信度與效度',
+    question: '請說明「信度」與「效度」的定義、影響誤差類型，以及兩者之間的核心邏輯關係？',
+    keywords: [
+      { label: '效度＝正確性(系統誤差)', groups: [['效度'], ['正確性', '正確', '準確'], ['系統誤差']] },
+      { label: '信度＝穩定性/一致性(隨機誤差)', groups: [['信度'], ['穩定性', '穩定', '一致', '可靠'], ['隨機誤差', '機率誤差']] },
+      { label: '先求效度再談信度', groups: [['先求效度', '先(有|確立|建立|確定|談|考慮|求得)效度', '效度.{0,10}(才|再)(能|來)?(談|論|求|講|看)?信度', '效度優先']] },
+      { label: '必要條件而非充分條件', groups: [['必要條件', '必要'], ['非充分條件', '充分', '效度不一定高']] },
+    ],
+    examples: ['飛鏢', '紅心', '靶', '體重計', '磅秤'],
+    exampleHint: '飛鏢全部穩定射在左下角：很集中（信度高）卻偏離紅心（效度低）。',
+    model: '1. 效度（Validity）指測驗的「正確性」，即能真實測出欲測特質的程度，反映系統誤差大小；信度（Reliability）指測驗結果的「穩定性與一致性」，反映隨機誤差大小。\n2. 編製測驗必須「先有效度，才能進一步談信度」。\n3. 兩者關係：效度高，信度一定高；信度低，效度一定低；但信度高，效度不一定高（可能穩定地測錯方向）。因此，信度是效度的「必要條件」，而非「充分條件」。\n4. 例如射飛鏢每次都穩穩射在左下角：很集中代表信度高，但沒有命中紅心代表效度低。' },
+  { id: 2, topic: 'portfolio', type: '比較', category: '檔案評量 vs. 卷宗資料',
+    question: '趙老師打算在閱讀與寫作課讓學生製作「學習檔案（檔案評量）」。請說明檔案評量與一般作品集（卷宗資料）的差異？並舉出三項絕對不可放入檔案評量的資料。',
+    keywords: [
+      { label: '弱結構化(師生共建)', groups: [['弱結構'], { name: '師生共建', t: ['師生共', '共同參與', '學生參與', '親師生', '共建', '學生.{0,4}選'] }] },
+      { label: '有目的性篩選', groups: [['目的'], ['篩選', '選擇', '挑選', '選件']] },
+      { label: '歷程與結果並重', groups: [['歷程', '過程'], { name: '結果／並重', t: ['結果', '成果', '並重', '兼顧', '進步'] }] },
+      { label: '評分標準事前確定', groups: [['評分標準', '評分規準', '規準', '標準'], ['事前', '事先', '預先', '先確定', '先訂']] },
+      { label: '三大必備元素(學生自我省思、家長回饋、教師回饋)', groups: [['自我省思', '省思', '反省', '反思'], ['家長'], { name: '教師回饋', t: ['教師回饋', '老師回饋', '教師.{0,4}(評|回饋)', '老師.{0,4}(評|回饋)'] }] },
+      { label: '不可放行政雜件', groups: [{ name: '說明「不可放」', t: ['不可', '不能', '不放', '不適合', '不應', '不得'] }, { name: '舉出三項行政雜件', min: 3, t: ['菜單|營養午餐|營養表', '通報', '齲齒|塗氟', '行事曆', '作息表', '通知單'] }] },
+    ],
+    examples: ['菜單', '營養', '通報', '齲齒', '塗氟', '行事曆', '作息表', '通知單', '備審', '推甄', '作文', '閱讀心得'],
+    exampleHint: '營養午餐菜單、緊急通報流程圖、齲齒塗氟宣傳單、行事曆、戶外教學通知單（全班都一樣，不屬個人成長紀錄）。',
+    model: '1. 結構與控制：檔案評量屬於「弱結構化」，由親師生共同參與選件，非老師一人決定（老師完全決定稱為強結構化）。\n2. 目的與歷程：配合教學目標「有目的地篩選」作品，重視「歷程加結果（學生的進步軌跡）」，且評分標準與選擇指引須事前確定並與學生討論。\n3. 三大必備心血：必須包含「學生的自我反省（省思）」、「家長的參與回饋」以及「教師的評量回饋」，並安排同儕觀摩分享。\n4. 不可放入的資料：凡是不屬於個人成長紀錄、全班一模一樣的行政表單皆不可放入，例如：每月營養午餐菜單、學校緊急通報流程圖、齲齒塗氟宣傳單、行事曆、戶外教學家長通知單。' },
+  { id: 3, topic: 'trend', type: '定義', category: '動態評量',
+    question: '針對學習與診斷上有困難或文化不利的學生，什麼是「動態評量」？其理論基礎、實施三階段與優缺點為何？',
+    keywords: [
+      { label: '費爾斯坦(Feuerstein)', groups: [['費爾斯坦', '費斯坦', '費厄斯坦', 'feuerstein']] },
+      { label: '維高斯基近側發展區(ZPD)', groups: [['維高斯基', '維果斯基', '維果茨基', '維高思基', 'vygotsky'], ['近側發展區', '近側', '可能發展區', '最近發展區', 'zpd']] },
+      { label: '前測—教學介入(中介)—後測', groups: [['前測'], { name: '教學介入（中介）', t: ['介入', '中介', '鷹架'] }, ['後測']] },
+      { label: '評估學習潛能', groups: [['潛能', '潛力']] },
+      { label: '避免非認知因素干擾', groups: [['非認知'], { name: '干擾（如文化不利）', t: ['干擾', '影響', '文化不利'] }] },
+    ],
+    examples: ['文化不利', '原住民', '新住民', '16週', '16周', '鷹架', '手把手', '主流'],
+    exampleHint: '文化不利或不熟悉主流社會工具的孩子；老師手把手提供鷹架；一個個案常需 12~16 週。',
+    model: '1. 動態評量是指把評量和教學結合、評估學習潛能的方法。理論基礎：由費爾斯坦（Feuerstein）提出，奠基於維高斯基（Vygotsky）的「近側發展區（ZPD）」理論。\n2. 實施三階段：也就是「前測 ➔ 教學介入（教師主動提供中介鷹架、手把手引導） ➔ 後測」，將測驗診斷與教學緊密結合。\n3. 優點：能評估學生的「學習潛能」與連續性學習歷程、顧及個別差異、避免非認知因素（如文化不利或不懂主流工具）對教學的干擾，並強化正向自我概念。\n4. 限制：極度耗時（處理單一個案常需 12~16 週，大班級難以普及），且信度與效度較難控制。' },
+  { id: 4, topic: 'performance', also: ['observe'], type: '比較', category: '實作評量與評分工具',
+    question: '什麼是「實作評量」？它有哪些優點與限制？為了克服其主觀性限制，可搭配哪些評分工具（請比較檢核表、評定量表與評分規程）？',
+    keywords: [
+      { label: '表現本位/實際操作展演', groups: [['表現本位', '實際操作', '動手', '展演', '操作']] },
+      { label: '情境相關(脈絡化)', groups: [['情境', '脈絡']] },
+      { label: '引導有意義的學習', groups: [['有意義']] },
+      { label: '不受語文能力干擾', groups: [['語文', '語言'], ['不受', '干擾', '影響']] },
+      { label: '耗時且評分者信度低', groups: [['耗時', '費時', '花時間', '花錢', '耗費'], ['評分者信度', '主觀', '信度低', '信度偏低', '不客觀']] },
+      { label: '檢核表(是非) vs. 評定量表(等級) vs. 評分規程(雙向表格)', groups: [['檢核表'], { name: '是／否、有／無', t: ['是否', '是/否', '有無', '有/無', '有或沒有', '是或否', '打勾'] }, ['評定量表', '等級量表'], { name: '區分等級', t: ['等級', '等第', '高低'] }, ['評分規程', '評分規準', 'rubric'], { name: '雙向表格', t: ['雙向'] }] },
+    ],
+    examples: ['試教', '論文', '打電話', '電話', '郵局', '寄信', '康乃馨', '瘖啞', '廚師', '廚藝', '書法', '圖畫', '分離焦慮', '哭', '出國', '音樂會'],
+    exampleHint: '特教學生實際撥電話評打電話技巧、帶一年級去郵局寄信；檢核表＝分離焦慮有沒有哭；評定量表＝書法、圖畫作品。',
+    model: '1. 實作評量是指要求學生實際動手操作、展演或完成作品（如試教、寫論文、打電話技巧、郵局寄信），重過程與結果。\n2. 優點：比標準化測驗更能提供有效解釋、引導有意義的學習、具「情境相關（脈絡化）」、較不受語文能力干擾（如瘖啞人士仍可展現廚藝或繪畫）。\n3. 限制：非常耗時花錢、測驗情境不易控制、評分標準難界定、易受主觀影響導致「評分者信度」偏低。\n4. 評分工具區別：\n   - 檢核表（Checklist）是指僅判斷行為「是/否、有/無」出現（如分離焦慮哭泣觀察、出國物品清單）。\n   - 評定量表（Rating Scale）：當行為或作品品質有明顯差距，可區分出不同「等級高低」時使用（如書法、圖畫作品評分）。\n   - 評分規程（Rubrics）：雙向表格，事先向學生說明作業期待標準與各等級規準，供學生修改作業並提升評分客觀性與公平性。' },
+  { id: 5, topic: 'standard', also: ['reference', 'skew'], type: '綜合', category: '標準化、參照與偏態',
+    question: '請區分「編製過程（標準化 vs. 非標準化）」與「分數解釋（常模參照 vs. 標準參照）」的不同，並說明偏態分布（左偏態 vs. 右偏態）代表的試題難度意義。',
+    keywords: [
+      { label: '標準化(統一編製/施測/計分) vs. 非標準化(教師自編)', groups: [['標準化'], { name: '統一編製施測計分', t: ['統一', '專業', '一致', '常模'] }, { name: '非標準化（教師自編）', t: ['非標準化', '教師自編', '老師自編', '自編'] }] },
+      { label: '常模參照(相對位置/PR) vs. 標準參照(絕對門檻/事先決定)', groups: [['常模參照'], { name: '相對位置／PR', t: ['相對', '排名', 'pr', '百分等級', '比高低'] }, STD_REF, { name: '絕對門檻／事先決定', t: ['絕對', '門檻', '事先', '及格', '過關'] }] },
+      { label: '左偏態(負偏/太簡單/天花板效應)', groups: [['左偏', '負偏'], { name: '題目太簡單', t: ['簡單', '容易'] }, ['天花板', '高限']] },
+      { label: '右偏態(正偏/太難/地板效應)', groups: [['右偏', '正偏'], { name: '題目太難', t: ['太難', '偏難', '很難', '困難', '較難', '過難'] }, ['地板', '低限']] },
+    ],
+    examples: ['學測', '會考', '教甄', '教檢', '駕照', '英檢', '游泳', '6級', '60分', '前20', '前百分之20'],
+    exampleHint: '常模：學測、會考、教甄前 20% 進複試；標準：教檢 60 分及格、駕照、游泳 1~10 級、實作 1~6 級。',
+    model: '1. 編製過程：分為「標準化測驗」（專業部門統一編製、嚴格施測與計分標準，全台考同一份，具跨區可比較性與公平性）與「非標準化測驗」（教師依班級需求自編，具彈性）。\n2. 分數解釋：分為「常模參照」（與團體常模比高低、看相對位置如 PR 值，重鑑別度與高信度，如學測、教甄前20%複試）與「標準/效標參照」（依教學前事先決定的標準看是否過關，屬絕對位置，如教檢60分及格、游泳1~10級、學期實作1~6級）。\n3. 偏態分布（看長尾巴位置）：\n   - 左偏態（負偏態）：長尾巴在左邊低分區，多數人考高分，代表題目「太簡單」（天花板/高限效應），眾數 > 中位數 > 平均數。\n   - 右偏態（正偏態）：長尾巴在右邊高分區，多數人考低分，代表題目「太難」（地板/低限效應），平均數 > 中位數 > 眾數。' },
+  { id: 6, topic: 'bloom', type: '定義', category: 'Bloom 認知分類與雙向細目表',
+    question: '請列出布魯姆（Bloom）修訂版認知歷程向度的六個層次與四大知識向度（含實例），並說明「雙向細目表」的功能與配分原則。',
+    keywords: [
+      { label: '記、了、應、分、評、創', groups: [['記憶'], ['了解', '理解'], ['應用'], ['分析'], ['評鑑'], ['創造']] },
+      { label: '事實(豬狗)、概念(哺乳類)、程序(釣魚步驟)、後設認知(看考古題/存在主義)', groups: [['事實知識', '事實'], ['概念知識', '概念'], ['程序知識', '程序'], ['後設認知', '後設'], { name: '各舉實例（至少兩類）', min: 2, t: ['豬|狗|羊|斑馬|化學符號', '哺乳', '釣魚|四則|量筒|顯微鏡|開車', '考古題|塞車|存在主義'] }] },
+      { label: '雙向細目表確保內容效度', groups: [['雙向細目表'], ['內容效度']] },
+      { label: '單元配分均衡、認知層次比例不強求相等', groups: [['單元'], { name: '配分均衡', t: ['均衡', '平均', '比重'] }, ['認知層次', '層次'], { name: '不強求相等', t: ['不強求', '不必', '不一定', '不需'] }] },
+    ],
+    examples: ['豬', '斑馬', '化學符號', '哺乳', '釣魚', '四則', '量筒', '顯微鏡', '考古題', '塞車', '存在主義', '日本', '墾丁', '畢業旅行'],
+    exampleHint: '事實＝動物園裡的豬狗羊；概念＝哺乳類；程序＝釣魚方法、四則運算；後設認知＝考前看考古題抓方向；評鑑＝比較畢旅去日本或墾丁。',
+    model: '1. 認知歷程六層次（由低至高）：記憶 ➔ 了解 ➔ 應用 ➔ 分析 ➔ 評鑑（判斷好壞對錯） ➔ 創造。\n2. 四大知識向度（由具體至抽象）：\n   - 事實知識是指單一具體名詞（如化學符號、豬狗羊）。\n   - 概念知識是指抽象分類與原理（如「哺乳類動物」）。\n   - 程序知識：有嚴格操作步驟的技能與方法（如四則運算、釣魚方法、使用量筒）。\n   - 後設認知知識：策略、情境脈絡與自我知識（如看考古題抓方向、避開塞車路線、對應存在主義的自我定位）。\n3. 雙向細目表：成就測驗的命題藍圖，結合「教材內容單元」與「認知歷程目標」以確保「內容效度」。原則上各單元配分須均衡，但各認知層次題數比例不強求相等。' },
+  { id: 7, topic: 'process', type: '比較', category: '依教學歷程分類的四種評量',
+    question: '依教學歷程，評量可分為哪四種？請說明各自的實施時機與目的；若全班形成性評量都考不好，責任在誰？',
+    keywords: [
+      { label: '安置性評量(教學前/起點行為)', groups: [['安置'], { name: '教學前／起點行為', t: ['教學前', '起點', '先備', '舊經驗'] }] },
+      { label: '形成性評量(教學中/調整教學)', groups: [['形成性'], { name: '教學中', t: ['教學中', '教學過程', '隨堂', '學習單', '課堂問答'] }, { name: '調整教學', t: ['調整', '修正', '改進'] }] },
+      { label: '形成性考不好責任在老師', groups: [{ name: '責任在老師', t: ['責任在(老師|教師)', '(老師|教師)的責任', '(老師|教師)要?負責', '(老師|教師).{0,6}調整'] }] },
+      { label: '診斷性評量(找迷思/補救教學)', groups: [['診斷'], { name: '找出迷思或困難', t: ['迷思', '困難', '盲點', '錯題'] }, { name: '補救教學', t: ['補救', '轉介'] }] },
+      { label: '總結性評量(教學後/評定成就)', groups: [['總結性'], { name: '教學後', t: ['教學後', '教學結束', '段考', '期末'] }, { name: '評定成就', t: ['成就', '成績', '等第'] }] },
+    ],
+    examples: ['隨堂', '小考', '學習單', '段考', '期末考', '家長', '引起動機', '開學', '錯題'],
+    exampleHint: '開學前了解舊經驗（安置）；隨堂小考、學習單（形成）；錯題分析找迷思再補救（診斷）；段考、期末考（總結）；假日學習單需家長共同參與。',
+    model: '1. 安置性評量：教學前（開學前、單元開始前）實施，了解學生的起點行為、先備知識與舊經驗，對應教案準備活動的引起動機與銜接舊經驗。\n2. 形成性評量：教學過程中實施（隨堂小考、學習單、課堂問答），掌握教學進度、確認學生是否學會，作為教師立即調整教學策略的依據。若全班考不好，責任在老師，代表教學策略需要調整，因此平時小考即使計分，比重也應極低；假日學習單則需家長共同參與、共同承擔學習責任。\n3. 診斷性評量：教學中或教學後，針對反覆出現學習困難的學生進行錯題分析，找出迷思概念與學習盲點，以進行補救教學或提出轉介證明。\n4. 總結性評量：教學結束後（段考、期末考）實施，評定整體學習成就並提供成績等第，責任在學生。' },
+  { id: 8, topic: 'perform', type: '比較', category: '最大表現 vs. 典型表現',
+    question: 'Cronbach 將測驗依作答表現分為「最大表現測驗」與「典型表現測驗」，請說明兩者差異、各舉測驗類型，並指出各自最重視的效度。',
+    keywords: [
+      { label: 'Cronbach 提出', groups: [['cronbach', '克隆巴赫', '克倫巴']] },
+      { label: '最大表現(盡力考好/有對錯)', groups: [['最大表現'], { name: '盡力考到最好', t: ['盡力', '最好', '能力極限'] }, { name: '有標準答案、有對錯', t: ['標準答案', '對錯'] }] },
+      { label: '成就測驗重內容效度', groups: [['成就測驗'], ['內容效度']] },
+      { label: '性向/智力測驗重預測效度', groups: [['性向', '智力'], ['預測效度'], { name: '測未來潛能', t: ['潛能', '未來'] }] },
+      { label: '典型表現(誠實作答/無對錯)', groups: [['典型表現'], { name: '正常、誠實作答', t: ['誠實', '正常表現', '真實'] }, { name: '沒有對錯', t: ['沒有對錯', '無對錯', '沒有標準答案', '無標準答案', '沒有對與錯'] }] },
+      { label: '情意人格量表重建構效度', groups: [{ name: '情意／人格／興趣量表', t: ['情意', '人格', '興趣', '動機量表', '態度'] }, CONSTRUCT] },
+    ],
+    examples: ['段考', '學習動機量表', '內外向', '興趣量表', '智力測驗', '生活適應', '工作滿意度', '人格問卷'],
+    exampleHint: '最大表現：段考（成就）、智力或性向測驗；典型表現：學習動機量表、人格問卷（內外向）、興趣量表、工作滿意度調查。',
+    model: '1. 由 Cronbach 依作答表現提出。\n2. 最大表現測驗：要求受試者盡力考到最好，有標準答案、有對錯之分，測量能力極限或學習成果。\n   - 成就測驗：測量教學後的學習成果（如段考），最重視內容效度。\n   - 性向測驗／智力測驗：測量未來發展潛能，最重視預測效度。\n3. 典型表現測驗：要求受試者正常表現、誠實作答即可，沒有對錯之分，例如情意測驗、人格問卷（內外向）、興趣量表、生活適應量表、工作滿意度調查、學習動機量表。最重視建構（構念）效度。' },
+  { id: 9, topic: 'reliability', type: '定義', category: '信度種類與影響因素',
+    question: '常見的信度有哪幾種？哪一種通常最高、哪一種最低？並說明影響信度的三大因素。',
+    keywords: [
+      { label: '再測信度最高', groups: [['再測', '重測'], ['最高']] },
+      { label: '複本信度', groups: [['複本']] },
+      { label: '內部一致性(折半/α)', groups: [{ name: '內部一致性', t: ['內部一致', '折半', 'α', 'alpha', 'cronbach'] }] },
+      { label: '評分者信度最低', groups: [['評分者'], ['最低']] },
+      { label: '題數越多信度越高', groups: [{ name: '試題題數', t: ['題數', '題目數', '增加題目', '試題數', '題目數量'] }] },
+      { label: '難度適中(P≈0.50)', groups: [['難度'], { name: '適中（P≈0.50）', t: ['適中', '0\\.5', '50%', '百分之50', '百分之五十'] }] },
+      { label: '團體異質性高信度高', groups: [['異質'], { name: '同質班信度降低', t: ['同質', '資優班', '音樂班', '體育班', '標準差'] }] },
+    ],
+    examples: ['影分身', '雙胞胎', '月暈', '申論', '資優班', '音樂班', '體育班', '兩週', '兩周'],
+    exampleHint: '再測像「影分身」隔兩週再考一次；複本像雙胞胎 A、B 卷；評分者受月暈效應影響；資優班、音樂班同質性高，信度會下降。',
+    model: '1. 信度種類：\n   - 再測信度（重測信度、穩定係數）是指同一份測驗隔一段時間（如兩週）對同一批人施測兩次，通常是所有信度中最高的。\n   - 複本信度：難度與結構相似的 A、B 兩卷。\n   - 內部一致性信度：折半信度、Cronbach α。\n   - 評分者間信度是指多位評分者對同一份作業、申論題或實作評分的一致程度，受月暈效應等主觀因素影響，是所有信度中最低的。\n2. 影響信度的三大因素：\n   - 試題題數：適度增加同質性題目，可提高信度。\n   - 試題難易度：難度適中（P≈0.50）時信度與鑑別度最高，太難或太簡單都會降低信度。\n   - 團體異質性：團體程度差異越大、標準差越大，信度越高；資優班、音樂班、體育班等同質性高的班級，信度會降低。' },
+  { id: 10, topic: 'validity', type: '定義', category: '三大效度',
+    question: '請說明效度的三大類型（含效標關聯效度的兩種），並各舉一個適用的測驗情境。',
+    keywords: [
+      { label: '內容效度(雙向細目表/所教即所考)', groups: [['內容效度'], ['雙向細目表'], { name: '所教即所考', t: ['所教即所考', '涵蓋', '教學目標', '教材範圍'] }] },
+      { label: '效標關聯效度', groups: [['效標關聯', '效標']] },
+      { label: '同時效度(與現有效標同時施測)', groups: [['同時效度', '並行效度'], { name: '與現有效標同時施測', t: ['同時施測', '取代', '魏氏', '現有'] }] },
+      { label: '預測效度(預測未來表現)', groups: [['預測效度'], { name: '預測未來表現', t: ['未來', '時間差', '模擬考'] }] },
+      { label: '建構效度(抽象心理特質)', groups: [CONSTRUCT, { name: '抽象心理特質', t: ['抽象', '心理', '特質', '理論', '動機', '焦慮', '自我概念'] }] },
+    ],
+    examples: ['雙向細目表', '魏氏', '模擬考', '會考', '學習動機', '焦慮', '自我概念', '性向測驗', '段考', '學力測驗'],
+    exampleHint: '段考用雙向細目表（內容）；新智力測驗與魏氏同時施測（同時）；模擬考預測會考（預測）；學習動機、焦慮量表（建構）。',
+    model: '1. 內容效度：試題是否涵蓋教學目標與教材範圍（所教即所考），成就測驗最重視，編製時以雙向細目表確保。\n2. 效標關聯效度：與外在公認有效的效標求關聯。\n   - 同時效度（並行效度）：新編測驗與現有公認效標（如魏氏智力量表、全國學力測驗）同時施測比較，看能否取代原測驗。\n   - 預測效度：以現在的分數預測未來表現，有時間差，如性向測驗、模擬考預測會考。\n3. 建構效度（構念效度）：測量理論上的抽象心理特質，凡學習動機量表、焦慮量表、自我概念量表、人格問卷等典型表現測驗，都看建構效度。' },
+  { id: 11, topic: 'item', type: '定義', category: '試題分析：難度與鑑別度',
+    question: '請說明試題分析中高低分組的分組方式，以及難度（P）與鑑別度（D）的計算、理想數值；若鑑別度為負值代表什麼？',
+    keywords: [
+      { label: '前後27%分高低分組', groups: [['27'], { name: '高分組／低分組', t: ['高分組', '低分組'] }] },
+      { label: '難度P＝(PH＋PL)/2', groups: [['難度'], { name: 'P＝(PH＋PL)÷2', t: ['ph\\+pl', '通過率', '除以2', '除以二', '/2', '相加'] }] },
+      { label: '難度0.50最佳(0.40～0.60)', groups: [{ name: 'P＝0.50 最佳', t: ['0\\.5', '50%', '百分之50', '百分之五十'] }, { name: '理想範圍 0.40～0.60', t: ['0\\.4', '0\\.6', '適中'] }] },
+      { label: '鑑別度D＝PH－PL', groups: [['鑑別度'], { name: 'D＝PH－PL', t: ['ph-pl', 'ph−pl', '相減', '減去', '減掉'] }] },
+      { label: '負鑑別度＝高分組答錯/題目有誤', groups: [['負'], { name: '高分組答錯、題目或答案有誤', t: ['高分組.{0,6}錯', '低分組.{0,6}對', '答案.{0,4}錯', '題目.{0,4}(錯|誤)', '誤解', '有問題'] }] },
+    ],
+    examples: ['掐頭去尾', '誤解', '標準答案', '給錯', '例如某題', '計算'],
+    exampleHint: '「掐頭去尾法」取前後 27%；舉一題算給老師聽，例如 PH＝0.8、PL＝0.4，P＝0.6、D＝0.4；鑑別度 −0.2 代表高分組可能誤解題意或答案給錯。',
+    model: '1. 分組方式：採「掐頭去尾法」，取全體考生成績前 27% 為高分組（PH），後 27% 為低分組（PL）。\n2. 難度（P）：P＝(PH＋PL)÷2，即通過率，最佳值為 0.50，理想範圍 0.40～0.60。\n3. 鑑別度（D）：D＝PH－PL，正值越大代表越能區分高分組與低分組。\n4. 負鑑別度：代表高分組答錯、低分組反而答對，通常是題目出錯、高分組誤解題意或標準答案給錯，需要修題。' },
+  { id: 12, topic: 'trend', type: '綜合', category: '現代評量新趨勢',
+    question: '請說明現代評量的四大新趨勢；多元評量可以使用紙筆測驗嗎？另類評量興起的原因為何，它能提高信度嗎？',
+    keywords: [
+      { label: '靜態→動態評量', groups: [['動態評量', '動態']] },
+      { label: '虛假→真實性評量(生活脈絡)', groups: [['真實'], { name: '真實生活脈絡', t: ['生活', '脈絡', '情境'] }] },
+      { label: '單一→多元評量(可含紙筆)', groups: [['多元評量', '多元'], { name: '可以使用紙筆', t: ['紙筆'] }] },
+      { label: '適性評量/電腦適性測驗(CAT)', groups: [['適性', 'cat', '電腦適性'], { name: '動態調整題目難度', t: ['難度', '調整', '能力'] }] },
+      { label: '另類評量興起：Ausubel有意義學習、傳統評量缺失', groups: [{ name: 'Ausubel 有意義的學習', t: ['奧蘇貝爾', 'ausubel', '有意義'] }, { name: '傳統評量缺失、窄化教學', t: ['窄化', '缺失'] }] },
+      { label: '另類評量無法提高信度', groups: [['信度'], { name: '無法提高', t: ['無法', '不能', '不會', '降低', '偏低'] }] },
+    ],
+    examples: ['托福', 'toefl', '英檢', '科學閱讀', '辯論', '專題', '買東西', '商店', '前測'],
+    exampleHint: '陳老師「科學閱讀」：省思 30%＋辯論 30%＋專題 40%（多元）；讓低年級到商店買東西評算數（真實）；托福、英檢（CAT）。',
+    model: '1. 四大新趨勢：\n   - 靜態評量 ➔ 動態評量：前測、教學介入、後測，評估學習潛能。\n   - 虛假評量 ➔ 真實性評量：也就是在真實生活脈絡中解決問題。\n   - 單一評量 ➔ 多元評量：例如科學閱讀課以省思 30%、辯論 30%、專題報告 40% 評分。\n   - 適性評量／電腦適性測驗（CAT）：如托福、英檢，電腦依作答動態調整題目難度，估算真實能力。\n2. 多元評量可以使用紙筆測驗，紙筆只是其中一種工具、不是唯一工具即可，因此同時包含主觀與客觀資訊。\n3. 另類評量興起原因：受奧蘇貝爾（Ausubel）「有意義的學習」影響、傳統評量有諸多缺失、標準化測驗會窄化教學。但另類評量主觀性較強，無法提高評量的信度。' },
+  { id: 13, topic: 'observe', type: '比較', category: '觀察紀錄與評定方法',
+    question: '請說明軼事紀錄法適用的評量，以及事件取樣、時間取樣、實距紀錄三種觀察取樣法的差異；並比較等第法與心象法。',
+    keywords: [
+      { label: '軼事紀錄法(最適合情意評量)', groups: [['軼事'], { name: '適合情意評量', t: ['情意', '態度'] }] },
+      { label: '事件取樣(特定事件發生才記)', groups: [['事件取樣'], { name: '特定事件發生才記錄', t: ['特定', '發生', '爭吵', '哭'] }] },
+      { label: '時間取樣(固定時間間隔)', groups: [['時間取樣'], { name: '固定時間間隔', t: ['固定', '間隔'] }] },
+      { label: '實距紀錄(持續時間長度)', groups: [['實距'], { name: '行為持續多久', t: ['持續', '多久', '長度'] }] },
+      { label: '等第法(先分堆再評名次) vs. 心象法(與心中標準比/可從缺)', groups: [['等第法'], { name: '先分堆再給名次', t: ['分堆', '金牌', '銀牌', '名次'] }, ['心象法'], { name: '與心中標準比、可從缺', t: ['從缺', '心中', '過往', '以前'] }] },
+    ],
+    examples: ['爭吵', '分離', '哭', '美術', '蘭花', '茶葉', '從缺', '小傳記', '個案'],
+    exampleHint: '軼事紀錄像寫個案小傳記；事件取樣＝爭吵或分離哭泣發生時才記錄；等第法＝美術、茶葉、蘭花比賽先分五堆；心象法＝本屆未達標就「優等從缺」。',
+    model: '1. 軼事紀錄法是指像寫個案小傳記一樣，客觀記錄學生在自然情境中發生的特殊重要行為或事件，最適合運用於情意教學的評量（態度、願不願意積極配合）。\n2. 三大觀察取樣法：\n   - 事件取樣法是指特定事件（如爭吵、分離哭泣）出現時才開始觀察，記錄始末。\n   - 時間取樣法：在固定時間間隔觀察特定行為是否發生。\n   - 實距紀錄法：記錄某行為持續發生的時間長度。\n3. 等第法 vs. 心象法：等第法是先把美術作品、茶葉、蘭花等分堆（如五堆），再分出金牌、銀牌、銅牌、優等、入選；心象法是評審心中已有過往的高標準，若本屆作品都未達標，就會出現「優等從缺」。' },
+  { id: 14, topic: 'process', type: '情境', category: '安置性與形成性評量',
+    question: '王老師在新學期第一週先讓學生做一份單元前測，了解學生學過哪些分數概念；上課期間每節課都用學習單確認學生是否學會。請說明王老師使用了哪兩種評量及其目的。',
+    keywords: [
+      { label: '安置性評量(了解起點行為)', groups: [['安置'], { name: '了解起點行為', t: ['起點', '先備', '舊經驗', '學過'] }] },
+      { label: '形成性評量(確認學會、調整教學)', groups: [['形成性'], { name: '確認學會並調整教學', t: ['調整', '修正', '學會', '進度'] }] },
+      { label: '實施時機：教學前 vs. 教學中', groups: [{ name: '教學前', t: ['教學前', '開學', '第一週', '前測'] }, { name: '教學中', t: ['教學中', '教學過程', '每節', '上課期間'] }] },
+    ],
+    examples: ['前測', '學習單', '分數', '第一週', '小考'],
+    exampleHint: '開學第一週的單元前測（安置）、每節課的學習單（形成）。',
+    model: '1. 單元前測屬於「安置性評量」：在教學前實施，目的是了解學生的起點行為、先備知識與舊經驗（例如學過哪些分數概念），作為安排教學起點的依據。\n2. 每節課的學習單屬於「形成性評量」：在教學過程中實施，目的是確認學生是否學會、掌握教學進度，作為老師立即調整下一節教學策略的依據。若全班都沒學會，責任在老師，需調整教學。' },
+  { id: 15, topic: 'process', type: '比較', category: '診斷性 vs. 形成性評量',
+    question: '什麼是診斷性評量？它和形成性評量有何不同？',
+    keywords: [
+      { label: '診斷性評量針對反覆困難的學生', groups: [['診斷'], { name: '針對反覆困難的學生', t: ['反覆', '困難', '特定學生', '個別'] }] },
+      { label: '錯題分析找迷思概念', groups: [{ name: '錯題分析', t: ['錯題', '錯誤類型', '分析'] }, { name: '迷思概念', t: ['迷思', '盲點'] }] },
+      { label: '補救教學或轉介', groups: [['補救', '轉介']] },
+      { label: '形成性針對全班、調整教學', groups: [['形成性'], { name: '全班、調整教學', t: ['全班', '調整', '進度'] }] },
+    ],
+    examples: ['錯題', '迷思', '補救', '轉介', '分數', '分母'],
+    exampleHint: '分數加法總是把分母也相加的學生，用錯題分析找出迷思再補救。',
+    model: '1. 診斷性評量是指在教學中或教學後，針對反覆出現學習困難的學生，進行錯題分析，找出迷思概念、學習盲點與困難所在，以進行補救教學或提出轉介證明。例如分數加法總是把分母相加的學生，透過錯題分析找出迷思再補救。\n2. 與形成性評量的差異：形成性評量針對全班，目的是確認學習進度並調整教學；診斷性評量則是指針對特定有困難的學生，深入找出困難原因。' },
+  { id: 16, topic: 'reference', type: '比較', category: '常模參照 vs. 標準參照',
+    question: '請比較常模參照與標準（效標）參照評量的意義、特徵與適用情境，並各舉兩個實例。',
+    keywords: [
+      { label: '常模參照＝相對位置', groups: [['常模參照'], { name: '相對位置', t: ['相對', '排名', '比高低', 'pr', '百分等級'] }] },
+      { label: '標準參照＝事先決定的絕對標準', groups: [STD_REF, { name: '事先決定的絕對門檻', t: ['事先', '絕對', '門檻', '通過', '及格', '過關'] }] },
+      { label: '常模重鑑別度、適用異質團體', groups: [['鑑別度'], { name: '異質團體或高信度', t: ['異質', '高信度', '信度高'] }] },
+      { label: '標準適用精熟學習、形成與診斷', groups: [['精熟'], { name: '形成或診斷性評量', t: ['形成', '診斷'] }] },
+    ],
+    examples: ['學測', '會考', '教甄', '教檢', '駕照', '英檢', '游泳', '60分'],
+    exampleHint: '常模：學測、會考、教甄前 20% 進複試；標準：教檢 60 分及格、駕照、游泳 1～10 級。',
+    model: '1. 常模參照是指將個人分數與常模團體比較，了解個人在團體中的相對位置（比高低、看 PR 值）。重視鑑別度與高信度，適用於總結性評量、範圍廣、異質性大的團體。例如學測、國中會考、教甄排名前 20% 進複試。\n2. 標準（效標）參照是指依教學前事先決定的學習目標與表現標準（絕對門檻），判斷學生是否通過，不與他人比較。最適合精熟學習，適用於形成性與診斷性評量。例如教師資格檢定 60 分及格、駕照考試、游泳 1～10 級。\n3. 口訣：常模比高低，標準看過關。' },
+  { id: 17, topic: 'reference', type: '情境', category: '實作成績 1～6 級',
+    question: '方老師依事先訂定的表現標準，把學生期末實作成績公告為 1～6 級，不與他人排名。這是哪一種參照評量？請說明理由，並指出這類評量信度的特性。',
+    keywords: [
+      { label: '標準/效標參照', groups: [STD_REF] },
+      { label: '事先訂定標準、不排名', groups: [{ name: '事先訂標準', t: ['事先', '事前', '表現標準'] }, { name: '不與他人比較', t: ['不排名', '不比較', '不與他人', '不和別人', '不跟別人'] }] },
+      { label: '信度較低（一刀切）、重效度', groups: [['信度'], { name: '較低／一刀切', t: ['較低', '偏低', '一刀切'] }] },
+    ],
+    examples: ['游泳', '1~6級', '1到6級', '駕照', '教檢', '60分', '59分'],
+    exampleHint: '和游泳分級、駕照一樣；60 分過、59 分不過的一刀切。',
+    model: '1. 屬於標準（效標）參照評量。\n2. 理由：方老師依事先訂定的表現標準把學生分成 1～6 級，看的是學生是否達到各級標準（絕對門檻），不與他人排名比較，就像游泳分級檢測、駕照考試。\n3. 信度特性：標準參照在及格邊緣屬於「一刀切」（如 60 分過、59 分不過），因此信度通常較低，重要的是效度。' },
+  { id: 18, topic: 'reference', type: '情境', category: '教甄與教檢的參照',
+    question: '某縣教甄初試只取前 20% 進入複試；教師資格檢定則是 60 分及格。請分別說明這兩種考試屬於哪一種參照，以及分數解釋的差別。',
+    keywords: [
+      { label: '教甄取前 20%＝常模參照', groups: [['常模參照'], { name: '教甄前 20%', t: ['教甄', '前20', '20%', '百分之20', '百分之二十'] }] },
+      { label: '教檢 60 分及格＝標準參照', groups: [STD_REF, { name: '教檢 60 分', t: ['教檢', '60', '及格'] }] },
+      { label: '相對位置 vs. 絕對門檻', groups: [{ name: '相對位置', t: ['相對', '排名', '比高低'] }, { name: '絕對門檻', t: ['絕對', '門檻', '過關', '一刀切'] }] },
+    ],
+    examples: ['學測', '會考', '駕照', '游泳', '英檢'],
+    exampleHint: '常模比高低（看名次），標準看過關（看門檻）。',
+    model: '1. 教甄初試取前 20% 屬於常模參照：看考生在團體中的相對位置，名次決定能否進複試，分數本身高低不是重點。\n2. 教檢 60 分及格屬於標準（效標）參照：依事先決定的絕對門檻判斷是否過關，不論其他人考幾分，達到 60 分就通過。\n3. 差別：常模參照比高低（相對），標準參照看過關（絕對）。例如學測、會考也是常模參照；駕照考試、游泳分級也是標準參照。' },
+  { id: 19, topic: 'standard', type: '比較', category: '標準化 vs. 教師自編',
+    question: '標準化測驗與教師自編（非標準化）測驗有何不同？各有什麼優缺點？',
+    keywords: [
+      { label: '標準化：專業部門統一編製', groups: [['標準化'], { name: '專業部門統一編製', t: ['專業', '統一', '一致'] }] },
+      { label: '施測、計分程序與常模一致', groups: [{ name: '施測與計分程序一致', t: ['施測', '計分'] }, ['常模']] },
+      { label: '優點：公平、客觀、可比較', groups: [{ name: '公平、客觀、可比較', t: ['公平', '客觀', '可比較', '比較'] }] },
+      { label: '缺點：窄化教學', groups: [['窄化']] },
+      { label: '教師自編：依班級需求、具彈性', groups: [['自編', '非標準化'], { name: '依班級需求、具彈性', t: ['彈性', '需求', '班級', '在地', '個別差異'] }] },
+    ],
+    examples: ['花蓮', '台南', '臺南', '台北', '臺北', '夜市', '羅東', '英語隨堂', '學習單'],
+    exampleHint: '全台灣花蓮、台南、台北考同一份（標準化）；自編英語隨堂考、羅東夜市踏查學習單（自編）。',
+    model: '1. 標準化測驗是指由專業部門統一編製，施測程序、計分標準與常模都一致，全台灣花蓮、台南、台北考同一份。優點是公平、客觀、可跨區比較，連分數也可標準化；缺點是容易窄化教學。\n2. 非標準化（教師自編）測驗是指老師依班級特定需求與教學目標自行設計，只在自己班上施測，例如自編英語隨堂考、羅東夜市踏查學習單。優點是彈性高、能反映個別差異；缺點是缺乏常模，難以跨班比較。' },
+  { id: 20, topic: 'perform', also: ['validity'], type: '情境', category: '學習動機量表',
+    question: '輔導老師想用「學習動機量表」了解學生的學習動機。請判斷它屬於最大表現或典型表現測驗，並說明應重視哪一種效度、理由為何。',
+    keywords: [
+      { label: '典型表現測驗', groups: [['典型表現']] },
+      { label: '沒有對錯、誠實作答', groups: [{ name: '沒有對錯', t: ['沒有對錯', '無對錯', '沒有標準答案', '無標準答案'] }, { name: '誠實作答', t: ['誠實', '正常表現', '真實'] }] },
+      { label: '重視建構(構念)效度', groups: [CONSTRUCT] },
+      { label: '動機是抽象心理特質', groups: [{ name: '抽象心理特質', t: ['抽象', '心理特質', '特質', '理論'] }] },
+    ],
+    examples: ['焦慮', '自我概念', '人格', '興趣', '內外向'],
+    exampleHint: '焦慮量表、自我概念量表、人格問卷也一樣看建構效度。',
+    model: '1. 學習動機量表屬於典型表現測驗：只要求學生正常表現、誠實作答，沒有標準答案、沒有對錯之分。\n2. 應重視建構（構念）效度：學習動機屬於理論上的抽象心理特質，需檢驗量表是否真的測到這個構念。其他例如焦慮量表、自我概念量表、人格問卷也都看建構效度。' },
+  { id: 21, topic: 'perform', type: '比較', category: '成就測驗 vs. 性向測驗',
+    question: '成就測驗與性向（智力）測驗都屬於最大表現測驗，兩者有何不同？各最重視哪一種效度？',
+    keywords: [
+      { label: '成就測驗：測已學過的成果', groups: [['成就測驗'], { name: '測已學過的成果', t: ['學習成果', '已學', '學過', '教學後', '已知'] }] },
+      { label: '成就測驗重內容效度', groups: [['內容效度']] },
+      { label: '性向測驗：測未來潛能', groups: [['性向', '智力'], ['潛能', '未來']] },
+      { label: '性向測驗重預測效度', groups: [['預測效度']] },
+    ],
+    examples: ['段考', '期末考', '智力測驗', '魏氏', '會考', '模擬考'],
+    exampleHint: '段考是成就測驗；智力測驗、性向測驗看未來發展。',
+    model: '1. 成就測驗：測量已學過、教學後的學習成果，例如段考、期末考，最重視內容效度（所教即所考，用雙向細目表確保）。\n2. 性向（智力）測驗：測量在未知情境下的未來發展潛能，例如智力測驗、性向測驗，最重視預測效度（能否預測未來表現）。\n3. 兩者都要求受試者盡力考到最好、有對錯之分，所以都是最大表現測驗。' },
+  { id: 22, topic: 'relval', type: '情境', category: '體重計的信效度',
+    question: '一台體重計每次量都比實際重 2 公斤，而且每次結果都一樣。請用信度與效度的概念說明這台體重計，並說明兩者的關係。',
+    keywords: [
+      { label: '信度高（穩定一致）', groups: [{ name: '信度高', t: ['信度高', '信度很高', '信度.{0,6}高'] }, { name: '穩定一致', t: ['穩定', '一致'] }] },
+      { label: '效度低（系統誤差）', groups: [{ name: '效度低', t: ['效度低', '效度不高', '效度.{0,6}(低|不)'] }, ['系統誤差']] },
+      { label: '信度高，效度不一定高', groups: [{ name: '信度高不保證效度高', t: ['不一定', '不保證', '未必'] }] },
+      { label: '必要而非充分條件', groups: [['必要'], ['充分']] },
+    ],
+    examples: ['體重計', '2公斤', '兩公斤', '飛鏢', '紅心'],
+    exampleHint: '和飛鏢穩定射在左下角一樣：集中但偏離紅心。',
+    model: '1. 這台體重計信度高：每次量的結果都一樣，穩定且一致。\n2. 但效度低：每次都比實際重 2 公斤，沒有正確測出真實體重，屬於系統誤差。\n3. 關係：信度高，效度不一定高；但效度高，信度一定高；信度低，效度一定低。所以信度是效度的必要條件而非充分條件，就像飛鏢穩定射在左下角，集中卻偏離紅心。' },
+  { id: 23, topic: 'relval', type: '定義', category: '系統誤差與隨機誤差',
+    question: '什麼是測量誤差中的系統誤差與隨機誤差？分別影響信度還是效度？請說明真實分數公式 X = T + E 的意義。',
+    keywords: [
+      { label: 'X＝T＋E', groups: [{ name: '觀察分數＝真實分數＋誤差', t: ['x=t\\+e', '觀察分數', '真實分數'] }, ['誤差']] },
+      { label: '隨機誤差影響信度', groups: [['隨機誤差', '機率誤差'], ['信度']] },
+      { label: '系統誤差影響效度', groups: [['系統誤差'], ['效度']] },
+    ],
+    examples: ['體重計', '飛鏢', '身體不舒服', '猜題', '睡眠', '運氣'],
+    exampleHint: '當天身體不舒服、猜題運氣（隨機）；體重計每次都多 2 公斤（系統）。',
+    model: '1. 古典測驗理論：X＝T＋E，觀察分數等於真實分數加上誤差。\n2. 隨機誤差：每次測量時不規則出現的誤差，例如受試者當天身體不舒服、猜題運氣，影響測驗的穩定性，也就是信度。\n3. 系統誤差：每次都朝同一方向偏離的誤差，例如體重計每次都多 2 公斤，影響測驗的正確性，也就是效度。' },
+  { id: 24, topic: 'validity', type: '情境', category: '同時效度與預測效度',
+    question: '研究者新編一份智力測驗，想知道它能否取代魏氏智力量表；另一份模擬考則想用來預估學生下學期會考的表現。請分別說明兩者要檢驗哪一種效度。',
+    keywords: [
+      { label: '同時效度(與現有效標同時施測)', groups: [['同時效度', '並行效度'], { name: '與現有效標同時施測', t: ['同時施測', '取代', '魏氏'] }] },
+      { label: '預測效度(預估未來表現)', groups: [['預測效度'], { name: '預估未來表現', t: ['未來', '時間差', '會考', '以後'] }] },
+      { label: '同屬效標關聯效度', groups: [['效標關聯', '效標']] },
+    ],
+    examples: ['魏氏', '模擬考', '會考', '學力測驗'],
+    exampleHint: '新智力測驗和魏氏一起考（同時）；模擬考預估會考（預測）。',
+    model: '1. 新智力測驗與魏氏智力量表同時施測，看能否取代原測驗，檢驗的是「同時效度（並行效度）」。\n2. 模擬考用來預估下學期會考表現，現在的分數預測未來、有時間差，檢驗的是「預測效度」。\n3. 效標關聯效度是指拿外在公認的效標來求相關，兩者都屬於這一類，例如性向測驗也重視預測效度。' },
+  { id: 25, topic: 'validity', also: ['bloom'], type: '情境', category: '雙向細目表',
+    question: '導師編製段考試卷前，先做了一份雙向細目表。請說明編製測驗的第一步、雙向細目表的兩個向度、它主要確保哪一種效度，以及配分原則。',
+    keywords: [
+      { label: '第一步：確定測驗目的', groups: [{ name: '確定測驗目的', t: ['第一步', '確定.{0,4}目的'] }] },
+      { label: '兩向度：教材內容 × 教學目標', groups: [['雙向細目表'], { name: '教材內容（單元）', t: ['教材', '單元', '內容'] }, { name: '教學目標（認知歷程）', t: ['教學目標', '認知', '目標'] }] },
+      { label: '確保內容效度', groups: [['內容效度']] },
+      { label: '單元配分均衡、認知層次不強求', groups: [{ name: '單元配分均衡', t: ['均衡', '平均', '比重', '各佔'] }, { name: '認知層次不強求相等', t: ['不強求', '不必', '不一定', '不需'] }] },
+    ],
+    examples: ['50分', '25分', '段考', '記憶', '了解', '應用'],
+    exampleHint: '兩單元各 50 分；選擇與非選各 50 分時，每單元選擇、非選各 25 分。',
+    model: '1. 編製測驗的第一步是確定測驗目的。\n2. 雙向細目表是命題藍圖，兩個向度是「教材內容（單元）」與「教學目標（認知歷程，如記憶、了解、應用）」。\n3. 主要確保內容效度，做到所教即所考。\n4. 配分原則：各單元配分要均衡，例如兩單元各 50 分；若選擇與非選各 50 分，則各單元選擇、非選各 25 分。但各認知層次比例不強求相等。' },
+  { id: 26, topic: 'reliability', type: '情境', category: '資優班考卷信度偏低',
+    question: '某資優班數學段考分數普遍很高、彼此差距很小，老師發現這份考卷的信度偏低。請從影響信度的因素解釋原因，並提出提高信度的做法。',
+    keywords: [
+      { label: '同質性高、分數差異小', groups: [['同質'], { name: '差異小、標準差小', t: ['差異小', '差距小', '標準差', '分數接近', '集中'] }] },
+      { label: '題目偏簡單、難度不適中', groups: [{ name: '題目太簡單或難度不適中', t: ['簡單', '容易', '難度', '天花板'] }] },
+      { label: '增加題數', groups: [{ name: '增加題數', t: ['題數', '增加題目', '題目數', '增加.{0,4}題'] }] },
+      { label: '難度調整為適中', groups: [{ name: '難度適中（P 約 0.50）', t: ['適中', '0\\.5', '50%'] }] },
+    ],
+    examples: ['資優班', '音樂班', '體育班', '天花板'],
+    exampleHint: '資優班、音樂班、體育班同質性高；大家都考高分＝天花板效應。',
+    model: '1. 同質性是指團體成員程度相近。例如資優班、音樂班同質性高，分數集中、差異小（標準差小），信度會降低；團體異質性越高，信度越高。\n2. 大家都考很高代表題目偏簡單，難度不適中也會降低信度。\n3. 提高信度的做法：適度增加同質性的題目數量；把題目難度調整到適中（P 約 0.50）；若要比較信度，應以異質性較高的團體來估計。' },
+  { id: 27, topic: 'reliability', type: '比較', category: '再測信度 vs. 評分者信度',
+    question: '請比較再測信度與評分者信度的意義與實施方式，並說明哪一種信度通常最高、哪一種最低，原因為何。',
+    keywords: [
+      { label: '再測信度：同卷隔時間測兩次', groups: [['再測', '重測'], { name: '隔一段時間測兩次', t: ['隔', '兩次', '二次', '兩週', '兩周'] }] },
+      { label: '再測信度通常最高', groups: [['最高']] },
+      { label: '評分者信度：多位評分者一致程度', groups: [['評分者'], { name: '多位評分者的一致程度', t: ['一致', '吻合', '多位', '不同評分者'] }] },
+      { label: '評分者信度最低：主觀、月暈效應', groups: [['最低'], { name: '主觀因素（月暈效應）', t: ['主觀', '月暈'] }] },
+    ],
+    examples: ['影分身', '兩週', '申論', '作文', '實作', '月暈'],
+    exampleHint: '再測像影分身；申論題、作文給不同老師改，分數差很多。',
+    model: '1. 再測信度是指同一份測驗隔一段時間（如兩週）對同一批人施測兩次，求兩次分數的相關，像「影分身」，通常是所有信度中最高的。\n2. 評分者信度是指多位評分者對同一份申論題、作文或實作表現評分，求評分之間的一致程度。因受月暈效應等主觀因素影響，評分差距可能很大，是所有信度中最低的。' },
+  { id: 28, topic: 'skew', type: '情境', category: '大多考 90 分以上',
+    question: '某次數學段考，全班大多考 90 分以上，只有少數幾位考很低。請說明這種分數分布的名稱、試題難度意義、效應名稱，以及平均數、中位數、眾數的大小關係。',
+    keywords: [
+      { label: '左偏態/負偏態', groups: [['左偏', '負偏']] },
+      { label: '題目太簡單', groups: [{ name: '題目太簡單', t: ['簡單', '容易'] }] },
+      { label: '天花板效應(高限效應)', groups: [['天花板', '高限']] },
+      { label: '眾數 > 中位數 > 平均數', groups: [{ name: '眾數最大', t: ['眾數.{0,3}>', '眾數.{0,4}大於', 'mo.{0,2}>', '眾數最大', '眾數最高'] }, { name: '平均數最小', t: ['>.{0,3}平均數', '大於平均數', '平均數最小', '平均數最低', '拉低'] }] },
+    ],
+    examples: ['90分', '少數', '極端', '長尾巴', '尾巴'],
+    exampleHint: '多數人擠在高分、長尾巴拖在左邊，少數極低分把平均數拉低。',
+    model: '1. 這是左偏態（負偏態）：多數人擠在右邊高分區，長尾巴拖向左邊低分區。\n2. 代表題目太簡單，稱為天花板效應（高限效應）。\n3. 集中量數：眾數 > 中位數 > 平均數，因為少數極低分把平均數往左拉低。' },
+  { id: 29, topic: 'skew', also: ['reliability'], type: '情境', category: '大多考不及格',
+    question: '某次考試大多數學生都考不及格，只有少數人考很高。請判斷分布型態，說明長尾巴在哪一邊、代表什麼效應，以及這對試題的信度與鑑別度有何影響。',
+    keywords: [
+      { label: '右偏態/正偏態', groups: [['右偏', '正偏']] },
+      { label: '長尾巴在右（高分區）', groups: [{ name: '長尾巴在右邊', t: ['尾巴.{0,6}右', '右邊.{0,4}尾', '高分區'] }] },
+      { label: '地板效應、題目太難', groups: [['地板', '低限'], { name: '題目太難', t: ['太難', '很難', '困難', '偏難', '過難'] }] },
+      { label: '信度與鑑別度降低', groups: [{ name: '信度、鑑別度', t: ['信度', '鑑別度'] }, { name: '降低', t: ['降低', '下降', '變低', '偏低'] }] },
+    ],
+    examples: ['不及格', '少數', '長尾巴', '0.5', '適中'],
+    exampleHint: '分數都擠在低分端、差異變小；難度 P 約 0.50 時信度與鑑別度最高。',
+    model: '1. 這是右偏態（正偏態）：多數人擠在左邊低分區，長尾巴拖向右邊高分區。\n2. 代表題目太難，稱為地板效應（低限效應）；平均數 > 中位數 > 眾數。\n3. 影響：分數都擠在低分端、差異變小，信度與鑑別度都會降低。難度適中（P 約 0.50）時信度與鑑別度最高。' },
+  { id: 30, topic: 'normal', type: '計算', category: '小英 T 分數 40',
+    question: '小英在自我概念量表的 T 分數為 40 分。請換算她的 Z 分數與大約的 PR 值，並說明她的位置。',
+    keywords: [
+      { label: 'T＝50＋10Z', groups: [{ name: 'T＝50＋10Z', t: ['50\\+10z', '50加10z'] }] },
+      { label: 'Z＝−1', groups: [{ name: 'Z＝−1', t: ['z=-1', 'z=−1', 'z等於負1', '負1', '負一'] }] },
+      { label: '低於平均數 1 個標準差', groups: [{ name: '低於平均數', t: ['低於平均', '平均數以下', '低於.{0,4}平均'] }] },
+      { label: 'PR 約 16', groups: [{ name: 'PR 約 16', t: ['16', '15\\.87'] }] },
+    ],
+    examples: ['自我概念', '34.13', '50%'],
+    exampleHint: '平均數以下 50%，減掉 −1～0 之間的 34.13%，剩 15.87%。',
+    model: '1. T 分數公式：T＝50＋10Z。40＝50＋10Z，所以 Z＝−1。\n2. Z＝−1 就是小英低於平均數 1 個標準差。\n3. 常態分配下，平均數以下有 50%，−1 到 0 之間有 34.13%，所以 PR 約為 50－34.13＝15.87，約 PR 16，代表贏過約 16% 的人。\n4. 例如全班 100 人，小英大約贏過 16 人。' },
+  { id: 31, topic: 'normal', type: '計算', category: '教甄 T 分數 70',
+    question: '某生教甄的 T 分數為 70 分，宜蘭縣錄取率 2%、花蓮縣錄取率 3%。請換算 Z 分數與 PR，並判斷他在兩縣是否錄取。',
+    keywords: [
+      { label: 'Z＝+2', groups: [{ name: 'Z＝+2', t: ['z=\\+?2', 'z等於2', '正2', '正二'] }] },
+      { label: 'PR 97.72、前 2.28%', groups: [{ name: 'PR 97.72', t: ['97\\.72', '97'] }, { name: '前 2.28%', t: ['2\\.28'] }] },
+      { label: '宜蘭落榜、花蓮錄取', groups: [{ name: '宜蘭落榜', t: ['宜蘭.{0,30}(落榜|沒上|不錄取|未錄取|沒有錄取|沒考上)'] }, { name: '花蓮錄取', t: ['花蓮.{0,30}(錄取|上榜|考上)'] }] },
+    ],
+    examples: ['宜蘭', '花蓮', '教甄'],
+    exampleHint: '前 2.28% 不在宜蘭的前 2%，但在花蓮的前 3% 之內。',
+    model: '1. T 分數是指平均數 50、標準差 10 的標準分數，T＝50＋10Z，70＝50＋10Z，所以 Z＝+2。\n2. Z＝+2 時 PR 為 97.72，代表排名前 2.28%。\n3. 例如宜蘭縣錄取率 2%，前 2.28% 不在前 2% 內，所以落榜；花蓮縣錄取率 3%，前 2.28% 在前 3% 內，所以錄取。' },
+  { id: 32, topic: 'normal', type: '定義', category: '常態面積與 IQ 切點',
+    question: '常態分配下，平均數上下 1、2、3 個標準差的面積比例各是多少？魏氏智力測驗的特教安置切點是什麼？',
+    keywords: [
+      { label: '±1S＝68.26%', groups: [['68\\.26', '68']] },
+      { label: '±2S＝95.44%', groups: [['95\\.44', '95']] },
+      { label: '±3S＝99.72%', groups: [['99\\.72', '99\\.7']] },
+      { label: 'IQ＝100＋15Z', groups: [{ name: 'IQ＝100＋15Z', t: ['100\\+15z', '平均數100', '標準差15', '100.{0,6}15'] }] },
+      { label: 'IQ≥130 資優、IQ≤70 資源班', groups: [['130'], ['70'], { name: '資優／資源班安置', t: ['資優', '資源班', '特殊教育', '特教'] }] },
+    ],
+    examples: ['34.13', '13.59', '2.14', '資優班', '資源班'],
+    exampleHint: '單側 34.13%、13.59%、2.14%；超過 ±2 個標準差需特教安置。',
+    model: '1. 常態分配面積：平均數上下 1 個標準差占 68.26%（單側 34.13%）；上下 2 個標準差占 95.44%（1～2 個標準差之間單側 13.59%）；上下 3 個標準差占 99.72%（2～3 個標準差之間單側 2.14%）。\n2. 魏氏智力測驗 IQ＝100＋15Z，也就是平均數 100、標準差 15。\n3. 特教安置切點是指上下超過 2 個標準差需特殊教育安置，例如 IQ ≥ 130（Z ≥ +2）安置資優班，IQ ≤ 70（Z ≤ −2）安置資源班。' },
+  { id: 33, topic: 'normal', also: ['reference'], type: '定義', category: '百分等級 PR',
+    question: '什麼是百分等級（PR）？它與百分比分數有何不同？為什麼 PR 沒有 0 和 100？',
+    keywords: [
+      { label: 'PR＝贏過百分之多少的人（相對位置）', groups: [{ name: '贏過百分之多少的人', t: ['贏過', '勝過', '高於', '超過'] }, { name: '相對位置', t: ['相對', '排名', '位置'] }] },
+      { label: 'PR 沒有 0 和 100', groups: [{ name: '沒有 0 與 100', t: ['沒有0', '沒有零', '沒有100', '1.{0,3}99', '1到99'] }] },
+      { label: '百分比分數＝答對比例', groups: [{ name: '百分比分數＝答對比例', t: ['答對', '百分比分數', '原始分數'] }] },
+      { label: 'PR 屬常模參照', groups: [['常模']] },
+    ],
+    examples: ['會考', '學測', '80分', 'pr80', 'pr 80'],
+    exampleHint: '答對 80% 不等於 PR 80；會考、學測用 PR。',
+    model: '1. 百分等級（PR）是常模參照的分數，代表在團體中贏過百分之多少的人，表示相對位置。例如 PR 80 代表贏過 80% 的人。\n2. 百分比分數是答對題數占總題數的比例，是絕對分數；答對 80% 不等於 PR 80。\n3. PR 永遠介於 1～99，沒有 0 也沒有 100：最高分的人也無法贏過包含自己在內的全體 100%，最低分也記為 1。' },
+  { id: 34, topic: 'item', type: '計算', category: '算難度與鑑別度',
+    question: '某題高分組通過率 0.80，低分組通過率 0.40。請計算難度 P 與鑑別度 D，並評估這題的品質。',
+    keywords: [
+      { label: 'P＝(PH＋PL)÷2＝0.60', groups: [['難度'], { name: 'P＝0.60', t: ['0\\.6', '0\\.60'] }] },
+      { label: 'D＝PH－PL＝0.40', groups: [['鑑別度'], { name: 'D＝0.40', t: ['0\\.4', '0\\.40'] }] },
+      { label: '難度適中', groups: [{ name: '難度在理想範圍', t: ['適中', '理想', '0\\.4.{0,3}0\\.6'] }] },
+      { label: '鑑別度良好', groups: [{ name: '鑑別度良好', t: ['良好', '佳', '不錯', '很好', '能區分', '區分'] }] },
+    ],
+    examples: ['0.8', '0.4', '27%', '高分組'],
+    exampleHint: '把公式代入念出來：(0.8＋0.4)÷2、0.8－0.4。',
+    model: '1. 難度是指通過率，P＝(PH＋PL)÷2＝(0.80＋0.40)÷2＝0.60。\n2. 鑑別度 D＝PH－PL＝0.80－0.40＝0.40。\n3. 評估：像這題難度 0.60 落在理想範圍 0.40～0.60，屬於難度適中；鑑別度 0.40 為正值且相當高，能有效區分高分組與低分組，是品質良好的題目。' },
+  { id: 35, topic: 'item', type: '情境', category: '鑑別度 −0.2',
+    question: '某題鑑別度為 −0.2。請解釋這個數值的意義，並說明教師應如何處理。',
+    keywords: [
+      { label: 'D＝PH－PL', groups: [{ name: 'D＝PH－PL', t: ['ph-pl', 'ph−pl'] }] },
+      { label: '低分組答對率高於高分組', groups: [{ name: '低分組答對比高分組多', t: ['低分組.{0,8}(高|多|好)', '高分組.{0,8}(低|少|差|錯)'] }] },
+      { label: '原因：題目或答案有誤、高分組誤解', groups: [{ name: '題目或答案有誤、高分組誤解', t: ['誤解', '答案.{0,4}錯', '題目.{0,4}(錯|誤|問題)', '給錯'] }] },
+      { label: '處理：檢查修改或刪題', groups: [{ name: '檢討修改或刪題', t: ['修改', '刪除', '刪題', '檢查', '重新', '修題', '送分'] }] },
+    ],
+    examples: ['-0.2', '−0.2', '27%', '高分組'],
+    exampleHint: '−0.2 代表低分組答對率比高分組高 20%。',
+    model: '1. 鑑別度是指高低分組答對率的差，D＝PH－PL，−0.2 代表低分組的答對率反而比高分組高 20%。\n2. 原因：通常是題目出錯，例如標準答案給錯，或高分組對題目有所誤解（想太多），題目品質有問題。\n3. 處理：老師應檢查題目與標準答案，修改題目或刪除此題，必要時重新計分。' },
+  { id: 36, topic: 'bloom', type: '比較', category: 'Bloom 舊版 vs. 修訂版',
+    question: 'Bloom 舊版與 2001 年修訂版認知領域有何差異？請說明名詞改動詞、最高兩層的變化。',
+    keywords: [
+      { label: '2001 年 Anderson 等人修訂', groups: [{ name: '2001／Anderson', t: ['2001', 'anderson', '安德森'] }] },
+      { label: '名詞改為動詞', groups: [['名詞'], ['動詞']] },
+      { label: '新版六層', groups: [['記憶'], ['了解', '理解'], ['應用'], ['分析']] },
+      { label: '綜合改為創造', groups: [['綜合'], ['創造']] },
+      { label: '最高兩層對調（評鑑、創造）', groups: [{ name: '順序對調', t: ['對調', '調換', '互換', '順序'] }, ['評鑑']] },
+    ],
+    examples: ['畢業旅行', '日本', '墾丁', '記了應分評創'],
+    exampleHint: '口訣「記、了、應、分、評、創」；評鑑＝比較畢旅去日本或墾丁。',
+    model: '1. 修訂版是指 2001 年由 Anderson 等人修訂的版本。\n2. 舊版用名詞：知識、理解、應用、分析、綜合、評鑑；新版改用動詞：記憶、了解、應用、分析、評鑑、創造，口訣「記、了、應、分、評、創」。\n3. 最高兩層順序對調，且「綜合」改為「創造」，創造成為最高層。評鑑是指依規準判斷好壞對錯並做決策，例如評估畢業旅行去日本或墾丁的經費與效益。\n4. 修訂版另外加入知識向度：事實、概念、程序、後設認知。' },
+  { id: 37, topic: 'bloom', type: '情境', category: '判斷四種知識向度',
+    question: '請判斷下列各屬於哪一種知識向度並說明：(1) 認識動物園裡的豬、狗、斑馬；(2) 理解「哺乳類動物」；(3) 學會使用量筒的步驟；(4) 考前先看考古題抓方向。',
+    keywords: [
+      { label: '事實知識(具體名詞)', groups: [['事實'], { name: '具體名詞細節', t: ['具體', '名詞', '細節', '符號'] }] },
+      { label: '概念知識(抽象分類)', groups: [['概念'], { name: '抽象分類', t: ['抽象', '分類', '原理', '通則'] }] },
+      { label: '程序知識(固定步驟)', groups: [['程序'], { name: '固定操作步驟', t: ['步驟', '順序', '方法', '操作'] }] },
+      { label: '後設認知知識(策略與自我)', groups: [['後設'], { name: '策略與自我知識', t: ['策略', '自我', '脈絡', '情境'] }] },
+    ],
+    examples: ['豬', '斑馬', '哺乳', '量筒', '考古題', '釣魚', '塞車'],
+    exampleHint: '動物園裡沒有一隻動物名字叫「哺乳類」；授人以漁＝程序知識。',
+    model: '(1) 豬、狗、斑馬屬於事實知識：單一、具體的名詞與細節。\n(2) 哺乳類屬於概念知識：抽象的分類與原理通則，動物園裡沒有一隻動物叫哺乳類。\n(3) 量筒使用步驟屬於程序知識：有嚴格固定操作順序的方法，像四則運算、釣魚方法。\n(4) 看考古題抓方向屬於後設認知知識：知道用什麼策略學習、了解任務情境與自我，像下班避開塞車路線。' },
+  { id: 38, topic: 'bloom', type: '情境', category: '評鑑層次與紙筆測驗',
+    question: '畢業旅行要選擇去日本或墾丁，老師請學生依經費與效益做出決定並說明理由。這屬於 Bloom 修訂版哪一個認知層次？為什麼紙筆測驗中很少出現最高層次的題目？',
+    keywords: [
+      { label: '評鑑（依規準判斷、決策）', groups: [['評鑑'], { name: '依規準判斷、做決策', t: ['規準', '判斷', '決策', '決定', '好壞'] }] },
+      { label: '最高層是創造', groups: [['創造']] },
+      { label: '高層次主觀、無標準答案', groups: [{ name: '主觀、沒有標準答案', t: ['主觀', '沒有標準答案', '無標準答案', '批判'] }] },
+      { label: '改用實作或檔案評量', groups: [{ name: '改用實作或檔案評量', t: ['實作', '檔案'] }] },
+    ],
+    examples: ['日本', '墾丁', '畢業旅行', '經費'],
+    exampleHint: '評鑑＝依經費、效益這些規準判斷，再做決定。',
+    model: '1. 屬於「評鑑」層次：也就是依經費、效益等規準判斷好壞並做出決策，例如比較畢業旅行去日本或墾丁。\n2. 修訂版最高層是「創造」，其次是評鑑。\n3. 評鑑與創造涉及主觀批判、沒有標準答案，難以在標準化紙筆測驗客觀計分，所以紙筆測驗多停在記憶、了解、應用，頂多到分析；高層次多改用實作評量或檔案評量來評。' },
+  { id: 39, topic: 'trend', type: '情境', category: '科學閱讀的多元評量',
+    question: '陳老師開設「科學閱讀」選修，評分依據為閱讀省思 30%、小組辯論 30%、專題報告與發表 40%。這屬於哪一種評量？多元評量可以使用紙筆測驗嗎？',
+    keywords: [
+      { label: '多元評量（含實作評量）', groups: [['多元評量', '多元'], { name: '實作評量', t: ['實作'] }] },
+      { label: '可以用紙筆，只要不是唯一工具', groups: [['紙筆'], { name: '不是唯一工具', t: ['唯一', '其中一種', '之一'] }] },
+      { label: '兼具主觀與客觀資訊', groups: [['主觀'], ['客觀']] },
+      { label: '不是動態評量（需前測—介入—後測）', groups: [{ name: '動態評量需前測—介入—後測', t: ['前測', '後測', '介入'] }] },
+    ],
+    examples: ['科學閱讀', '辯論', '專題', '30%', '40%'],
+    exampleHint: '省思 30%＋辯論 30%＋專題 40%；動態評量一定要有前測、介入、後測。',
+    model: '1. 陳老師結合閱讀省思、小組辯論、專題報告與發表等多種表現形式，屬於多元評量，其中辯論、專題發表也屬於實作評量。\n2. 多元評量可以使用紙筆測驗：紙筆測驗是多元評量的其中一種工具，只要不是唯一工具即可，因此多元評量同時包含主觀與客觀資訊。\n3. 這不是動態評量，動態評量必須有「前測—教學介入—後測」三階段。' },
+  { id: 40, topic: 'trend', type: '比較', category: '靜態、動態、真實、CAT',
+    question: '請比較靜態評量與動態評量的差異，並說明真實性評量與電腦適性測驗（CAT）的意義與實例。',
+    keywords: [
+      { label: '靜態一次施測 vs. 動態結合教學', groups: [['靜態'], ['動態'], { name: '評量結合教學、看潛能', t: ['結合', '潛能', '歷程', '介入'] }] },
+      { label: '真實性評量：真實生活脈絡', groups: [['真實'], { name: '真實生活脈絡', t: ['生活', '脈絡', '情境'] }] },
+      { label: '傳統紙筆＝虛假評量', groups: [['虛假']] },
+      { label: 'CAT 依作答調整難度', groups: [['適性', 'cat'], { name: '依作答調整難度', t: ['難度', '調整'] }] },
+    ],
+    examples: ['托福', 'toefl', '英檢', '商店', '買東西', '郵局'],
+    exampleHint: '讓低年級到商店買東西（真實）；托福、英檢（CAT）。',
+    model: '1. 靜態評量是一次施測、只看結果；動態評量採「前測—教學介入—後測」，把評量與教學結合，評估學習歷程與潛能（Feuerstein 提出，基於 Vygotsky 的 ZPD）。\n2. 真實性評量：在真實生活脈絡中解決問題，例如讓低年級學生到商店買東西評量算數能力；相對地，傳統紙筆測驗被稱為虛假評量。\n3. 電腦適性測驗（CAT）：電腦依受試者作答情形動態調整題目難度，精準估算真實能力，例如托福、英檢。' },
+  { id: 41, topic: 'performance', type: '情境', category: '特教學生打電話',
+    question: '李老師要求特教班學生實際撥打電話給老師，以評定其打電話技巧。這是什麼評量？請說明它的優點與限制。',
+    keywords: [
+      { label: '實作評量/表現本位', groups: [['實作', '表現本位']] },
+      { label: '情境相關(脈絡化)', groups: [['情境', '脈絡']] },
+      { label: '不受語文能力干擾', groups: [['語文', '語言']] },
+      { label: '耗時、評分者信度低', groups: [{ name: '耗時花錢', t: ['耗時', '費時', '花錢'] }, { name: '評分主觀、評分者信度低', t: ['主觀', '評分者信度', '信度低', '不客觀'] }] },
+    ],
+    examples: ['打電話', '郵局', '寄信', '康乃馨', '瘖啞', '廚師', '試教'],
+    exampleHint: '帶一年級去郵局寄信、用皺紋紙做康乃馨也是實作評量。',
+    model: '1. 這是實作評量（表現本位評量），是指要學生實際做出打電話的行為。\n2. 優點：情境相關（脈絡化），也就是在真實情境中結合知識與能力；比標準化測驗更能提供有效解釋、引導有意義的學習；較不受語文能力干擾，例如瘖啞人士仍能展現廚藝，特教學生不必靠紙筆也能展現能力。\n3. 限制：非常耗時花錢、情境不易控制、評分標準難界定，評分容易主觀，評分者信度偏低，可搭配評分規準改善。' },
+  { id: 42, topic: 'performance', type: '定義', category: '作品評量三大類',
+    question: '實作評量中的作品評量有哪三大類？請各舉實例。',
+    keywords: [
+      { label: '書面（文章、報告）', groups: [['書面'], { name: '文章、報告', t: ['文章', '報告'] }] },
+      { label: '視覺（圖表、概念圖、繪畫）', groups: [['視覺'], { name: '圖表、概念圖、繪畫', t: ['圖表', '概念圖', '繪畫', '多媒體', '展覽'] }] },
+      { label: '學習檔案（過程與作品樣本）', groups: [['學習檔案', '檔案'], { name: '過程與作品樣本', t: ['過程', '歷程', '樣本'] }] },
+    ],
+    examples: ['報告', '概念圖', '統計圖', '繪畫', '展覽', '作文'],
+    exampleHint: '書面報告、統計圖或概念圖、作文從初稿到定稿的學習檔案。',
+    model: '作品評量是指以學生完成的作品來評量，可分三大類：\n1. 書面作品：例如文章、書面報告、作文。\n2. 視覺作品：例如統計圖表、概念圖、繪畫、多媒體、展覽。\n3. 學習檔案：包含學習過程與作品樣本，也就是把作文從初稿、修改稿到定稿的歷程與省思收集起來。' },
+  { id: 43, topic: 'portfolio', type: '情境', category: '檔案內容由老師決定',
+    question: '趙老師讓學生製作學習檔案，但檔案內容完全由老師決定，以利統一評分。請判斷這個做法是否適切，並說明檔案評量應有的做法。',
+    keywords: [
+      { label: '不適切：變成強結構化', groups: [{ name: '不適切', t: ['不適切', '不恰當', '不適當', '不對', '不妥'] }, ['強結構']] },
+      { label: '弱結構化、學生參與選件', groups: [['弱結構'], { name: '學生參與選擇', t: ['學生參與', '共同', '共建', '學生.{0,4}選'] }] },
+      { label: '事先與學生家長溝通', groups: [{ name: '事先溝通目的與目標', t: ['事先', '事前', '溝通', '討論'] }] },
+      { label: '自我省思與同儕觀摩', groups: [['省思', '反省'], { name: '同儕觀摩分享', t: ['同儕', '觀摩', '分享'] }] },
+    ],
+    examples: ['閱讀', '寫作', '作文', '省思單', '家長'],
+    exampleHint: '讓學生挑自己最滿意的作文放進檔案，並寫省思、訂下一期目標。',
+    model: '1. 不適切：內容完全由老師決定，就是強結構化的傳統作品集，失去檔案評量的意義。\n2. 檔案評量屬於弱結構化，應由師生共建，讓學生參與選擇放入的作品，例如讓學生挑自己最滿意的作文。\n3. 應事先與學生及家長溝通檔案的目的與目標，評分標準事前確定。\n4. 安排學生自我省思並訂定下一期目標，加上家長回饋與教師回饋，並安排同儕展示觀摩。' },
+  { id: 44, topic: 'portfolio', type: '定義', category: '形成性、總結性與自我比較',
+    question: '檔案評量兼具形成性與總結性功能，並強調「自我比較」。請說明這兩個特色的意義。',
+    keywords: [
+      { label: '兼具形成性與總結性', groups: [['形成性'], ['總結性']] },
+      { label: '看歷程與進步', groups: [{ name: '看歷程與進步', t: ['歷程', '過程', '進步'] }] },
+      { label: '自我比較、不與他人排名', groups: [{ name: '與自己比較', t: ['自我比較', '自己比', '跟自己', '和自己', '自己過去'] }, { name: '不與他人排名', t: ['不排名', '不比較', '不與他人', '不與其他', '不和別人', '不跟別人', '不與.{0,6}比較'] }] },
+      { label: '適用所有兒童（含特殊需求）', groups: [{ name: '適用所有兒童', t: ['特殊', '所有', '個別差異'] }] },
+    ],
+    examples: ['作文', '初稿', '定稿', '特教', '學習單'],
+    exampleHint: '作文從初稿、修改稿到定稿，看見自己的進步。',
+    model: '1. 兼具形成性與總結性是指檔案評量重視歷程與結果，在學習過程中持續蒐集作品、看見進步並調整教學（形成性），學期末也能呈現整體成果（總結性）。例如作文從初稿、修改稿到定稿。\n2. 自我比較是指以學生自己過去的表現為基準，看個人的進步，不與其他兒童比較排名，因此重視個別差異，適用於所有兒童，包含特殊需求學生。' },
+  { id: 45, topic: 'observe', type: '情境', category: '分離焦慮的觀察',
+    question: '小一新生小櫻每天早上家長離開後都哭不停。老師想 (1) 記錄她每天有沒有哭；(2) 記錄每次哭泣事件的始末。請分別建議適合的工具或方法並說明理由。',
+    keywords: [
+      { label: '檢核表（只記有無）', groups: [['檢核表'], { name: '只記有／無', t: ['有無', '有沒有', '是否', '有或沒有', '是或否', '打勾'] }] },
+      { label: '不區分等級', groups: [{ name: '不區分等級高低', t: ['不分等級', '沒有等級', '不區分', '無等級'] }] },
+      { label: '事件取樣法（記錄始末）', groups: [['事件取樣'], { name: '事件發生時記錄始末', t: ['始末', '發生', '經過'] }] },
+    ],
+    examples: ['分離焦慮', '哭', '小櫻', '爭吵'],
+    exampleHint: '有沒有哭＝檢核表；哭的時候才開始記前因後果＝事件取樣。',
+    model: '1. 記錄每天「有沒有哭」：使用檢核表，也就是只記錄行為有或沒有（是或否）發生，打勾即可，不區分等級高低。\n2. 記錄每次哭泣事件的始末：使用事件取樣法，例如小櫻分離哭泣這個特定事件發生時才開始觀察，記錄事件的前因、經過與結果，找出輔導方式。' },
+  { id: 46, topic: 'observe', also: ['performance'], type: '定義', category: '評分規準 Rubrics',
+    question: '為什麼評分規準（Rubrics）能提升實作評量的客觀性與公平性？請說明其結構與使用方式。',
+    keywords: [
+      { label: '雙向表格（向度 × 等級描述）', groups: [['雙向'], { name: '評分向度', t: ['向度', '項目', '面向'] }, { name: '等級描述', t: ['等級', '描述', '水準'] }] },
+      { label: '事先向學生說明', groups: [{ name: '事先說明標準', t: ['事先', '事前', '說明', '公布'] }] },
+      { label: '學生據以修改作業', groups: [{ name: '學生據此修改', t: ['修改', '自我檢核', '自評', '改進'] }] },
+      { label: '提高客觀性與公平性', groups: [['客觀'], ['公平']] },
+    ],
+    examples: ['作文', '口頭報告', '書法', '簡報', '實作'],
+    exampleHint: '作文規準：內容、組織、表達三個向度，各分優、佳、待加強並寫出描述。',
+    model: '1. 評分規準是指雙向表格：一個向度代表評分項目（如內容、組織、表達），另一個向度是各等級的表現描述。\n2. 老師事先把規準公布並向學生說明對作業的期待，學生可據此自我檢核與修改作業。\n3. 評分時依明確描述給分，減少主觀與月暈效應，因此提高實作評量的客觀性與公平性。例如作文、口頭報告、書法作品評分。' },
+];
+const SAMPLE = '信度是指測驗結果的穩定性與一致性，受隨機誤差影響；效度是測驗的正確性。兩者關係是信度高效度不一定高，例如射飛鏢每次都射在左下角，很集中但沒有命中紅心。';
+const topicName = id => (TOPICS.find(t => t.id === id) || {}).title || '';
+const inTopic = (q, id) => id === 'all' || q.topic === id || (q.also || []).includes(id);
+
+/* ---------- 比對引擎 ---------- */
+function normWithMap(text) {
+  let n = ''; const map = []; let i = 0;
+  for (const ch of text) {
+    if (!/\s/.test(ch)) {
+      for (const c of ch.normalize('NFKC').toLowerCase()) { n += c; map.push(i); }
+    }
+    i += ch.length;
+  }
+  return { n, map };
+}
+const reCache = new Map();
+function rx(t) {
+  if (!reCache.has(t)) { let r = null; try { r = new RegExp(t.normalize('NFKC').toLowerCase(), 'g'); } catch (e) {} reCache.set(t, r); }
+  return reCache.get(t);
+}
+function findSpans(term, N) {
+  const r = rx(term); const out = []; if (!r) return out;
+  r.lastIndex = 0; let m;
+  while ((m = r.exec(N.n))) {
+    if (!m[0].length) { r.lastIndex++; continue; }
+    out.push({ s: N.map[m.index], e: N.map[m.index + m[0].length - 1] + 1 });
+  }
+  return out;
+}
+const asGroup = g => Array.isArray(g) ? { name: g[0], t: g, min: 1 } : { min: 1, ...g };
+
+function matchKeywords(q, text) {
+  const N = normWithMap(text);
+  return {
+    N,
+    kws: q.keywords.map(kw => {
+      const spans = []; const lack = []; let pass = 0;
+      kw.groups.map(asGroup).forEach(g => {
+        let hits = 0;
+        g.t.forEach(term => { const s = findSpans(term, N); if (s.length) { hits++; spans.push(...s); } });
+        if (hits >= g.min) pass++; else lack.push(g.min > 1 ? `${g.name}（目前 ${hits}／${g.min}）` : g.name);
+      });
+      const ratio = pass / kw.groups.length;
+      const status = ratio === 1 ? 'hit' : ratio > 0 ? 'partial' : 'miss';
+      const first = spans.length ? Math.min(...spans.map(s => s.s)) : Infinity;
+      return { label: kw.label, ratio, status, lack, spans, first };
+    }),
+  };
+}
+const DEF_RE = /是指|指的是|意指|意思是|定義|也就是|亦即|即是|代表|稱為|係指|就是|意即|屬於|指|即/g;
+const EX_RE = /例如|比如|譬如|像是|舉例|好比|實例|例子|如同|\(如|如:|像/;
+
+function grade(q, text) {
+  const { N, kws } = matchKeywords(q, text);
+  const coverage = kws.reduce((a, k) => a + k.ratio, 0) / kws.length;
+  const base = 50 * coverage;
+  const defCount = (N.n.match(DEF_RE) || []).length;
+  const exMarker = EX_RE.test(N.n);
+  const exTerms = q.examples.filter(t => findSpans(t, N).length);
+  const defScore = Math.min(1, defCount / 2);
+  const exScore = Math.min(1, (exMarker ? 0.4 : 0) + 0.3 * Math.min(exTerms.length, 2));
+  const lenF = Math.min(1, N.n.length / 90);
+  const elab = 50 * (0.5 * defScore + 0.5 * exScore) * lenF * Math.min(1, coverage * 1.25);
+  const found = kws.filter(k => k.status !== 'miss');
+  const cut = text.length * 0.3;
+  const early = found.filter(k => k.first < cut).length;
+  const frontOk = found.length > 0 && early >= Math.max(1, Math.ceil(found.length / 2));
+  return { kws, base, elab, total: Math.round(base + elab), defCount, defScore, exMarker, exTerms, exScore, len: N.n.length, frontOk, early, found: found.length };
+}
+
+const RANK = { miss: 3, partial: 2, hit: 1 };
+function Marked({ text, layers, prefix, hand }) {
+  // 同一字元若被多個關鍵字覆蓋，取最需要注意的狀態
+  const cls = new Array(text.length).fill(null);
+  layers.forEach(({ spans, status }) => spans.forEach(({ s, e }) => {
+    for (let i = s; i < e; i++) if (!cls[i] || RANK[status] > RANK[cls[i]]) cls[i] = status;
+  }));
+  const segs = []; let i = 0;
+  while (i < text.length) { let j = i; while (j < text.length && cls[j] === cls[i]) j++; segs.push([text.slice(i, j), cls[i]]); i = j; }
+  return html`<p className=${'marked' + (hand ? ' hand' : '')}>${segs.map(([t, c], k) => c ? html`<mark key=${k} className=${prefix + c}>${t}</mark>` : t)}</p>`;
+}
+
+/* ---------- 朗讀（裝置內建語音） ---------- */
+const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null;
+function speechify(t) {
+  return t
+    .replace(/\s*vs\.?\s*/gi, '，對比，')
+    .replace(/[｜|]/g, '，')
+    .replace(/≥/g, '大於等於').replace(/≤/g, '小於等於').replace(/≈/g, '約').replace(/±/g, '正負')
+    .replace(/(^|[^0-9A-Za-z）)])[＋+](\d)/g, '$1正$2')
+    .replace(/([0-9A-Za-z）)])\s*[−－-]\s*(?=[0-9A-Za-z（(])/g, '$1減')
+    .replace(/[−－](\d)/g, '負$1')
+    .replace(/[＝=]/g, '等於').replace(/[＋+]/g, '加').replace(/÷/g, '除以').replace(/×/g, '乘')
+    .replace(/(\d)\s*[～~]\s*(\d)/g, '$1到$2')
+    .replace(/[→➔]/g, '，').replace(/[／]/g, '或').replace(/[「」『』]/g, '')
+    .replace(/>/g, '大於').replace(/</g, '小於');
+}
+function chunks(text) {
+  const out = [];
+  speechify(text).replace(/([。！？；\n])/g, '$1\u0000').split('\u0000').forEach(p => {
+    p = p.trim(); if (!p) return;
+    while (p.length > 110) { let i = p.lastIndexOf('，', 110); if (i < 20) i = 110; out.push(p.slice(0, i + 1)); p = p.slice(i + 1); }
+    if (p) out.push(p);
+  });
+  return out;
+}
+function topicScript(t, i) {
+  return `第${i + 1}個主題，${t.title}。口試開場這樣講：${t.open}\n` +
+    t.pts.map(([h, d]) => `${h}。${d}`).join('\n') +
+    (t.traps.length ? `\n易錯提醒：${t.traps.join('')}` : '');
+}
+function pickVoice(voices, uri) {
+  if (!voices.length) return null;
+  const byUri = voices.find(v => v.voiceURI === uri); if (byUri) return byUri;
+  const tw = voices.filter(v => /zh[-_]TW|cmn[-_]Hant|zh[-_]Hant/i.test(v.lang));
+  const pool = tw.length ? tw : voices.filter(v => /^zh|^cmn/i.test(v.lang));
+  return pool.find(v => /premium|enhanced|加強|優化|neural|natural/i.test(v.name)) || pool.find(v => /meijia|美佳|google/i.test(v.name)) || pool[0] || null;
+}
+function useTTS() {
+  const [voices, setVoices] = useState([]);
+  const [voiceURI, setVoiceURI] = useState(() => load('voice', ''));
+  const [rate, setRate] = useState(() => load('rate', 1));
+  const [player, setPlayer] = useState(null);
+  const tok = useRef(0);
+  const rateRef = useRef(rate); rateRef.current = rate;
+  const voiceRef = useRef(null);
+  voiceRef.current = pickVoice(voices, voiceURI);
+  useEffect(() => {
+    if (!synth) return;
+    const f = () => setVoices(synth.getVoices().filter(v => /^(zh|cmn|yue)/i.test(v.lang)));
+    f();
+    if (synth.addEventListener) synth.addEventListener('voiceschanged', f); else synth.onvoiceschanged = f;
+    const t = setTimeout(f, 800);
+    return () => { clearTimeout(t); if (synth.removeEventListener) synth.removeEventListener('voiceschanged', f); synth.cancel(); };
+  }, []);
+  useEffect(() => save('voice', voiceURI), [voiceURI]);
+  useEffect(() => save('rate', rate), [rate]);
+
+  function play(items, start = 0, chunk = 0, opts = {}) {
+    if (!synth) return;
+    const token = ++tok.current;
+    synth.cancel();
+    const run = (i, c) => {
+      if (token !== tok.current) return;
+      if (i >= items.length) { setPlayer(p => p && { ...p, playing: false, ended: true }); return; }
+      const cs = chunks(items[i].text);
+      if (c >= cs.length) { run(i + 1, 0); return; }
+      setPlayer({ items, idx: i, chunk: c, total: cs.length, playing: true, scroll: !!opts.scroll });
+      const u = new SpeechSynthesisUtterance(cs[c]);
+      const v = voiceRef.current;
+      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'zh-TW';
+      u.rate = rateRef.current;
+      u.onend = () => run(i, c + 1);
+      u.onerror = e => { if (e.error === 'interrupted' || e.error === 'canceled') return; run(i, c + 1); };
+      synth.speak(u);
+    };
+    run(start, chunk);
+  }
+  const pause = () => { tok.current++; if (synth) synth.cancel(); setPlayer(p => p && { ...p, playing: false }); };
+  const resume = () => { if (player) play(player.items, player.ended ? 0 : player.idx, player.ended ? 0 : player.chunk, { scroll: player.scroll }); };
+  const jump = d => { if (player) play(player.items, Math.max(0, Math.min(player.items.length - 1, player.idx + d)), 0, { scroll: player.scroll }); };
+  const stop = () => { tok.current++; if (synth) synth.cancel(); setPlayer(null); };
+  const currentKey = player && player.items[player.idx] ? player.items[player.idx].key : null;
+  return { supported: !!synth, voices, voice: voiceRef.current, setVoiceURI, rate, setRate, player, play, pause, resume, jump, stop, currentKey };
+}
+
+const Speaker = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"></path><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path></svg>`;
+const PauseI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"></rect><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"></rect></svg>`;
+const PlayI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"></path></svg>`;
+const PrevI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"></path></svg>`;
+const NextI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"></path></svg>`;
+const StopI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"></rect></svg>`;
+
+/* ---------- 數學工具 ---------- */
+function erf(x) {
+  const s = Math.sign(x); x = Math.abs(x);
+  const t = 1 / (1 + 0.3275911 * x);
+  const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return s * y;
+}
+const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+const phi = z => Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
+function invPhi(p) {
+  const a = [-39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716, 2.506628277459239];
+  const b = [-54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572];
+  const c = [-0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734, 4.374664141464968, 2.938163982698783];
+  const d = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416];
+  const pl = 0.02425;
+  if (p < pl) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if (p > 1 - pl) { const q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  const q = p - 0.5, r = q * q;
+  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+}
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const fmt = (v, d = 2) => (v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+
+/* ---------- 圖解 ---------- */
+function TimelineFig() {
+  const steps = [
+    ['教學前', '安置性', '了解起點行為、舊經驗', '單元前測'],
+    ['教學中', '形成性', '確認學會沒，立即調整教學', '隨堂小考、學習單', '考不好：老師負責'],
+    ['教學中／後', '診斷性', '錯題分析找迷思，補救或轉介', '反覆困難的學生'],
+    ['教學後', '總結性', '評定整體成就、給等第', '段考、期末考', '學生負責'],
+  ];
+  return html`<div>
+    <div className="tl-axis"><span>教學開始</span><i></i><span>教學結束</span></div>
+    <div className="tl">${steps.map(([w, n, p, e, who]) => html`<div className="tl-step" key=${n}>
+      <div className="when">${w}</div><div className="nm">${n}</div><div>${p}</div><div className="meta">例：${e}</div>${who && html`<span className="who">${who}</span>`}
+    </div>`)}</div>
+  </div>`;
+}
+function ReferenceFig() {
+  const kids = [['甲', 92, 99], ['乙', 78, 80], ['丙', 64, 55], ['丁', 58, 40], ['戊', 41, 12]];
+  return html`<div className="two">
+    <div className="panel"><h3>常模參照 <small>比高低・看相對位置</small></h3>
+      <div className="sbars">${kids.map(([n, s, pr]) => html`<div className="sbar" key=${n}><span>${n}</span><span className="tr"><i style=${{ width: s + '%' }}></i></span><b>PR ${pr}</b></div>`)}</div>
+      <p className="note">看的是「贏過多少人」。例：學測、會考、教甄前 20%。（PR 為示意）</p></div>
+    <div className="panel"><h3>標準參照 <small>看過關・事先訂門檻</small></h3>
+      <div className="sbars">${kids.map(([n, s]) => html`<div className="sbar" key=${n}><span>${n}</span><span className="tr"><i className=${s < 60 ? 'fail' : ''} style=${{ width: s + '%' }}></i><span className="cut" style=${{ left: '60%' }}></span></span><b>${s >= 60 ? '通過' : '未通過'}</b></div>`)}</div>
+      <p className="note">紅線＝事先決定的 60 分門檻，和別人考幾分無關。例：教檢、駕照、游泳分級。</p></div>
+  </div>`;
+}
+function VsFig({ left, right }) {
+  return html`<div className="two">${[left, right].map(s => html`<div className="panel" key=${s.t}><h3>${s.t}${s.s && html`<small>${s.s}</small>`}</h3><ul>${s.items.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`)}</div>`;
+}
+function TreeFig({ branches }) {
+  return html`<div className="tree" style=${{ '--cols': branches.length }}>${branches.map(b => html`<div className="branch" key=${b.t}>
+    <div className="hd">${b.t}${b.s && html`<small>${b.s}</small>`}</div>
+    ${b.leaves.map(([a, to]) => html`<div className="leaf" key=${a}><span>${a}</span>${to && html`<span className="to">${to}</span>`}</div>`)}
+  </div>`)}</div>`;
+}
+function Target({ pts }) {
+  return html`<svg viewBox="0 0 120 120" aria-hidden="true">
+    ${[54, 40, 26, 12].map((r, i) => html`<circle key=${r} cx="60" cy="60" r=${r} fill=${i === 3 ? 'var(--miss-bg)' : 'none'} stroke="var(--rule)" strokeWidth="2"></circle>`)}
+    <circle cx="60" cy="60" r="4" fill="var(--redpen)"></circle>
+    ${pts.map(([x, y], i) => html`<circle key=${i} cx=${x} cy=${y} r="4.5" fill="var(--curve)" stroke="var(--sheet)" strokeWidth="1.5"></circle>`)}
+  </svg>`;
+}
+function TargetsFig() {
+  const cards = [
+    ['信度高、效度高', '集中又命中紅心', [[58, 57], [63, 61], [56, 63], [61, 56], [60, 65]]],
+    ['信度高、效度低', '集中但偏左下（系統誤差）', [[30, 86], [35, 90], [28, 92], [34, 84], [31, 89]]],
+    ['信度低、效度低', '散亂（隨機誤差大）', [[22, 30], [90, 40], [48, 98], [80, 88], [40, 52]]],
+    ['信度低、效度高', '不可能：信度是必要條件', []],
+  ];
+  return html`<div className="targets">${cards.map(([t, s, p], i) => html`<div className=${'target' + (i === 3 ? ' no' : '')} key=${t}>
+    ${i === 3 ? html`<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="var(--rule)" strokeWidth="2"></circle><path d="M30 30L90 90M90 30L30 90" stroke="var(--redpen)" strokeWidth="5" strokeLinecap="round"></path></svg>` : html`<${Target} pts=${p} />`}
+    <b>${t}</b><small>${s}</small></div>`)}</div>`;
+}
+function RelBarsFig() {
+  const bars = [['再測信度', 92, '通常最高'], ['複本信度', 80, ''], ['內部一致性', 72, '折半、α'], ['評分者信度', 42, '通常最低']];
+  return html`<div>
+    <div className="rbars">${bars.map(([n, w, s], i) => html`<div className="rbar" key=${n}><span>${n}</span><span className="tr"><i className=${i === 3 ? 'low' : ''} style=${{ width: w + '%' }}>${s}</i></span></div>`)}</div>
+    <p className="note">長條只表示相對高低，不是實際數值。</p>
+    <div className="factors">
+      <div className="factor"><b>題數 ↑</b>適度增加同質性題目，信度提高</div>
+      <div className="factor"><b>難度適中</b>P 約 0.50 信度最高，太難太易都降低</div>
+      <div className="factor"><b>異質性 ↑</b>差異大、標準差大，信度高；資優班信度低</div>
+    </div>
+  </div>`;
+}
+function BloomFig() {
+  const lv = [['記憶', 'Remember'], ['了解', 'Understand'], ['應用', 'Apply'], ['分析', 'Analyze'], ['評鑑', 'Evaluate'], ['創造', 'Create']];
+  const old = ['知識', '理解', '應用', '分析', '綜合', '評鑑'];
+  const k = [['事實知識', '具體名詞、細節', '豬、狗、斑馬'], ['概念知識', '抽象分類、原理', '哺乳類'], ['程序知識', '固定操作步驟', '釣魚方法、量筒'], ['後設認知', '策略、自我知識', '看考古題抓方向']];
+  return html`<div>
+    <div className="stairs">${lv.map(([n, e], i) => html`<div className=${'stair' + (i === 5 ? ' top' : '')} key=${n} style=${{ height: (34 + i * 13) + '%' }}>${n}<small>${e}</small></div>`)}</div>
+    <div className="oldrow">${old.map((o, i) => html`<span key=${o} className=${i >= 4 ? 'chg' : ''}>${o}</span>`)}</div>
+    <p className="note">上排：修訂版（動詞，記、了、應、分、評、創）。下排：舊版（名詞）。紅字＝最高兩層對調，「綜合」改為「創造」。</p>
+    <div className="kgrid">${k.map(([n, d, e]) => html`<div className="kcell" key=${n}><b>${n}</b>${d}<br /><span className="eg">${e}</span></div>`)}</div>
+  </div>`;
+}
+function TrendFig() {
+  const sh = [['靜態', '動態評量', '前測、介入、後測'], ['虛假', '真實性評量', '到商店買東西評算數'], ['單一', '多元評量', '省思＋辯論＋專題'], ['固定題本', '電腦適性測驗', '托福、英檢依作答調整難度']];
+  return html`<div>
+    <div className="flow">
+      <div className="box"><b>前測</b>先看學生獨立能做到哪裡</div><span className="arr">→</span>
+      <div className="box mid"><b>教學介入</b>老師提供中介、鷹架，手把手引導</div><span className="arr">→</span>
+      <div className="box"><b>後測</b>看學習潛能與進步</div>
+    </div>
+    <p className="note">動態評量：Feuerstein 提出，理論基礎是 Vygotsky 的近側發展區（ZPD）。</p>
+    <div className="shifts">${sh.map(([a, b, e]) => html`<div className="shift" key=${b}><div className="ft"><s>${a}</s> → ${b}</div><div className="meta">${e}</div></div>`)}</div>
+  </div>`;
+}
+function ToolsFig() {
+  const rows = [['只記錄「有沒有」做到？', '分離焦慮有沒有哭、出國物品清單', '檢核表'], ['品質差距明顯，要分好幾個等級？', '書法、圖畫作品', '評定量表'], ['要事先公告向度和各等級描述？', '作文、口頭報告', '評分規準'], ['要評態度、情意？', '願不願意積極配合', '軼事紀錄法'], ['特定事件發生才記錄始末？', '爭吵、分離哭泣', '事件取樣'], ['固定時間間隔觀察？', '每隔固定時間看一次', '時間取樣'], ['記錄行為持續多久？', '某行為持續的時間長度', '實距紀錄']];
+  return html`<div className="dec">${rows.map(([q, e, a]) => html`<div className="decrow" key=${a}><span>${q}<small>${e}</small></span><span className="ans">${a}</span></div>`)}</div>`;
+}
+
+/* ---------- 互動：試題分析計算器 ---------- */
+function ItemFig() {
+  const [ph, setPh] = useState(0.8);
+  const [pl, setPl] = useState(0.4);
+  const P = (ph + pl) / 2, D = ph - pl;
+  const pTxt = P < 0.4 ? '偏難' : P > 0.6 ? '偏易' : '難度適中（0.40～0.60）';
+  const dTxt = D < 0 ? '負鑑別：題目或答案可能有誤，要檢查、修改或刪題' : D < 0.2 ? '鑑別度差，需修改' : D < 0.3 ? '尚可' : D < 0.4 ? '良好' : '非常優良';
+  return html`<div className="calc">
+    <div className="presets" role="group" aria-label="例題">
+      <button aria-pressed=${ph === 0.8 && pl === 0.4} onClick=${() => { setPh(0.8); setPl(0.4); }}>例題 PH 0.8、PL 0.4</button>
+      <button aria-pressed=${ph === 0.3 && pl === 0.5} onClick=${() => { setPh(0.3); setPl(0.5); }}>負鑑別例</button>
+      <button aria-pressed=${ph === 1 && pl === 0.95} onClick=${() => { setPh(1); setPl(0.95); }}>題目太簡單</button>
+    </div>
+    <div><label htmlFor="ph" className="meta">高分組（前 27%）通過率 PH：<b className="mono">${ph.toFixed(2)}</b></label>
+      <input id="ph" type="range" min="0" max="1" step="0.01" value=${ph} onInput=${e => setPh(+e.target.value)} onChange=${e => setPh(+e.target.value)} /></div>
+    <div><label htmlFor="pl" className="meta">低分組（後 27%）通過率 PL：<b className="mono">${pl.toFixed(2)}</b></label>
+      <input id="pl" type="range" min="0" max="1" step="0.01" value=${pl} onInput=${e => setPl(+e.target.value)} onChange=${e => setPl(+e.target.value)} /></div>
+    <div className="vals">
+      <div className="val"><span>難度 P＝(PH＋PL)÷2</span><b>${P.toFixed(2)}</b></div>
+      <div className="val"><span>鑑別度 D＝PH－PL</span><b>${fmt(D)}</b></div>
+    </div>
+    <div className="verdict">難度：<b className=${P >= 0.4 && P <= 0.6 ? 'good' : 'bad'}>${pTxt}</b>；鑑別度：<b className=${D >= 0.3 ? 'good' : 'bad'}>${dTxt}</b></div>
+    <p className="note">鑑別度等級採 Ebel 常用標準（0.40 以上非常優良、0.30 以上良好、0.20 以上尚可），屬補充參考。</p>
+  </div>`;
+}
+
+/* ---------- 互動：檔案評量 ---------- */
+const PF_ROWS = [
+  ['結構與控制權', '弱結構化', '弱結構化：師生共建，學生參與選件', '強結構化：教師控制，叫你交什麼就交什麼', '嚴格上對下，相同教材與測驗'],
+  ['收集目的', '有目的性篩選', '配合教學目標，有目的地篩選，反映朝目標的努力', '沒有篩選，什麼都放，只求收齊', '局限教材範圍，目的在「偵錯」'],
+  ['評量焦點', '歷程＋結果並重', '歷程與結果並重，以進步為評判基準', '只代表工作完成（結果）', '只看最後成就'],
+  ['評分標準', '事前確定', '評分標準事前確定，提供選擇指引並與學生討論', '通常沒有事先建立，缺乏一致性', '標準化客觀計分'],
+  ['必備元素', '三大回饋', '學生自我省思＋家長參與回饋＋教師評量回饋，並同儕觀摩分享', '沒有自我省思的證據，不一定分享', '學生被動受評、被找缺點'],
+  ['層次與功能', '自我比較', '層次較高（應用、分析、創造）；兼具形成性與總結性；與自己比，不與他人排名', '只是資料堆疊', '偏重記憶、了解'],
+];
+const PF_ITEMS = [
+  ['每月營養午餐菜單', false, '全班都一樣的行政資料，不是個人成長紀錄。'],
+  ['學生自己設計的營養午餐學習單（附自我省思）', true, '個人作品，又有省思，正是課堂特別提到的例外。'],
+  ['校園緊急通報流程圖', false, '行政雜件，每個人拿到的都一樣。'],
+  ['作文的初稿、修改稿與定稿', true, '能看出進步軌跡，符合「歷程＋結果並重」。'],
+  ['學校行事曆', false, '行政資料，與個人學習歷程無關。'],
+  ['自我省思單與下一期目標', true, '三大必備元素之一：學生自我省思。'],
+  ['齲齒防治塗氟調查表與宣傳單', false, '衛生行政表單，不放。'],
+  ['家長看完作品後寫的回饋單', true, '三大必備元素之一：家長參與回饋。'],
+  ['戶外教學家長通知單（帶雨衣、綠油精）', false, '全班統一通知，不放。'],
+  ['班級作息表', false, '行政資料，不放。'],
+  ['老師依評分規準寫在作品上的評語', true, '三大必備元素之一：教師評量回饋。'],
+];
+function PortfolioFig() {
+  const [showTest, setShowTest] = useState(false);
+  const [picks, setPicks] = useState({});
+  const answered = Object.keys(picks).length;
+  const right = PF_ITEMS.filter((it, i) => picks[i] != null && picks[i] === it[1]).length;
+  return html`<div>
+    <label className="switch"><input type="checkbox" id="showTest" checked=${showTest} onChange=${e => setShowTest(e.target.checked)} />加入「傳統紙筆測驗」欄一起比較</label>
+    <div className="scroll">
+      <table className="cmp">
+        <thead><tr><th>比較維度</th><th className="pf">檔案評量</th><th>一般作品集</th>${showTest && html`<th>傳統紙筆測驗</th>`}</tr></thead>
+        <tbody>${PF_ROWS.map(r => html`<tr key=${r[0]}><td className="dim">${r[0]}<em>${r[1]}</em></td><td className="pf">${r[2]}</td><td>${r[3]}</td>${showTest && html`<td>${r[4]}</td>`}</tr>`)}</tbody>
+      </table>
+    </div>
+    <p className="note">表格可左右滑動。每列藍字就是口試要先講的關鍵字。</p>
+    <div className="sortgame">
+      <h3>快篩：這能放進檔案評量嗎？ <small>答對 ${right} ／ ${answered}（共 ${PF_ITEMS.length} 項）</small>
+        ${answered > 0 && html`<button className="link" onClick=${() => setPicks({})}>重來</button>`}</h3>
+      <div className="items">
+        ${PF_ITEMS.map(([name, ok, why], i) => {
+          const p = picks[i]; const done = p != null; const correct = done && p === ok;
+          return html`<div key=${i} className=${'item' + (done ? (correct ? ' right' : ' wrong') : '')}>
+            <span className="name">${name}</span>
+            ${done ? html`<span className="why"><b className=${correct ? 'r' : 'w'}>${correct ? '答對' : '答錯'}，${ok ? '可以放' : '不可放'}。</b>${why}</span>`
+              : html`<span className="acts"><button onClick=${() => setPicks(s => ({ ...s, [i]: true }))}>可以放</button><button onClick=${() => setPicks(s => ({ ...s, [i]: false }))}>不可放</button></span>`}
+          </div>`;
+        })}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------- 互動：偏態 ---------- */
+function skewStats(s) {
+  const alpha = s * 7, xi = 50 - s * 32, om = 22;
+  const xs = [], fs = [];
+  for (let x = 0; x <= 100; x += 0.5) { const u = (x - xi) / om; xs.push(x); fs.push(phi(u) * Phi(alpha * u)); }
+  const tot = fs.reduce((a, b) => a + b, 0);
+  let mean = 0; fs.forEach((f, i) => mean += xs[i] * f); mean /= tot;
+  let acc = 0, median = 50; for (let i = 0; i < fs.length; i++) { acc += fs[i]; if (acc >= tot / 2) { median = xs[i]; break; } }
+  let mi = 0; fs.forEach((f, i) => { if (f > fs[mi]) mi = i; });
+  return { xs, fs, fmax: fs[mi], mean, median, mode: xs[mi] };
+}
+function SkewFig() {
+  const [s, setS] = useState(-0.8);
+  const st = useMemo(() => skewStats(s), [s]);
+  const W = 400, H = 250, L = 16, R = 16, T = 18, B = 206;
+  const X = x => L + x / 100 * (W - L - R);
+  const Y = f => B - f / st.fmax * (B - T - 58);
+  const path = st.xs.map((x, i) => `${i ? 'L' : 'M'}${X(x).toFixed(1)},${Y(st.fs[i]).toFixed(1)}`).join('');
+  const kind = s < -0.15 ? 'left' : s > 0.15 ? 'right' : 'normal';
+  const info = {
+    left: { name: '左偏態（負偏態）', tail: '左邊・低分區', diff: '題目太簡單，多數人擠在高分', eff: '天花板效應（高限效應）', order: 'Mo > Md > M', why: '少數極低分把平均數往左拉' },
+    normal: { name: '常態分配', tail: '兩側對稱', diff: '難度適中（P 約 0.50）', eff: '信度與鑑別度最高', order: 'M = Md = Mo', why: '對稱，三個集中量數重疊' },
+    right: { name: '右偏態（正偏態）', tail: '右邊・高分區', diff: '題目太難，多數人擠在低分', eff: '地板效應（低限效應）', order: 'M > Md > Mo', why: '少數極高分把平均數往右拉' },
+  }[kind];
+  const lines = [['Mo 眾數', st.mode, T + 10, '2 0', 'var(--ink)'], ['Md 中位數', st.median, T + 28, '6 3', 'var(--ink)'], ['M 平均數', st.mean, T + 46, '2 3', 'var(--redpen)']];
+  return html`<div className="chartrow">
+    <div>
+      <svg className="chart" viewBox=${`0 0 ${W} ${H}`} role="img" aria-label=${info.name + '的分數分布圖'}>
+        <path d=${path + `L${X(100)},${B}L${X(0)},${B}Z`} fill="var(--curve-fill)" stroke="none"></path>
+        <path d=${path} fill="none" stroke="var(--curve)" strokeWidth="2.5"></path>
+        <line x1=${X(0)} x2=${X(100)} y1=${B} y2=${B} stroke="var(--ink-soft)" strokeWidth="1"></line>
+        ${[0, 20, 40, 60, 80, 100].map(v => html`<g key=${v}><line x1=${X(v)} x2=${X(v)} y1=${B} y2=${B + 5} stroke="var(--ink-soft)"></line><text x=${X(v)} y=${B + 20} textAnchor="middle" className="mono">${v}</text></g>`)}
+        <text x=${X(100)} y=${B + 40} textAnchor="end">分數 →</text>
+        ${lines.map(([lab, v, y, dash, col]) => html`<g key=${lab}>
+          <line x1=${X(v)} x2=${X(v)} y1=${y + 4} y2=${B} stroke=${col} strokeWidth="1.5" strokeDasharray=${dash}></line>
+          <text x=${X(v) + (kind === 'right' ? 6 : -6)} y=${y} textAnchor=${kind === 'right' ? 'start' : 'end'} style=${{ fill: col, fontWeight: 700 }}>${lab} ${v.toFixed(0)}</text>
+        </g>`)}
+        ${kind === 'left' && html`<text x=${X(1)} y=${B - 10} style=${{ fill: 'var(--redpen)', fontWeight: 700 }}>← 長尾巴在左</text>`}
+        ${kind === 'right' && html`<text x=${X(99)} y=${B - 10} textAnchor="end" style=${{ fill: 'var(--redpen)', fontWeight: 700 }}>長尾巴在右 →</text>`}
+      </svg>
+      <div className="presets" role="group" aria-label="快速切換">
+        <button aria-pressed=${kind === 'left'} onClick=${() => setS(-0.8)}>題目太簡單</button>
+        <button aria-pressed=${kind === 'normal'} onClick=${() => setS(0)}>難度適中</button>
+        <button aria-pressed=${kind === 'right'} onClick=${() => setS(0.8)}>題目太難</button>
+      </div>
+      <label htmlFor="skew" className="meta">拖動調整考題難度</label>
+      <input id="skew" type="range" min="-1" max="1" step="0.02" value=${s} onInput=${e => setS(+e.target.value)} onChange=${e => setS(+e.target.value)} />
+      <div className="rangecap"><span>簡單</span><span>適中</span><span>困難</span></div>
+    </div>
+    <dl className="facts">
+      <dt>分布</dt><dd className="key">${info.name}</dd>
+      <dt>長尾巴</dt><dd>${info.tail}</dd>
+      <dt>試題意義</dt><dd>${info.diff}</dd>
+      <dt>效應</dt><dd>${info.eff}</dd>
+      <dt>集中量數</dt><dd className="mono">${info.order}</dd>
+      <dt>原因</dt><dd>${info.why}</dd>
+    </dl>
+  </div>`;
+}
+
+/* ---------- 互動：常態分配 Z / T / IQ / PR ---------- */
+function NumField({ id, label, value, digits, onCommit, sub }) {
+  const [txt, setTxt] = useState(value.toFixed(digits));
+  const [focus, setFocus] = useState(false);
+  useEffect(() => { if (!focus) setTxt(value.toFixed(digits)); }, [value, focus, digits]);
+  return html`<div className="field">
+    <label htmlFor=${id}>${label}</label>
+    <input id=${id} inputMode="decimal" value=${txt} onFocus=${() => setFocus(true)} onBlur=${() => setFocus(false)}
+      onChange=${e => { setTxt(e.target.value); const v = parseFloat(e.target.value.replace('−', '-')); if (!isNaN(v)) onCommit(v); }} />
+    <small>${sub}</small>
+  </div>`;
+}
+const NORM_PRESETS = [
+  ['小英 T＝40', -1, '40＝50＋10Z → Z＝−1，低於平均 1 個標準差，PR 約 16。'],
+  ['教甄 T＝70', 2, 'Z＝+2，PR 97.72，排名前 2.28%：宜蘭縣錄取率 2% 落榜，花蓮縣錄取率 3% 錄取。'],
+  ['IQ 130', 2, '高於平均 2 個標準差：資優班安置切點。'],
+  ['IQ 70', -2, '低於平均 2 個標準差：資源班安置切點。'],
+];
+function NormalFig() {
+  const [z, setZRaw] = useState(-1);
+  const [note, setNote] = useState(NORM_PRESETS[0][2]);
+  const setZ = v => setZRaw(clamp(v, -3.5, 3.5));
+  const svgRef = useRef(null);
+  const drag = useRef(false);
+  const W = 420, L = 34, R = 12, T = 34, B = 184;
+  const X = v => L + (v + 3.5) / 7 * (W - L - R);
+  const Y = f => B - f / phi(0) * (B - T - 12);
+  const pts = []; for (let v = -3.5; v <= 3.5001; v += 0.05) pts.push([v, phi(v)]);
+  const curve = pts.map(([v, f], i) => `${i ? 'L' : 'M'}${X(v).toFixed(1)},${Y(f).toFixed(1)}`).join('');
+  const shadePts = pts.filter(([v]) => v <= z);
+  const shade = shadePts.length ? shadePts.map(([v, f], i) => `${i ? 'L' : 'M'}${X(v).toFixed(1)},${Y(f).toFixed(1)}`).join('') + `L${X(z)},${Y(phi(z))}L${X(z)},${B}L${X(-3.5)},${B}Z` : '';
+  const pr = Phi(z) * 100;
+  const prInt = clamp(Math.round(pr), 1, 99);
+  const T_ = 50 + 10 * z, IQ = 100 + 15 * z;
+  const fromEvent = e => {
+    const r = svgRef.current.getBoundingClientRect();
+    const vx = (e.clientX - r.left) / r.width * W;
+    setZ(Math.round(((vx - L) / (W - L - R) * 7 - 3.5) * 100) / 100); setNote('');
+  };
+  const rows = [
+    ['Z', [-3, -2, -1, 0, 1, 2, 3].map(v => [v, v > 0 ? '+' + v : String(v).replace('-', '−')])],
+    ['T', [-3, -2, -1, 0, 1, 2, 3].map(v => [v, String(50 + 10 * v)])],
+    ['IQ', [-3, -2, -1, 0, 1, 2, 3].map(v => [v, String(100 + 15 * v)])],
+    ['PR', [[-3, '0.13'], [-2, '2.28'], [-1, '15.87'], [0, '50'], [1, '84.13'], [2, '97.72'], [3, '99.87']]],
+  ];
+  const bands = [[0, 1, '34.13%'], [-1, 0, '34.13%'], [1, 2, '13.59%'], [-2, -1, '13.59%'], [2, 3, '2.14%'], [-3, -2, '2.14%']];
+  const dirTxt = Math.abs(z) < 0.005 ? '正好在平均數上' : `${z > 0 ? '高於' : '低於'}平均數 ${Math.abs(z).toFixed(2)} 個標準差`;
+  return html`<div>
+    <div className="presets" role="group" aria-label="課堂考題">
+      ${NORM_PRESETS.map(([lab, v, n]) => html`<button key=${lab} aria-pressed=${note === n} onClick=${() => { setZ(v); setNote(n); }}>${lab}</button>`)}
+    </div>
+    <div className="chartrow">
+      <div>
+        <svg ref=${svgRef} className="chart" viewBox=${`0 0 ${W} 284`} role="img" aria-label="常態分配曲線與分數對照"
+          onPointerDown=${e => { drag.current = true; e.currentTarget.setPointerCapture(e.pointerId); fromEvent(e); }}
+          onPointerMove=${e => { if (drag.current) fromEvent(e); }}
+          onPointerUp=${() => { drag.current = false; }} onPointerCancel=${() => { drag.current = false; }}>
+          <path d=${curve + `L${X(3.5)},${B}L${X(-3.5)},${B}Z`} fill="var(--curve-fill)"></path>
+          ${shade && html`<path d=${shade} fill="var(--shade)"></path>`}
+          ${[-3, -1, 0, 1, 3].map(v => html`<line key=${v} x1=${X(v)} x2=${X(v)} y1=${Y(phi(v))} y2=${B} stroke="var(--rule)" strokeWidth=${v === 0 ? 1.5 : 1}></line>`)}
+          ${[-2, 2].map(v => html`<line key=${'c' + v} x1=${X(v)} x2=${X(v)} y1=${T - 8} y2=${B} stroke="var(--redpen)" strokeDasharray="4 3" strokeWidth="1"></line>`)}
+          <text x=${X(-2) + 4} y=${T - 14} style=${{ fill: 'var(--redpen)', fontSize: '11px' }}>IQ≤70 資源班</text>
+          <text x=${X(2) - 4} y=${T - 14} textAnchor="end" style=${{ fill: 'var(--redpen)', fontSize: '11px' }}>IQ≥130 資優班</text>
+          ${bands.map(([a, b, lab]) => { const mid = (a + b) / 2; const inside = Math.abs(mid) < 2; return html`<text key=${a} x=${X(mid)} y=${inside ? B - 10 : Y(phi(mid)) - 8} textAnchor="middle" className="mono" style=${{ fontSize: '10.5px', fill: 'var(--ink)' }}>${lab}</text>`; })}
+          <path d=${curve} fill="none" stroke="var(--curve)" strokeWidth="2.5"></path>
+          <line x1=${X(-3.5)} x2=${X(3.5)} y1=${B} y2=${B} stroke="var(--ink-soft)"></line>
+          ${rows.map(([name, ticks], ri) => html`<g key=${name}>
+            <text x=${4} y=${B + 22 + ri * 22} style=${{ fill: 'var(--ink)', fontWeight: 700, fontSize: '12px' }}>${name}</text>
+            ${ticks.map(([v, lab]) => html`<text key=${v} x=${X(v)} y=${B + 22 + ri * 22} textAnchor="middle" className="mono" style=${{ fontSize: '11.5px' }}>${lab}</text>`)}
+          </g>`)}
+          <line x1=${X(z)} x2=${X(z)} y1=${Y(phi(z))} y2=${B + 92} stroke="var(--redpen)" strokeWidth="2"></line>
+          <circle cx=${X(z)} cy=${Y(phi(z))} r="9" fill="var(--sheet)" stroke="var(--redpen)" strokeWidth="2.5" style=${{ cursor: 'ew-resize' }}></circle>
+        </svg>
+        <label htmlFor="zrange" className="meta">拖動曲線上的紅點，或用這條滑桿</label>
+        <input id="zrange" type="range" min="-3.5" max="3.5" step="0.01" value=${z} onInput=${e => { setZ(+e.target.value); setNote(''); }} onChange=${e => { setZ(+e.target.value); setNote(''); }} />
+      </div>
+      <div>
+        <div className="fields">
+          <${NumField} id="fz" label="Z 分數" value=${z} digits=${2} sub="Z＝(X−M)÷S" onCommit=${v => { setZ(v); setNote(''); }} />
+          <${NumField} id="ft" label="T 分數" value=${T_} digits=${1} sub="T＝50＋10Z" onCommit=${v => { setZ((v - 50) / 10); setNote(''); }} />
+          <${NumField} id="fiq" label="魏氏 IQ" value=${IQ} digits=${1} sub="IQ＝100＋15Z" onCommit=${v => { setZ((v - 100) / 15); setNote(''); }} />
+          <${NumField} id="fpr" label="百分等級 PR" value=${pr} digits=${2} sub="PR 沒有 0 和 100" onCommit=${v => { setZ(invPhi(clamp(v, 0.02, 99.98) / 100)); setNote(''); }} />
+        </div>
+        <div className="readout">
+          Z＝<b className="mono">${fmt(z)}</b>，${dirTxt}，贏過約 <b className="mono">${pr.toFixed(2)}%</b> 的人，記作 <b>PR ${prInt}</b>。
+          ${z >= 2 && html`<span className="alert">IQ ≥ 130（Z ≥ +2）：需特殊教育安置，資優班。</span>`}
+          ${z <= -2 && html`<span className="alert">IQ ≤ 70（Z ≤ −2）：需特殊教育安置，資源班。</span>`}
+          ${note && html`<div className="note">課堂考題：${note}</div>`}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const FIGS = {
+  timeline: () => html`<${TimelineFig} />`,
+  reference: () => html`<${ReferenceFig} />`,
+  standard: () => html`<${VsFig} left=${{ t: '標準化測驗', s: '專業單位統一編製', items: ['編製、施測、計分、常模都一致', '全台灣花蓮、台南、台北考同一份', '優點：公平、客觀、可跨區比較', '缺點：容易窄化教學'] }} right=${{ t: '教師自編測驗', s: '依班級需求自編', items: ['依特定需求與教學目標設計', '只在自己班上施測', '優點：彈性高、反映個別差異', '例：英語隨堂考、羅東夜市學習單'] }} />`,
+  performTree: () => html`<${TreeFig} branches=${[
+    { t: '最大表現測驗', s: '盡力考到最好・有對錯', leaves: [['成就測驗：段考，測已學過的', '內容效度'], ['性向／智力測驗：測未來潛能', '預測效度']] },
+    { t: '典型表現測驗', s: '誠實作答・沒有對錯', leaves: [['學習動機、焦慮、自我概念量表', '建構效度'], ['人格問卷、興趣量表、工作滿意度', '建構效度']] },
+  ]} />`,
+  targets: () => html`<${TargetsFig} />`,
+  validityTree: () => html`<${TreeFig} branches=${[
+    { t: '內容效度', s: '所教即所考', leaves: [['雙向細目表確保', '成就測驗'], ['例：段考', null]] },
+    { t: '效標關聯效度', s: '和外在效標求相關', leaves: [['同時效度：新測驗與魏氏同時施測，能否取代', null], ['預測效度：模擬考預測會考，有時間差', '性向測驗']] },
+    { t: '建構（構念）效度', s: '抽象心理特質', leaves: [['學習動機、焦慮、自我概念、人格', '典型表現']] },
+  ]} />`,
+  relBars: () => html`<${RelBarsFig} />`,
+  skew: () => html`<${SkewFig} />`,
+  normal: () => html`<${NormalFig} />`,
+  item: () => html`<${ItemFig} />`,
+  bloom: () => html`<${BloomFig} />`,
+  trend: () => html`<${TrendFig} />`,
+  perfVs: () => html`<${VsFig} left=${{ t: '優點', s: '為什麼要用', items: ['比標準化測驗更能提供有效解釋', '引導有意義的教學與學習', '情境相關（脈絡化）', '較不受語文能力干擾：瘖啞人士也能展現廚藝'] }} right=${{ t: '限制', s: '口試也要講', items: ['非常耗時花錢', '測驗情境不易控制', '能力評定標準較難界定', '評分不客觀，評分者信度低 → 搭配評分規準'] }} />`,
+  portfolio: () => html`<${PortfolioFig} />`,
+  tools: () => html`<${ToolsFig} />`,
+};
+
+/* ---------- 背誦用遮罩：先自己講，再點開對答案 ---------- */
+function Reveal({ on, label, children }) {
+  const [shown, setShown] = useState(false);
+  useEffect(() => { setShown(false); }, [on]);
+  if (!on || shown) return children;
+  const open = () => setShown(true);
+  return html`<div className="cover" role="button" tabIndex="0" onClick=${open} onKeyDown=${e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }}>
+    <span className="blur" aria-hidden="true">${children}</span>
+    <span className="cap">${label || '先講出來，再點開對答案'}</span>
+  </div>`;
+}
+
+/* ---------- 重點背誦頁 ---------- */
+function Notes({ tts, onPractice }) {
+  const [memo, setMemo] = useState(() => load('memo', false));
+  const [known, setKnown] = useState(() => load('known', {}));
+  const [onlyTodo, setOnlyTodo] = useState(false);
+  useEffect(() => save('memo', memo), [memo]);
+  useEffect(() => save('known', known), [known]);
+  const items = useMemo(() => TOPICS.map((t, i) => ({ key: 'topic-' + t.id, label: `${String(i + 1).padStart(2, '0')} ${t.title}`, text: topicScript(t, i) })), []);
+  const cur = tts.currentKey;
+  useEffect(() => {
+    if (tts.player && tts.player.scroll && tts.player.playing && cur && cur.startsWith('topic-')) {
+      const el = document.getElementById(cur); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [cur]);
+  const allPlaying = tts.player && tts.player.items === items && tts.player.playing;
+  const knownN = TOPICS.filter(t => known[t.id]).length;
+  const shown = TOPICS.map((t, i) => [t, i]).filter(([t]) => !onlyTodo || !known[t.id]);
+  return html`<div>
+    <div className="notes-top">
+      <section className="sheet">
+        <h2 style=${{ fontSize: '17px' }}>15 個主題，全部背到能講出來</h2>
+        <ol className="howto">
+          <li>先「朗讀」或自己讀一遍，看懂圖解。</li>
+          <li>開啟背誦模式，答案會被遮住：看標題先開口講開場句和每個重點。</li>
+          <li>點開對答案；全部講對才按「我背熟了」，沒背熟的明天再來。</li>
+        </ol>
+        <div className="memobar">
+          <button className=${'btn ' + (memo ? 'on' : 'primary')} onClick=${() => setMemo(m => !m)}>${memo ? '背誦模式：開（關閉）' : '開啟背誦模式'}</button>
+          <button className=${'btn ' + (onlyTodo ? 'on' : '')} onClick=${() => setOnlyTodo(v => !v)}>${onlyTodo ? '顯示全部主題' : '只看還沒背熟'}</button>
+          <button className=${'btn ' + (allPlaying ? 'on' : '')} disabled=${!tts.supported} onClick=${() => allPlaying ? tts.pause() : tts.play(items, 0, 0, { scroll: true })}>
+            ${allPlaying ? html`<${PauseI} />暫停` : html`<${Speaker} />連續播放全部`}</button>
+        </div>
+        <div style=${{ marginTop: '10px' }}>
+          <div className="progress" aria-label="背熟進度">${TOPICS.map(t => html`<i key=${t.id} title=${t.title} className=${known[t.id] ? 'good' : ''}></i>`)}</div>
+          <span className="meta">已背熟 ${knownN}／${TOPICS.length} 個主題${knownN === TOPICS.length ? '，全部完成！到口試練習實戰吧' : ''}</span>
+        </div>
+        <nav className="toc" aria-label="主題目錄">
+          ${TOPICS.map((t, i) => html`<a key=${t.id} href=${'#topic-' + t.id} className=${(known[t.id] ? 'ok ' : '') + (cur === 'topic-' + t.id ? 'cur' : '')}
+            onClick=${e => { e.preventDefault(); if (onlyTodo && known[t.id]) setOnlyTodo(false); setTimeout(() => { const el = document.getElementById('topic-' + t.id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 0); }}><span>${String(i + 1).padStart(2, '0')}</span>${t.title}</a>`)}
+        </nav>
+      </section>
+      <section className="sheet voicebox" aria-label="朗讀設定">
+        <h2>朗讀設定</h2>
+        ${!tts.supported ? html`<p className="warn">這個瀏覽器不支援朗讀。請改用 iPhone 的 Safari、Android 的 Chrome，或電腦版 Chrome、Safari 開啟。</p>` : html`<div>
+          <div className="row"><label htmlFor="voice">聲音</label>
+            <select id="voice" value=${tts.voice ? tts.voice.voiceURI : ''} onChange=${e => tts.setVoiceURI(e.target.value)}>
+              ${tts.voices.length === 0 && html`<option value="">（系統預設）</option>`}
+              ${tts.voices.map(v => html`<option key=${v.voiceURI} value=${v.voiceURI}>${v.name}（${v.lang}）</option>`)}
+            </select></div>
+          <div className="row"><label htmlFor="rate">語速</label>
+            <div><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value=${tts.rate} onInput=${e => tts.setRate(+e.target.value)} onChange=${e => tts.setRate(+e.target.value)} />
+            <span className="meta">${tts.rate.toFixed(1)} 倍</span></div></div>
+          <div className="toolbar"><button className="btn" onClick=${() => tts.play([{ key: 'test', label: '試聽', text: '效度是正確性，信度是穩定性。先求效度，再談信度。' }])}><${Speaker} />試聽</button></div>
+          ${tts.voices.length === 0 && html`<p className="warn">還沒抓到中文語音，請先按一次「試聽」；若仍沒有聲音，到系統設定下載中文（台灣）語音。</p>`}
+          <p className="hint">聲音更自然：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文 → 中文（台灣）」，下載「美佳（加強版）」後回來選它。手機螢幕鎖定時朗讀會停，請讓螢幕保持亮著。</p>
+        </div>`}
+      </section>
+    </div>
+    <div className="topics">
+      ${shown.length === 0 && html`<div className="sheet empty">15 個主題都標記背熟了。按「顯示全部主題」可以再複習，或到口試練習實戰。</div>`}
+      ${shown.map(([t, i]) => {
+        const key = 'topic-' + t.id;
+        const playing = cur === key && tts.player && tts.player.playing;
+        const n = QUESTIONS.filter(q => inTopic(q, t.id)).length;
+        return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '') + (known[t.id] ? ' isknown' : '')} id=${key} key=${t.id}>
+          <header className="thead"><span className="tno">${String(i + 1).padStart(2, '0')}</span><div><div className="tmod">${t.mod}</div><h2>${t.title}</h2></div></header>
+          <div className="tacts">
+            <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([items[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
+            <button className=${'btn ' + (known[t.id] ? 'known' : '')} aria-pressed=${!!known[t.id]} onClick=${() => setKnown(k => ({ ...k, [t.id]: !k[t.id] }))}>${known[t.id] ? '✓ 已背熟' : '我背熟了'}</button>
+            <button className="btn" onClick=${() => onPractice(t.id)}>口試題（${n}）→</button>
+          </div>
+          <div className="open"><span className="tag">口試開場這樣講</span>
+            <${Reveal} on=${memo} label="先講出開場句，再點開">${t.open}<//></div>
+          <div className="fig"><${Reveal} on=${memo} label="點開看圖解">${FIGS[t.fig]()}<//></div>
+          <dl className="pts">${t.pts.map(([h, d]) => html`<div key=${h}><dt>${h}</dt><dd><${Reveal} on=${memo}>${d}<//></dd></div>`)}</dl>
+          ${t.traps.length > 0 && html`<div className="traps"><b>易錯提醒</b><${Reveal} on=${memo} label="想想看有哪些陷阱，再點開"><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul><//></div>`}
+        </article>`;
+      })}
+    </div>
+  </div>`;
+}
+
+/* ---------- 口試練習頁 ---------- */
+function Practice({ tts, topic, setTopic }) {
+  const [qid, setQid] = useState(() => load('qid', 1));
+  const [drafts, setDrafts] = useState(() => load('drafts', null) || { 1: SAMPLE });
+  const [scores, setScores] = useState(() => load('scores', {}));
+  const [graded, setGraded] = useState(() => {
+    const d = load('drafts', null) || { 1: SAMPLE }; const id = load('qid', 1);
+    return d[id] ? { [id]: d[id] } : {};
+  });
+  const [hints, setHints] = useState(false);
+  const [sec, setSec] = useState(0);
+  const [running, setRunning] = useState(false);
+  const list = useMemo(() => QUESTIONS.filter(q => inTopic(q, topic)), [topic]);
+  const q = list.find(x => x.id === qid) || list[0];
+  const pos = list.indexOf(q);
+  const text = drafts[q.id] || '';
+
+  useEffect(() => save('drafts', drafts), [drafts]);
+  useEffect(() => save('scores', scores), [scores]);
+  useEffect(() => { save('qid', q.id); setSec(0); setRunning(false); setHints(false); }, [q.id]);
+  useEffect(() => { if (!running) return; const t = setInterval(() => setSec(s => s + 1), 1000); return () => clearInterval(t); }, [running]);
+
+  const result = useMemo(() => graded[q.id] != null ? grade(q, graded[q.id]) : null, [q, graded]);
+  const gradedText = graded[q.id];
+  const stale = gradedText != null && gradedText !== text;
+  const modelLayers = useMemo(() => result ? matchKeywords(q, q.model).kws.map((k, i) => ({ spans: k.spans, status: result.kws[i].status })) : [], [q, result]);
+
+  const go = id => { setQid(id); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const setText = v => setDrafts(d => ({ ...d, [q.id]: v }));
+  const doGrade = () => { setGraded(g => ({ ...g, [q.id]: text })); setScores(s => ({ ...s, [q.id]: grade(q, text).total })); setRunning(false); };
+  const draw = () => {
+    if (list.length < 2) return;
+    // 優先抽還沒練過或低於 80 分的題目
+    const weak = list.filter(x => x.id !== q.id && !(scores[x.id] >= 80));
+    const pool = weak.length ? weak : list.filter(x => x.id !== q.id);
+    go(pool[Math.floor(Math.random() * pool.length)].id);
+  };
+  const mmss = `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  const charCount = text.replace(/\s/g, '').length;
+  const doneN = Object.keys(scores).length, goodN = Object.values(scores).filter(v => v >= 80).length;
+  const qKey = 'q-' + q.id, mKey = 'm-' + q.id;
+  const speaking = k => tts.currentKey === k && tts.player && tts.player.playing;
+
+  const advice = [];
+  if (result) {
+    const miss = result.kws.filter(k => k.status !== 'hit');
+    if (miss.length) advice.push(`先補上關鍵字：${miss.map(k => k.label.replace(/\(.*?\)/g, '')).join('、')}。每一段的第一句就講出來，老師才聽得到。`);
+    if (result.found && !result.frontOk) advice.push('關鍵字出現得太晚：開頭先把核心概念講一遍，再逐一解釋。');
+    if (result.defScore < 1) advice.push('定義講得不夠：多用「○○是指……」「也就是……」把每個概念講清楚。');
+    if (result.exScore < 1) advice.push(`補上課堂實例：${q.exampleHint}`);
+    if (!advice.length) advice.push('結構完整：關鍵字 → 定義 → 實例都有了。不看範本再講一次，控制在 3 分鐘內。');
+  }
+
+  return html`<div>
+    <div className="pbar">
+      <div className="pfilter">
+        <label htmlFor="tsel" className="meta">主題</label>
+        <select id="tsel" value=${topic} onChange=${e => setTopic(e.target.value)}>
+          <option value="all">全部主題（${QUESTIONS.length} 題）</option>
+          ${TOPICS.map((t, i) => html`<option key=${t.id} value=${t.id}>${String(i + 1).padStart(2, '0')} ${t.title}（${QUESTIONS.filter(x => inTopic(x, t.id)).length}）</option>`)}
+        </select>
+        <button className="btn primary" onClick=${draw}>隨機抽題</button>
+      </div>
+      <div className="pfilter">
+        <button className="btn" aria-label="上一題" disabled=${pos <= 0} onClick=${() => go(list[pos - 1].id)}>‹</button>
+        <select id="qsel" value=${q.id} onChange=${e => go(+e.target.value)} aria-label="選擇題目">
+          ${list.map(x => html`<option key=${x.id} value=${x.id}>${x.id}. ${x.category}（${x.type}）${scores[x.id] != null ? '・' + scores[x.id] + '分' : ''}</option>`)}
+        </select>
+        <button className="btn" aria-label="下一題" disabled=${pos >= list.length - 1} onClick=${() => go(list[pos + 1].id)}>›</button>
+      </div>
+      <div>
+        <div className="progress" aria-label="練習進度">${list.map(x => html`<i key=${x.id} title=${x.id + '. ' + x.category} className=${(scores[x.id] >= 80 ? 'good' : scores[x.id] != null ? 'done' : '') + (x.id === q.id ? ' cur' : '')}></i>`)}</div>
+        <span className="meta">全部 ${QUESTIONS.length} 題：已練 ${doneN} 題，80 分以上 ${goodN} 題（綠色）。隨機抽題會優先抽還沒過 80 分的題目。</span>
+      </div>
+    </div>
+    <div className="grid2">
+      <section className="sheet sticky" aria-label="作答區">
+        <div className="qhead"><span className="num">第 ${q.id} 題</span><span className="type">${q.type}</span><span>${topicName(q.topic)}</span></div>
+        <p className="qtext">${q.question}</p>
+        <div className="hintbar">
+          <button className=${'btn ' + (speaking(qKey) ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => speaking(qKey) ? tts.pause() : tts.play([{ key: qKey, label: `第 ${q.id} 題題目`, text: q.question }])}>
+            ${speaking(qKey) ? html`<${PauseI} />停止` : html`<${Speaker} />聽題目`}</button>
+          <button className="link" onClick=${() => setHints(h => !h)}>${hints ? '收起關鍵字提示' : '偷看關鍵字提示'}</button>
+        </div>
+        ${hints && html`<div className="kwhint">${q.keywords.map(k => html`<span key=${k.label}>${k.label}</span>`)}</div>`}
+        ${q.id === 1 && text === SAMPLE && html`<p className="samplenote">↓ 這是範例回答（故意漏了幾個關鍵字），可直接清空換成你自己的。</p>`}
+        <label htmlFor="answer" className="meta">你的口試回答（對著麥克風講，用聽寫轉成文字；也可以打字）</label>
+        <textarea id="answer" className="answer" value=${text} onChange=${e => setText(e.target.value)}
+          placeholder="先講關鍵字，再講定義，最後舉課堂例子……"></textarea>
+        <div className="toolbar">
+          <button className="btn primary" onClick=${doGrade}>批改</button>
+          <button className="btn" onClick=${() => setText('')}>清空</button>
+          <span className="spacer"></span>
+          <span className="meta">${charCount} 字</span>
+          <span className="timer">${mmss}</span>
+          <button className="btn" onClick=${() => setRunning(r => !r)}>${running ? '暫停' : '計時'}</button>
+          <button className="btn" onClick=${() => { setSec(0); setRunning(false); }}>歸零</button>
+        </div>
+        <p className="tip">口說作答：iPhone、Android 點輸入框後按鍵盤上的麥克風；Mac 連按兩下 Fn 開啟聽寫。講完直接按「批改」。草稿只存在這台裝置。</p>
+      </section>
+
+      <section className="sheet" aria-label="批改結果" aria-live="polite">
+        ${!result ? html`<div className="empty">講完按「批改」，這裡會用紅筆標出漏掉的關鍵字，並對照滿分範本。</div>` : html`<div>
+          ${stale && html`<div className="stale">回答已修改，按「批改」更新結果。</div>`}
+          <div className="score">
+            <div className="big">${result.total}<small> / 100</small></div>
+            <div className="bar"><span>基本分・關鍵字</span><span className="track"><i style=${{ width: (result.base / 50 * 100) + '%' }}></i></span><span className="pt">${Math.round(result.base)}/50</span></div>
+            <div className="bar"><span>滿分・定義實例</span><span className="track"><i style=${{ width: (result.elab / 50 * 100) + '%' }}></i></span><span className="pt">${Math.round(result.elab)}/50</span></div>
+          </div>
+          <div className="chk">
+            <span className=${result.frontOk ? 'ok' : 'no'}>${result.frontOk ? '✓' : '✗'} 關鍵字先講</span>
+            <span className=${result.defScore >= 1 ? 'ok' : 'no'}>${result.defScore >= 1 ? '✓' : '✗'} 定義句 ${result.defCount} 處</span>
+            <span className=${result.exScore >= 1 ? 'ok' : 'no'}>${result.exScore >= 1 ? '✓' : '✗'} 實例${result.exTerms.length ? '：' + result.exTerms.slice(0, 4).join('、') : (result.exMarker ? '（有「例如」但沒講課堂例子）' : '（沒有舉例）')}</span>
+          </div>
+          <h3 className="secttl">核心關鍵字 <small>命中 ${result.kws.filter(k => k.status === 'hit').length} ／ ${result.kws.length}</small></h3>
+          <ul className="kwlist">
+            ${result.kws.map(k => html`<li key=${k.label}>
+              <span className=${'pill ' + k.status}>${{ hit: '✓ 命中', partial: '△ 部分', miss: '✗ 漏掉' }[k.status]}</span>
+              <span>${k.label}${k.lack.length > 0 && html`<span className="lack">缺：${k.lack.join('、')}</span>`}</span>
+            </li>`)}
+          </ul>
+          <h3 className="secttl">怎麼補分</h3>
+          <ul className="advice">${advice.map((a, i) => html`<li key=${i}>${a}</li>`)}</ul>
+          <h3 className="secttl">你的回答 <span className="legend"><span><i style=${{ background: 'var(--hl)' }}></i>命中</span><span><i style=${{ borderBottom: '2px solid var(--partial)' }}></i>部分命中</span></span></h3>
+          ${gradedText ? html`<${Marked} text=${gradedText} hand=${true} prefix="m-" layers=${result.kws.map(k => ({ spans: k.spans, status: k.status === 'miss' ? 'hit' : k.status }))} />` : html`<p className="meta">（空白）</p>`}
+          <h3 className="secttl">滿分範本
+            <button className=${'btn ' + (speaking(mKey) ? 'on' : '')} disabled=${!tts.supported} onClick=${() => speaking(mKey) ? tts.pause() : tts.play([{ key: mKey, label: `第 ${q.id} 題滿分範本`, text: q.model }])}>${speaking(mKey) ? html`<${PauseI} />停止` : html`<${Speaker} />聽範本`}</button>
+            <span className="legend"><span><i style=${{ background: 'var(--miss-bg)', outline: '1px solid var(--redpen)' }}></i>你漏掉的</span><span><i style=${{ background: 'var(--partial-bg)' }}></i>部分</span><span><i style=${{ background: 'var(--hit-bg)' }}></i>已命中</span></span></h3>
+          <${Marked} text=${q.model} prefix="mm-" layers=${modelLayers} />
+          <p className="disclaim">估計分只依字面比對關鍵字與句型，用來檢查有沒有漏講，實際給分以老師判斷為準。第 1～6 題來自課堂題庫，第 7～46 題依課堂知識庫補充。</p>
+        </div>`}
+      </section>
+    </div>
+  </div>`;
+}
+
+/* ---------- 底部播放列 ---------- */
+const RATES = [0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.5];
+function Player({ tts }) {
+  const p = tts.player; if (!p) return null;
+  const it = p.items[p.idx];
+  return html`<div className="player" role="region" aria-label="朗讀播放">
+    <div className="in">
+      <div className="now"><b>${it.label}</b><span>${p.items.length > 1 ? `${p.idx + 1}／${p.items.length}・` : ''}${p.ended ? '播放完畢' : p.playing ? `第 ${p.chunk + 1}／${p.total} 段` : '已暫停'}</span></div>
+      ${p.items.length > 1 && html`<button className="pbtn" aria-label="上一個" onClick=${() => tts.jump(-1)}><${PrevI} /></button>`}
+      <button className="pbtn main" aria-label=${p.playing ? '暫停' : '播放'} onClick=${() => p.playing ? tts.pause() : tts.resume()}>${p.playing ? html`<${PauseI} />` : html`<${PlayI} />`}</button>
+      ${p.items.length > 1 && html`<button className="pbtn" aria-label="下一個" onClick=${() => tts.jump(1)}><${NextI} /></button>`}
+      <select className="hide-sm" aria-label="語速" value=${tts.rate} onChange=${e => tts.setRate(+e.target.value)}>
+        ${RATES.map(r => html`<option key=${r} value=${r}>${r}×</option>`)}
+        ${!RATES.includes(tts.rate) && html`<option value=${tts.rate}>${tts.rate}×</option>`}
+      </select>
+      <button className="pbtn" aria-label="關閉播放" onClick=${tts.stop}><${StopI} /></button>
+    </div>
+  </div>`;
+}
+
+function App() {
+  const [tab, setTabRaw] = useState(() => { const h = (location.hash || '').slice(1); return h === 'notes' || h === 'practice' ? h : load('tab', 'notes'); });
+  const [topic, setTopic] = useState(() => load('ptopic', 'all'));
+  const tts = useTTS();
+  useEffect(() => save('tab', tab), [tab]);
+  useEffect(() => save('ptopic', topic), [topic]);
+  const setTab = t => { setTabRaw(t); window.scrollTo({ top: 0 }); };
+  return html`<div style=${{ paddingBottom: tts.player ? '84px' : 0 }}>
+    <header className="mast">
+      <div>
+        <div className="eyebrow">國小教育測驗與學習評量（114-3）・期中考</div>
+        <h1>口試特訓</h1>
+      </div>
+      <div className="rules"><span>期中考採 <b>口試</b></span><span>先講 <b>核心關鍵字</b> 拿基本分</span><span>再講 <b>定義＋生活實例</b> 拿滿分</span></div>
+    </header>
+    <div className="tabs" role="tablist">
+      <button className="tab" role="tab" aria-selected=${tab === 'notes'} onClick=${() => setTab('notes')}>重點背誦<small>15</small></button>
+      <button className="tab" role="tab" aria-selected=${tab === 'practice'} onClick=${() => setTab('practice')}>口試練習<small>${QUESTIONS.length}</small></button>
+    </div>
+    ${tab === 'notes' ? html`<${Notes} tts=${tts} onPractice=${id => { setTopic(id); setTab('practice'); }} />` : html`<${Practice} tts=${tts} topic=${topic} setTopic=${setTopic} />`}
+    <footer>內容依課堂知識庫與題庫整理。朗讀使用這台裝置內建的語音；背誦進度與作答草稿只存在這台裝置。</footer>
+    <${Player} tts=${tts} />
+  </div>`;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+</script>
+</body>
+</html>
