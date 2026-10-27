@@ -25,10 +25,10 @@ const slice = (a, b) => {
 };
 const code = slice('const TOPICS', 'const RANK') + slice('const synth', 'const Speaker') +
   slice('const SHORT', 'TOPICS.forEach') +
-  '\n;globalThis.__out = { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript };';
+  '\n;globalThis.__out = { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX };';
 const ctx = { window: {}, console };
 vm.runInNewContext(code, ctx);
-const { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript } = ctx.__out;
+const { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX } = ctx.__out;
 
 // 3. 主題與題庫對應
 const ids = new Set(TOPICS.map(t => t.id));
@@ -51,6 +51,30 @@ for (const q of QUESTIONS) {
   }
 }
 if (!low) console.log(`✓ ${QUESTIONS.length} 份滿分範本全部命中關鍵字，估計分都 ≥ 85`);
+
+// 5. 朗讀句長、跟讀段落與語音聽考
+const before = problems;
+const tooLong = units => units.filter(u => u.say && u.say.length > CHUNK_MAX + 1);
+TOPICS.forEach((t, i) => {
+  const long = chunks(topicScript(t, i)).filter(c => c.length > CHUNK_MAX + 1);
+  if (long.length) warn(`主題 ${t.id} 有超過 ${CHUNK_MAX + 1} 字的朗讀句：${long[0]}`);
+  const parts = topicParts(t, i).map(p => p.part);
+  if (!parts.includes('open') || t.pts.some((_, k) => !parts.includes('pt-' + k)) || (t.traps.length && !parts.includes('traps'))) warn(`主題 ${t.id} 朗讀段落缺少開場句、重點或易錯提醒`);
+  const quiz = topicQuiz(t, i);
+  if (quiz.length !== t.pts.length + 2) warn(`主題 ${t.id} 聽考應有 ${t.pts.length + 2} 步，實際 ${quiz.length} 步`);
+  quiz.forEach(s => {
+    const gaps = s.units.filter(u => u.gap), sec = gaps[0] && gapFor(gaps[0].gap.ans, 'auto', gaps[0].gap.lo, gaps[0].gap.hi);
+    if (gaps.length !== 1 || !s.units.some(u => u.part === 'q') || !s.units.some(u => u.part === 'a') || !(sec >= 6 && sec <= 30)) warn(`主題 ${t.id} 聽考「${s.label}」缺少題目、停頓或答案`);
+    if (tooLong(s.units).length) warn(`主題 ${t.id} 聽考「${s.label}」有過長的朗讀句`);
+  });
+});
+QUESTIONS.forEach(q => {
+  const it = questionQuiz(q), g = it.units.find(u => u.gap), sec = g && gapFor(g.gap.ans, 'auto', g.gap.lo, g.gap.hi);
+  if (!(sec >= 20 && sec <= 120)) warn(`第 ${q.id} 題聽考停頓 ${sec} 秒，超出 20～120`);
+  if (tooLong(it.units).length) warn(`第 ${q.id} 題聽考有過長的朗讀句`);
+});
+if (gapFor('一二三', 'manual', 6, 30) !== -1 || gapFor('一二三', '10', 6, 30) !== 10 || gapFor('一二三', 'auto', 6, 30) !== 6) warn('作答時間設定換算錯誤');
+if (problems === before) console.log(`✓ 朗讀句都在 ${CHUNK_MAX + 1} 字內，${TOPICS.length} 個主題與 ${QUESTIONS.length} 題聽考都有題目、停頓、答案`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');

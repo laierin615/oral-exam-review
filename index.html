@@ -611,6 +611,40 @@ footer { border-top: 2px solid var(--edge); padding-top: 24px; margin-top: 40px;
   .bcard { margin-top: 0; }
   .bbody { padding: 20px 16px; }
 }
+/* ---------- 語音複習：連續播放清單、跟讀標示、語音聽考、口說作答 ---------- */
+.listen-desk { display: grid; gap: 16px; }
+.listen-desk .desk-heading { margin-bottom: 0; }
+.listen-lists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.listen-lists .btn { flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; gap: 2px; padding: 12px 14px; min-height: 64px; }
+.listen-lists .ll-name { display: inline-flex; align-items: center; gap: 6px; }
+.listen-lists small { font-size: 16px; font-weight: 400; }
+.listen-desk .voicebox { border-radius: 10px; }
+.voicebox .row { grid-template-columns: 72px minmax(0, 1fr); }
+.reading { outline: 3px solid var(--accent); outline-offset: 3px; }
+.open, .pts > div, .traps { scroll-margin-top: 96px; }
+.quiz-box { display: grid; gap: 12px; margin-block: 0 24px; }
+.quiz-box h3 { font-size: 22px; }
+.quiz-box .note { margin: 0; }
+.quiz-acts { margin: 0; align-items: center; }
+.gap-field { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 16px; font-weight: 700; }
+.gap-field select { border: 1.5px solid var(--edge); background: var(--sheet); border-radius: 8px; padding: 6px 10px; font-size: 16px; font-weight: 400; }
+.review-list .sheet.playing { outline: 3px solid var(--accent); outline-offset: 3px; }
+.player .line { flex: 1 1 100%; margin: 0; font-size: 16px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.player .countdown { flex: 1 1 100%; }
+.player .countdown i { transition: width 1s linear; }
+.player .reveal { min-height: 44px; padding: 8px 16px; }
+.player .warnline { color: var(--redpen); }
+.mic-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 10px; }
+.btn.rec { background: var(--redpen); color: var(--sheet); border-color: var(--edge); }
+.rec-dot { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: var(--redpen); }
+.rec-dot::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--redpen); animation: recblink 1.2s infinite; }
+@keyframes recblink { 50% { opacity: .25; } }
+.answer.listening { border-color: var(--redpen); box-shadow: 0 0 0 3px var(--miss-bg); }
+.mic-warn { font-size: 16px; color: var(--redpen); margin: 0 0 10px; }
+@media (max-width: 700px) {
+  .listen-lists .btn { padding: 10px 12px; }
+  .quiz-acts .btn { width: 100%; }
+}
 
 </style>
 </head>
@@ -1378,19 +1412,83 @@ function speechify(t) {
     .replace(/[→➔]/g, '，').replace(/[／]/g, '或').replace(/[「」『』]/g, '')
     .replace(/>/g, '大於').replace(/</g, '小於');
 }
-function chunks(text) {
+// 每句最多約 44 字：Chrome 的線上語音念超過約 15 秒常會中斷，句子短也比較好跟讀。
+const CHUNK_MAX = 44;
+function cutAt(p, max) {
+  const head = p.slice(0, max + 1);
+  let i = Math.max(head.lastIndexOf('，'), head.lastIndexOf('：'), head.lastIndexOf(','));
+  if (i < 12) i = head.lastIndexOf('、');
+  if (i < 12) i = max - 1;
+  return i + 1;
+}
+function chunks(text, max = CHUNK_MAX) {
   const out = [];
   speechify(text).replace(/([。！？；\n])/g, '$1\u0000').split('\u0000').forEach(p => {
     p = p.trim(); if (!p) return;
-    while (p.length > 110) { let i = p.lastIndexOf('，', 110); if (i < 20) i = 110; out.push(p.slice(0, i + 1)); p = p.slice(i + 1); }
+    while (p.length > max) { const i = cutAt(p, max); out.push(p.slice(0, i).trim()); p = p.slice(i).trim(); }
     if (p) out.push(p);
   });
   return out;
 }
-function topicScript(t, i) {
-  return `第${i + 1}個主題，${t.title}。口試開場這樣講：${t.open}\n` +
-    t.pts.map(([h, d]) => `${h}。${d}`).join('\n') +
-    (t.traps.length ? `\n易錯提醒：${t.traps.join('')}` : '');
+const endStop = s => /[。！？]$/.test(s) ? s : s + '。';
+// 朗讀稿分段：part 對應主題卡上的開場句、第幾點重點、易錯提醒，播放時用來標示目前位置。
+function topicParts(t, i) {
+  return [
+    { part: 'title', text: `第${i + 1}個主題，${t.title}。` },
+    { part: 'open', text: `口試開場這樣講：${t.open}` },
+    ...t.pts.map(([h, d], k) => ({ part: 'pt-' + k, text: `${h}。${d}` })),
+    ...(t.traps.length ? [{ part: 'traps', text: `易錯提醒：${t.traps.map(endStop).join('')}` }] : []),
+  ];
+}
+function topicScript(t, i) { return topicParts(t, i).map(p => p.text).join('\n'); }
+
+/* ---------- 語音聽考：念題目 → 停頓讓你開口說 → 念答案 ---------- */
+const GAPS = [['auto', '自動（依答案長度）'], ['5', '5 秒'], ['10', '10 秒'], ['20', '20 秒'], ['30', '30 秒'], ['60', '60 秒'], ['manual', '手動揭曉']];
+// 自動停頓以每秒約 4 字的口說速度估算，限制在 lo～hi 秒；-1 代表等使用者按「揭曉」。
+function gapFor(ans, setting, lo, hi) {
+  if (setting === 'manual') return -1;
+  const n = parseInt(setting, 10);
+  if (n > 0) return n;
+  return Math.min(hi, Math.max(lo, Math.round(ans.replace(/\s/g, '').length / 4)));
+}
+const ansText = a => Array.isArray(a) ? a.join('\n') : a;
+function recallSteps(t) {
+  return [
+    { sec: 0, title: '口試開場句', prompt: '開口說出這個主題的口試開場句。', ans: t.open },
+    ...t.pts.map(([h, d]) => ({ sec: 1, title: h, prompt: `說出「${h}」的重點內容。`, ans: d })),
+    { sec: 2, title: '易錯陷阱', prompt: `這個主題有 ${t.traps.length} 個易錯提醒，說說看是哪些。`, ans: t.traps },
+  ];
+}
+const sayUnits = (text, part) => chunks(text).map(say => ({ say, part }));
+function topicQuiz(t, i) {
+  const no = String(i + 1).padStart(2, '0');
+  return recallSteps(t).map((s, k) => ({
+    key: `quiz-${t.id}-${k}`, label: `${no} ${t.short || t.title}・${s.title}`,
+    units: [
+      ...sayUnits(k === 0 ? `第${i + 1}個主題，${t.title}。${s.prompt}` : s.prompt, 'q'),
+      { gap: { ans: ansText(s.ans), lo: 6, hi: 30 } },
+      ...sayUnits('答案：' + ansText(s.ans), 'a'),
+    ],
+  }));
+}
+function questionQuiz(q) {
+  return { key: 'qq-' + q.id, label: `第 ${q.id} 題・${q.category}`, units: [
+    ...sayUnits(`第${q.id}題。${q.question}`, 'q'),
+    { gap: { ans: q.model, lo: 20, hi: 120 } },
+    ...sayUnits('參考範本：' + q.model, 'a'),
+  ] };
+}
+const unitCache = new WeakMap();
+function unitsOf(it) {
+  if (it.units) return it.units;
+  if (!unitCache.has(it)) unitCache.set(it, (it.parts || [{ text: it.text }]).flatMap(p => sayUnits(p.text, p.part)));
+  return unitCache.get(it);
+}
+// 估計分鐘數：朗讀每秒約 4.5 字，聽考另加作答停頓（手動揭曉不計）。
+function estMinutes(items, rate, setting) {
+  let s = 0;
+  items.forEach(it => unitsOf(it).forEach(u => { s += u.gap ? Math.max(0, gapFor(u.gap.ans, setting, u.gap.lo, u.gap.hi)) : u.say.length / (4.5 * rate) + 0.4; }));
+  return Math.max(1, Math.round(s / 60));
 }
 function pickVoice(voices, uri) {
   if (!voices.length) return null;
@@ -1399,13 +1497,37 @@ function pickVoice(voices, uri) {
   const pool = tw.length ? tw : voices.filter(v => /^zh|^cmn/i.test(v.lang));
   return pool.find(v => /premium|enhanced|加強|優化|neural|natural/i.test(v.name)) || pool.find(v => /meijia|美佳|google/i.test(v.name)) || pool[0] || null;
 }
+// 聽考提示音：Web Audio 要在使用者點按時啟動（iPhone 的規定），手機靜音時可能聽不到。
+let actx = null;
+function primeAudio() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!actx) actx = new AC();
+    if (actx.state === 'suspended') actx.resume();
+  } catch (e) {}
+}
+function beep(f) {
+  try {
+    if (!actx || actx.state !== 'running') return;
+    const o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime;
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.2, t0 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.28);
+    o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + 0.3);
+  } catch (e) {}
+}
 function useTTS() {
   const [voices, setVoices] = useState([]);
   const [voiceURI, setVoiceURI] = useState(() => load('voice', ''));
   const [rate, setRate] = useState(() => load('rate', 1));
+  const [gap, setGap] = useState(() => { const g = load('gap', 'auto'); return GAPS.some(([v]) => v === g) ? g : 'auto'; });
+  const [last, setLast] = useState(() => load('listen', null));
   const [player, setPlayer] = useState(null);
-  const tok = useRef(0);
+  const tok = useRef(0), timer = useRef(0), utt = useRef(null), errs = useRef(0);
   const rateRef = useRef(rate); rateRef.current = rate;
+  const gapRef = useRef(gap); gapRef.current = gap;
   const voiceRef = useRef(null);
   voiceRef.current = pickVoice(voices, voiceURI);
   useEffect(() => {
@@ -1418,33 +1540,84 @@ function useTTS() {
   }, []);
   useEffect(() => save('voice', voiceURI), [voiceURI]);
   useEffect(() => save('rate', rate), [rate]);
+  useEffect(() => save('gap', gap), [gap]);
 
-  function play(items, start = 0, chunk = 0, opts = {}) {
-    if (!synth) return;
-    const token = ++tok.current;
-    synth.cancel();
-    const run = (i, c) => {
-      if (token !== tok.current) return;
-      if (i >= items.length) { setPlayer(p => p && { ...p, playing: false, ended: true }); return; }
-      const cs = chunks(items[i].text);
-      if (c >= cs.length) { run(i + 1, 0); return; }
-      setPlayer({ items, idx: i, chunk: c, total: cs.length, playing: true, scroll: !!opts.scroll });
-      const u = new SpeechSynthesisUtterance(cs[c]);
-      const v = voiceRef.current;
-      if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'zh-TW';
-      u.rate = rateRef.current;
-      u.onend = () => run(i, c + 1);
-      u.onerror = e => { if (e.error === 'interrupted' || e.error === 'canceled') return; run(i, c + 1); };
-      synth.speak(u);
+  const halt = () => { tok.current++; clearTimeout(timer.current); clearInterval(timer.current); utt.current = null; if (synth) synth.cancel(); };
+  const remember = v => { setLast(v); save('listen', v); };
+  function say(text, live, next) {
+    const u = new SpeechSynthesisUtterance(text);
+    const v = voiceRef.current;
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'zh-TW';
+    u.rate = rateRef.current;
+    let done = false;
+    const fin = ok => {
+      if (done) return; done = true; clearTimeout(dog);
+      if (!live()) return;
+      if (ok) { errs.current = 0; next(); return; }
+      if (++errs.current >= 3) { halt(); setPlayer(p => p && { ...p, playing: false, error: '朗讀失敗：請到「朗讀設定」換一個聲音再試。' }); return; }
+      next();
     };
-    run(start, chunk);
+    u.onend = () => fin(true);
+    u.onerror = e => { if (e.error === 'interrupted' || e.error === 'canceled') { done = true; clearTimeout(dog); return; } fin(false); };
+    // 有些瀏覽器念到一半停住卻不回報結束：超過預估時間就接著念下一句。
+    const dog = setTimeout(() => {
+      if (done || !live()) return;
+      done = true; synth.cancel();
+      timer.current = setTimeout(() => { if (live()) next(); }, 150);
+    }, (text.length / (3.2 * u.rate) + 4) * 1000);
+    utt.current = u; // 保留參照：Chrome 回收語句物件後可能不觸發 onend
+    synth.speak(u);
   }
-  const pause = () => { tok.current++; if (synth) synth.cancel(); setPlayer(p => p && { ...p, playing: false }); };
-  const resume = () => { if (player) play(player.items, player.ended ? 0 : player.idx, player.ended ? 0 : player.chunk, { scroll: player.scroll }); };
-  const jump = d => { if (player) play(player.items, Math.max(0, Math.min(player.items.length - 1, player.idx + d)), 0, { scroll: player.scroll }); };
-  const stop = () => { tok.current++; if (synth) synth.cancel(); setPlayer(null); };
+  function play(items, start = 0, unit = 0, opts = {}) {
+    if (!synth || !items.length) return;
+    const busy = synth.speaking || synth.pending;
+    halt();
+    errs.current = 0;
+    const token = tok.current, live = () => token === tok.current;
+    const quiz = items.some(it => it.units);
+    if (quiz) primeAudio();
+    const base = { items, playing: true, scroll: !!opts.scroll, list: opts.list || null, quiz };
+    const run = (i, u, left) => {
+      if (!live()) return;
+      if (i >= items.length) { setPlayer(p => p && { ...p, playing: false, ended: true, line: '' }); if (base.list) remember(null); return; }
+      const us = unitsOf(items[i]);
+      if (u >= us.length) { run(i + 1, 0); return; }
+      const x = us[u], st = { ...base, idx: i, unit: u, total: us.length, part: x.part || null };
+      if (base.list) remember({ list: base.list, key: items[i].key, unit: u, label: items[i].label });
+      if (x.gap) {
+        const total = gapFor(x.gap.ans, gapRef.current, x.gap.lo, x.gap.hi);
+        let n = left != null ? left : total;
+        setPlayer({ ...st, phase: 'gap', left: n, gapTotal: total, line: '' });
+        if (left == null) beep(660);
+        if (n < 0) return; // 手動揭曉：等使用者按「揭曉」
+        timer.current = setInterval(() => {
+          if (!live()) { clearInterval(timer.current); return; }
+          n -= 1;
+          if (n > 0) { setPlayer(p => p && { ...p, left: n }); return; }
+          clearInterval(timer.current); beep(880);
+          timer.current = setTimeout(() => run(i, u + 1), 300);
+        }, 1000);
+        return;
+      }
+      setPlayer({ ...st, phase: 'say', line: x.say });
+      say(x.say, live, () => run(i, u + 1));
+    };
+    const go = () => run(start, unit, opts.left);
+    // 正在念時先取消、稍等再念，避免 Safari 吃掉緊接著的新語句；沒在念就直接念，iPhone 才算使用者觸發。
+    if (busy) timer.current = setTimeout(go, 150); else go();
+  }
+  const opt = p => ({ scroll: p.scroll, list: p.list });
+  const pause = () => { halt(); setPlayer(p => p && { ...p, playing: false }); };
+  const resume = () => {
+    const p = player; if (!p) return;
+    if (p.ended) play(p.items, 0, 0, opt(p));
+    else play(p.items, p.idx, p.unit, { ...opt(p), left: p.phase === 'gap' ? p.left : undefined });
+  };
+  const jump = d => { const p = player; if (p) play(p.items, Math.max(0, Math.min(p.items.length - 1, p.idx + d)), 0, opt(p)); };
+  const reveal = () => { const p = player; if (p && p.phase === 'gap' && !p.ended) { beep(880); play(p.items, p.idx, p.unit + 1, opt(p)); } };
+  const stop = () => { halt(); setPlayer(null); };
   const currentKey = player && player.items[player.idx] ? player.items[player.idx].key : null;
-  return { supported: !!synth, voices, voice: voiceRef.current, setVoiceURI, rate, setRate, player, play, pause, resume, jump, stop, currentKey };
+  return { supported: !!synth, voices, voice: voiceRef.current, setVoiceURI, rate, setRate, gap, setGap, last, player, play, pause, resume, jump, reveal, stop, currentKey };
 }
 
 const Speaker = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"></path><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path></svg>`;
@@ -1453,6 +1626,86 @@ const PlayI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="t
 const PrevI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z" fill="currentColor"></path></svg>`;
 const NextI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z" fill="currentColor"></path></svg>`;
 const StopI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"></rect></svg>`;
+const MicI = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"></rect><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path></svg>`;
+
+/* ---------- 口說作答：裝置的語音轉文字 ---------- */
+const SR = typeof window !== 'undefined' ? (window.SpeechRecognition || window.webkitSpeechRecognition || null) : null;
+const MIC_DENIED = '沒有麥克風權限：請在瀏覽器允許使用麥克風；iPhone 另需開啟「設定 → 一般 → 鍵盤 → 啟用聽寫」。';
+const MIC_FAIL = '無法啟動語音轉文字，請改用鍵盤上的麥克風聽寫。';
+const STT_ERR = {
+  'not-allowed': MIC_DENIED, 'service-not-allowed': MIC_DENIED,
+  'audio-capture': '找不到麥克風，請確認裝置有麥克風且沒有被其他程式占用。',
+  'network': '語音轉文字需要網路連線。可以連上網路再試，或改用鍵盤上的麥克風聽寫。',
+  'language-not-supported': '這個瀏覽器不支援中文（台灣）語音轉文字，請改用鍵盤上的麥克風聽寫。',
+};
+const glue = (a, b) => !a || !b ? a + b : a + (/[，。！？、,.!?]$/.test(a) ? '' : '，') + b;
+// 每次都從整份結果重組；某段若已包含前面全部文字（部分 iPhone 版本會累積回傳）就取代，不重複接上。
+function joinResults(results) {
+  let s = '';
+  for (let k = 0; k < results.length; k++) {
+    const t = ((results[k][0] && results[k][0].transcript) || '').trim();
+    if (t) s = s && t.startsWith(s) ? t : s + t;
+  }
+  return s;
+}
+function useSTT() {
+  const [on, setOn] = useState(false);
+  const [err, setErr] = useState('');
+  const want = useRef(false), live = useRef(false), rec = useRef(null), acc = useRef(''), cur = useRef(''), cb = useRef({}), quiet = useRef(0);
+  useEffect(() => () => { want.current = false; live.current = false; try { if (rec.current) rec.current.abort(); } catch (e) {} }, []);
+  function finish() {
+    if (!live.current) return;
+    live.current = false; want.current = false; rec.current = null; setOn(false);
+    if (cb.current.onDone) cb.current.onDone(glue(acc.current, cur.current));
+  }
+  function open() {
+    let r;
+    try { r = new SR(); } catch (e) { setErr(MIC_FAIL); finish(); return; }
+    rec.current = r; cur.current = '';
+    r.lang = 'zh-TW'; r.continuous = true; r.interimResults = true;
+    r.onresult = e => { cur.current = joinResults(e.results); quiet.current = 0; if (cb.current.onText) cb.current.onText(glue(acc.current, cur.current)); };
+    r.onerror = e => { if (STT_ERR[e.error]) { setErr(STT_ERR[e.error]); want.current = false; } };
+    r.onend = () => {
+      if (rec.current !== r) return;
+      acc.current = glue(acc.current, cur.current); cur.current = ''; rec.current = null;
+      // 停頓太久或單次收音到上限時瀏覽器會自己結束：還在收音就重新開始，連續 8 次沒聽到聲音才停。
+      if (want.current && ++quiet.current <= 8) { setTimeout(() => { if (want.current) open(); else finish(); }, 250); return; }
+      finish();
+    };
+    try { r.start(); } catch (e) { setErr(MIC_FAIL); rec.current = null; finish(); }
+  }
+  function start(handlers) {
+    if (!SR || live.current) return false;
+    cb.current = handlers; acc.current = ''; cur.current = ''; quiet.current = 0;
+    want.current = true; live.current = true; setErr(''); setOn(true);
+    open();
+    return true;
+  }
+  function stop() {
+    want.current = false;
+    const r = rec.current;
+    if (!r) { finish(); return; }
+    try { r.stop(); } catch (e) { finish(); return; }
+    // 少數瀏覽器停止後不回報結束，2.5 秒後強制收尾。
+    setTimeout(() => { if (live.current && rec.current === r) { try { r.abort(); } catch (e) {} finish(); } }, 2500);
+  }
+  return { supported: !!SR, on, err, start, stop };
+}
+
+/* ---------- 播放或收音時讓螢幕保持亮著（支援 Screen Wake Lock 的瀏覽器） ---------- */
+function useWakeLock(on) {
+  useEffect(() => {
+    if (!on || typeof navigator === 'undefined' || !navigator.wakeLock) return;
+    let lock = null, alive = true;
+    const get = () => {
+      if (document.visibilityState !== 'visible' || (lock && !lock.released)) return;
+      navigator.wakeLock.request('screen').then(l => { if (alive) lock = l; else l.release().catch(() => {}); }).catch(() => {});
+    };
+    get();
+    document.addEventListener('visibilitychange', get);
+    return () => { alive = false; document.removeEventListener('visibilitychange', get); if (lock) lock.release().catch(() => {}); };
+  }, [on]);
+}
 
 /* ---------- 數學工具 ---------- */
 function erf(x) {
@@ -1876,11 +2129,7 @@ function useStudy() {
 /* ---------- 主動回想：答案先遮住，再逐步自評 ---------- */
 function RecallSession({ id, game, tts, onClose, onRead }) {
   const t = TOPICS.find(x => x.id === id);
-  const steps = useMemo(() => [
-    { sec: 0, title: '口試開場句', prompt: '開口說出這個主題的口試開場句。', ans: t.open },
-    ...t.pts.map(([h, d]) => ({ sec: 1, title: h, prompt: `說出「${h}」的重點內容。`, ans: d })),
-    { sec: 2, title: '易錯陷阱', prompt: `這個主題有 ${t.traps.length} 個易錯提醒，說說看是哪些。`, ans: t.traps },
-  ], [id]);
+  const steps = useMemo(() => recallSteps(t), [id]);
   const [i, setI] = useState(0);
   const [shown, setShown] = useState(false);
   const [marks, setMarks] = useState([]);
@@ -1904,7 +2153,6 @@ function RecallSession({ id, game, tts, onClose, onRead }) {
   }, []);
   useEffect(() => { if (btnRef.current) btnRef.current.focus(); }, [i, shown, result]);
   const step = steps[i];
-  const ansText = a => Array.isArray(a) ? a.join('\n') : a;
   const speaking = tts.currentKey === 'atk' && tts.player && tts.player.playing;
   const judge = ok => {
     if (tts.player) tts.stop();
@@ -2017,86 +2265,141 @@ function ConceptMatch({ t }) {
       <button className="btn" onClick=${() => { setI((i + 1) % t.pts.length); setChoice(null); }}>下一個概念</button></div>`}
   </details>`;
 }
-function Review({ game, onAttack, onRead }) {
+function Review({ game, tts, onAttack, onRead }) {
   const [filter, setFilter] = useState('due');
   const items = TOPICS.filter(t => filter === 'all' || (filter === 'due' ? game.status(t.id).kind === 'dmg' : game.status(t.id).kind === 'new'));
+  const quizOf = ts => ts.flatMap(t => topicQuiz(t, TOPICS.indexOf(t)));
+  const quizAll = useMemo(() => quizOf(items), [items.map(t => t.id).join()]);
+  const quizId = tts.player && tts.currentKey && tts.currentKey.startsWith('quiz-') ? tts.currentKey.split('-')[1] : null;
+  const allOn = tts.player && tts.player.playing && tts.player.items === quizAll;
   return html`<section className="review-page">
     <div className="section-intro"><h2>回想練習</h2><p>每個主題依序練開場句、重點與易錯提醒。全部能獨立說出後，安排下次複習。</p></div>
     <div className="reading-path" aria-label="回想步驟">${[['01','遮住答案'],['02','自己說一遍'],['03','對照並補強']].map(([n,x]) => html`<div key=${n}><span>${n}</span><b>${x}</b></div>`)}</div>
     <p className="note">已熟悉 ${game.builtN}／15 個主題，待複習 ${game.dueN} 個。複習間隔為 1、3、7、14 天；提早練習不延後原日期。</p>
     <div className="filter-row" role="group" aria-label="回想主題篩選">${[['due','待複習'],['new','尚未完成'],['all','全部主題']].map(([v,l]) => html`<button className=${'btn ' + (filter === v ? 'on' : '')} aria-pressed=${filter === v} onClick=${() => setFilter(v)} key=${v}>${l}</button>`)}</div>
+    <section className="sheet quiz-box" aria-label="語音聽考">
+      <h3>語音聽考</h3>
+      <p className="note">念題目後停頓，讓你開口說，再念答案。聽考不記錄熟悉程度；要排複習日期請用「開始回想」。</p>
+      ${!tts.supported ? html`<p className="warn">這個瀏覽器不支援朗讀。請改用 iPhone 的 Safari、Android 的 Chrome，或電腦版 Chrome、Safari 開啟。</p>` : html`<div className="filter-row quiz-acts">
+        <button className=${'btn ' + (allOn ? 'on' : 'primary')} disabled=${!items.length} onClick=${() => allOn ? tts.pause() : tts.play(quizAll)}>${allOn ? html`<${PauseI} />暫停聽考` : items.length ? html`<${Speaker} />聽考這 ${items.length} 個主題（約 ${estMinutes(quizAll, tts.rate, tts.gap)} 分）` : '這個分類目前沒有主題'}</button>
+        <label className="gap-field" htmlFor="gap-review">作答時間<${GapSelect} tts=${tts} id="gap-review" /></label>
+      </div>`}
+    </section>
     ${!items.length && html`<p className="sheet">${filter === 'due' ? '目前沒有到期的主題。可先選「尚未完成」，或從全部主題練習。' : '這個分類目前沒有主題，可以切換到全部主題。'}</p>`}
-    <div className="review-list">${items.map(t => { const st = game.status(t.id); return html`<article className="sheet" key=${t.id}><p className="meta">${studyLabel(st)}${st.due ? '・複習日期 ' + mdText(st.due) : ''}</p><h3>${t.title}</h3><div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想</button><button className="btn" onClick=${() => onRead(t.id)}>先讀重點</button></div></article>`; })}</div>
+    <div className="review-list">${items.map(t => { const st = game.status(t.id); return html`<article className=${'sheet' + (quizId === t.id ? ' playing' : '')} key=${t.id}><p className="meta">${studyLabel(st)}${st.due ? '・複習日期 ' + mdText(st.due) : ''}</p><h3>${t.title}</h3><div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想</button><button className="btn" onClick=${() => onRead(t.id)}>先讀重點</button><button className="btn" disabled=${!tts.supported} onClick=${() => tts.play(quizOf([t]))}><${Speaker} />語音聽考</button></div></article>`; })}</div>
   </section>`;
 }
 
 /* ---------- 圖鑑頁：15 個主題完整重點 ---------- */
+const LIST_NAMES = { all: '全部主題', due: '待複習主題', open: '只聽開場句', traps: '只聽易錯提醒' };
+function GapSelect({ tts, id }) {
+  return html`<select id=${id} value=${tts.gap} onChange=${e => tts.setGap(e.target.value)}>${GAPS.map(([v, l]) => html`<option key=${v} value=${v}>${l}</option>`)}</select>`;
+}
+function VoiceSettings({ tts }) {
+  return html`<details className="voicebox"><summary>朗讀設定</summary>
+    ${!tts.supported ? html`<p className="warn">這個瀏覽器不支援朗讀。請改用 iPhone 的 Safari、Android 的 Chrome，或電腦版 Chrome、Safari 開啟。</p>` : html`<div>
+      <div className="row"><label htmlFor="voice">聲音</label>
+        <select id="voice" value=${tts.voice ? tts.voice.voiceURI : ''} onChange=${e => tts.setVoiceURI(e.target.value)}>
+          ${tts.voices.length === 0 && html`<option value="">（系統預設）</option>`}
+          ${tts.voices.map(v => html`<option key=${v.voiceURI} value=${v.voiceURI}>${v.name}（${v.lang}）</option>`)}
+        </select></div>
+      <div className="row"><label htmlFor="rate">語速</label>
+        <div><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value=${tts.rate} onInput=${e => tts.setRate(+e.target.value)} onChange=${e => tts.setRate(+e.target.value)} />
+        <span className="meta">${tts.rate.toFixed(1)} 倍</span></div></div>
+      <div className="row"><label htmlFor="gap">作答時間</label><${GapSelect} tts=${tts} id="gap" /></div>
+      <div className="toolbar"><button className="btn" onClick=${() => tts.play([{ key: 'test', label: '試聽', text: '效度是正確性，信度是穩定性。先求效度，再談信度。' }])}><${Speaker} />試聽</button></div>
+      ${tts.voices.length === 0 && html`<p className="warn">還沒抓到中文語音，請先按一次「試聽」；若仍沒有聲音，到系統設定下載中文（台灣）語音。</p>`}
+      <p className="hint">作答時間用於語音聽考：選「自動」時，主題重點依答案長短停 6～30 秒，口試題停 20～120 秒。</p>
+      <p className="hint">聲音更自然：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文 → 中文（台灣）」，下載「美佳（加強版）」後回來選它。</p>
+      <p className="hint">播放時會讓螢幕保持亮著（支援的瀏覽器）；螢幕鎖定或切到其他 App，朗讀會停。iPhone 沒有聲音時，先確認側邊的靜音開關沒有打開。</p>
+    </div>`}
+  </details>`;
+}
 function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
-  const items = useMemo(() => TOPICS.map((t, i) => ({ key: 'topic-' + t.id, label: `${String(i + 1).padStart(2, '0')} ${t.title}`, text: topicScript(t, i) })), []);
+  const lists = useMemo(() => {
+    const no = i => String(i + 1).padStart(2, '0');
+    const all = TOPICS.map((t, i) => ({ key: 'topic-' + t.id, label: `${no(i)} ${t.title}`, parts: topicParts(t, i) }));
+    return {
+      all,
+      open: TOPICS.map((t, i) => ({ key: all[i].key, label: `${no(i)} ${t.title}・開場句`, parts: [{ part: 'title', text: `${t.title}。` }, { part: 'open', text: t.open }] })),
+      traps: TOPICS.map((t, i) => ({ t, i })).filter(({ t }) => t.traps.length).map(({ t, i }) => ({ key: all[i].key, label: `${no(i)} ${t.title}・易錯提醒`, parts: [{ part: 'title', text: `${t.title}。` }, { part: 'traps', text: `易錯提醒：${t.traps.map(endStop).join('')}` }] })),
+    };
+  }, []);
   const [selected, setSelected] = useState('all');
   const [query, setQuery] = useState('');
   const [onlyDue, setOnlyDue] = useState(false);
-  const cur = tts.currentKey;
+  const due = lists.all.filter((it, i) => game.status(TOPICS[i].id).kind === 'dmg');
+  const listOf = name => name === 'due' ? due : lists[name] || [];
+  const p = tts.player, cur = tts.currentKey, part = p ? p.part : null;
+  // 連續播放時跟著念到的段落捲動：換主題捲到主題開頭，段落不在畫面內才捲到中間。
   useEffect(() => {
-    if (tts.player && tts.player.scroll && tts.player.playing && cur && cur.startsWith('topic-')) {
-      const el = document.getElementById(cur); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [cur]);
+    if (!(p && p.scroll && p.playing && cur && cur.startsWith('topic-'))) return;
+    const el = document.getElementById(part && part !== 'title' ? cur + '-' + part : cur);
+    if (!el) return;
+    const r = el.getBoundingClientRect(), ph = (document.querySelector('.player') || {}).offsetHeight || 0;
+    // 距離遠或使用者偏好減少動畫時直接跳過去，近的才平滑捲動。
+    const behavior = Math.abs(r.top) > 1500 || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    if (!part || part === 'title') el.scrollIntoView({ behavior, block: 'start' });
+    else if (r.top < 90 || r.bottom > innerHeight - ph - 8) el.scrollIntoView({ behavior, block: 'center' });
+  }, [cur, part]);
+  const playList = (name, idx = 0, unit = 0) => {
+    const its = listOf(name); if (!its.length) return;
+    setSelected('all'); setQuery(''); setOnlyDue(name === 'due');
+    tts.play(its, idx, unit, { scroll: true, list: name });
+  };
+  const last = tts.last, lastIdx = last && LIST_NAMES[last.list] ? listOf(last.list).findIndex(it => it.key === last.key) : -1;
+  const showResume = lastIdx >= 0 && !(p && p.list === last.list);
   useEffect(() => {
     if (!focus) return;
     setSelected(focus); setQuery(''); setOnlyDue(false);
     const tm = setTimeout(() => { const el = document.getElementById('topic-' + focus); if (el) el.scrollIntoView({ block: 'start' }); clearFocus(); }, 30);
     return () => clearTimeout(tm);
   }, [focus]);
-  const allPlaying = tts.player && tts.player.items === items && tts.player.playing;
   return html`<div>
     <div className="notes-top">
       <section className="editor-desk" aria-label="本期導讀">
         <div className="desk-heading"><h2>主題導讀</h2></div>
         <div className="feature-question"><div className="feature-art" data-module="1"><${ChapterArt} kind=${1} /></div><div><span className="small-label">概念比較</span><h3>測得很穩，<br />就一定測得準嗎？</h3><button className="cover-link" onClick=${() => { setSelected('relval'); setQuery(''); setOnlyDue(false); setTimeout(() => document.getElementById('topic-relval')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); }}>信度與效度 →</button></div></div>
         <div className="reading-search"><label htmlFor="topic-search">搜尋主題</label><input id="topic-search" type="search" placeholder="搜尋信度、偏態、檔案評量…" value=${query} onChange=${e => { setQuery(e.target.value); setSelected('all'); }} /></div>
-        <div className="filter-row"><button className="btn" onClick=${() => { setSelected('all'); setQuery(''); setOnlyDue(false); }}>看全部主題</button><button className=${'btn ' + (onlyDue ? 'on' : '')} aria-pressed=${onlyDue} onClick=${() => { setOnlyDue(v => !v); setSelected('all'); }}>只看待複習</button>
-          <button className=${'btn listen-all ' + (allPlaying ? 'on' : '')} disabled=${!tts.supported} onClick=${() => { if (allPlaying) tts.pause(); else { setSelected('all'); setQuery(''); setOnlyDue(false); tts.play(items, 0, 0, { scroll: true }); } }}>${allPlaying ? html`<${PauseI} />暫停` : html`<${Speaker} />連續播放全部`}</button></div>
+        <div className="filter-row"><button className="btn" onClick=${() => { setSelected('all'); setQuery(''); setOnlyDue(false); }}>看全部主題</button><button className=${'btn ' + (onlyDue ? 'on' : '')} aria-pressed=${onlyDue} onClick=${() => { setOnlyDue(v => !v); setSelected('all'); }}>只看待複習</button></div>
         <details className="issue-directory" open=${selected === 'all' && !query && !onlyDue}><summary>本期目錄 <span>5 個章節・15 個主題</span></summary>
           <nav className="chapter-directory" aria-label="主題目錄">${EDITIONS.map((m, mi) => html`<section className="chapter-group" data-module=${mi} key=${m.name}><header><span className="chapter-index">${String(mi + 1).padStart(2,'0')}</span><h3>${m.name}</h3><${ChapterArt} kind=${mi} /></header><div className="toc">${m.ids.map(id => { const t = TOPICS.find(x => x.id === id), i = TOPICS.indexOf(t), st = game.status(id); return html`<a key=${id} href=${'#topic-' + id} className=${(st.kind === 'ok' ? 'ok ' : st.kind === 'dmg' ? 'dmg ' : '') + (cur === 'topic-' + id ? 'cur' : '')} onClick=${e => { e.preventDefault(); setSelected(id); setQuery(''); setOnlyDue(false); setTimeout(() => document.getElementById('topic-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); }}><span>${String(i + 1).padStart(2,'0')}</span><b>${t.title}</b><span className="toc-arrow" aria-hidden="true">↗</span></a>`; })}</div></section>`)}</nav>
         </details>
       </section>
-      <details className="sheet voicebox"><summary>朗讀設定</summary>
-        ${!tts.supported ? html`<p className="warn">這個瀏覽器不支援朗讀。請改用 iPhone 的 Safari、Android 的 Chrome，或電腦版 Chrome、Safari 開啟。</p>` : html`<div>
-          <div className="row"><label htmlFor="voice">聲音</label>
-            <select id="voice" value=${tts.voice ? tts.voice.voiceURI : ''} onChange=${e => tts.setVoiceURI(e.target.value)}>
-              ${tts.voices.length === 0 && html`<option value="">（系統預設）</option>`}
-              ${tts.voices.map(v => html`<option key=${v.voiceURI} value=${v.voiceURI}>${v.name}（${v.lang}）</option>`)}
-            </select></div>
-          <div className="row"><label htmlFor="rate">語速</label>
-            <div><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value=${tts.rate} onInput=${e => tts.setRate(+e.target.value)} onChange=${e => tts.setRate(+e.target.value)} />
-            <span className="meta">${tts.rate.toFixed(1)} 倍</span></div></div>
-          <div className="toolbar"><button className="btn" onClick=${() => tts.play([{ key: 'test', label: '試聽', text: '效度是正確性，信度是穩定性。先求效度，再談信度。' }])}><${Speaker} />試聽</button></div>
-          ${tts.voices.length === 0 && html`<p className="warn">還沒抓到中文語音，請先按一次「試聽」；若仍沒有聲音，到系統設定下載中文（台灣）語音。</p>`}
-          <p className="hint">聲音更自然：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文 → 中文（台灣）」，下載「美佳（加強版）」後回來選它。手機螢幕鎖定時朗讀會停，請讓螢幕保持亮著。</p>
-        </div>`}
-      </details>
+      <section className="sheet listen-desk" aria-label="語音複習">
+        <div className="desk-heading"><h2>語音複習</h2></div>
+        <div className="listen-lists">${Object.keys(LIST_NAMES).map(v => {
+          const its = listOf(v), mine = p && p.list === v, on = mine && p.playing, held = mine && !p.playing && !p.ended;
+          const n = v === 'open' ? `${its.length} 句` : `${its.length} 個主題`;
+          return html`<button key=${v} className=${'btn ' + (on ? 'on' : '')} disabled=${!tts.supported || !its.length} onClick=${() => on ? tts.pause() : held ? tts.resume() : playList(v)}>
+            <span className="ll-name">${on ? html`<${PauseI} />` : html`<${Speaker} />`}${LIST_NAMES[v]}</span>
+            <small>${on ? '播放中，點一下暫停' : held ? '已暫停，點一下繼續' : its.length ? `${n}・約 ${estMinutes(its, tts.rate, tts.gap)} 分` : n}</small></button>`;
+        })}</div>
+        ${showResume && html`<button className="cover-link" onClick=${() => playList(last.list, lastIdx, last.unit)}>繼續上次：${LIST_NAMES[last.list]}・${last.label} →</button>`}
+        <${VoiceSettings} tts=${tts} />
+      </section>
     </div>
     ${!TOPICS.some(t => (selected === 'all' || t.id === selected) && (!onlyDue || game.status(t.id).kind === 'dmg') && (!query.trim() || [t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) && html`<p className="sheet" role="status">沒有符合的主題。試試其他關鍵詞，或按「看全部主題」。</p>`}
     <div className="topics">
       ${TOPICS.map((t, i) => {
         const key = 'topic-' + t.id;
-        const playing = cur === key && tts.player && tts.player.playing;
+        const playing = cur === key && p && p.playing;
+        const rp = cur === key && p ? p.part : null;
         const n = QUESTIONS.filter(q => inTopic(q, t.id)).length;
         const st = game.status(t.id);
         if ((selected !== 'all' && selected !== t.id) || (onlyDue && st.kind !== 'dmg') || (query.trim() && ![t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) return null;
         return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '') + (st.kind === 'ok' ? ' isknown' : '')} id=${key} key=${t.id} data-module=${moduleOf(t.id)}>
           <header className="thead"><div className="topic-heading"><div className="tmod"><span className="topic-chapter">${t.mod}</span><span className="study-status">${studyLabel(st)}</span></div><div className="topic-title"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h2>${t.title}</h2></div></div><${ChapterArt} kind=${moduleOf(t.id)} /></header>
           <div className="tacts">
-            <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([items[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
+            <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([lists.all[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
             <button className="btn red" onClick=${() => onAttack(t.id)}>回想練習</button>
             <button className="btn" onClick=${() => onPractice(t.id)}>口試題（${n}）→</button>
           </div>
-          <div className="open"><span className="tag">口試開場句</span><p>${t.open}</p></div>
+          <div className=${'open' + (rp === 'open' ? ' reading' : '')} id=${key + '-open'}><span className="tag">口試開場句</span><p>${t.open}</p></div>
           <h3 className="reading-label"><span className="section-number">01</span> 圖解</h3><figure className="figure-wrap"><div className="fig">${FIGS[t.fig]()}</div><figcaption>圖解 ${String(i + 1).padStart(2, '0')}｜${t.title}</figcaption></figure><${ConceptMap} t=${t} /><h3 className="reading-label"><span className="section-number">03</span> 重點整理</h3>
-          <dl className="pts">${t.pts.map(([h, d], pi) => html`<div key=${h}><dt><span className="point-number">${String(pi + 1).padStart(2, '0')}</span>${h}</dt><dd>${d}</dd></div>`)}</dl>
+          <dl className="pts">${t.pts.map(([h, d], pi) => html`<div key=${h} id=${key + '-pt-' + pi} className=${rp === 'pt-' + pi ? 'reading' : undefined}><dt><span className="point-number">${String(pi + 1).padStart(2, '0')}</span>${h}</dt><dd>${d}</dd></div>`)}</dl>
           <h3 className="reading-label"><span className="section-number">04</span> 概念配對</h3><${ConceptMatch} t=${t} />
-          ${t.traps.length > 0 && html`<div className="traps"><b><span aria-hidden="true">！</span> 易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
+          ${t.traps.length > 0 && html`<div className=${'traps' + (rp === 'traps' ? ' reading' : '')} id=${key + '-traps'}><b><span aria-hidden="true">！</span> 易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
           <div className="topic-end"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想練習 →</button></div>
         </article>`;
       })}
@@ -2116,14 +2419,23 @@ function Practice({ tts, game, topic, setTopic }) {
   const [hints, setHints] = useState(false);
   const [sec, setSec] = useState(0);
   const [running, setRunning] = useState(false);
+  const [undo, setUndo] = useState(null);
+  const stt = useSTT();
+  useWakeLock(stt.on);
   const list = useMemo(() => QUESTIONS.filter(q => inTopic(q, topic)), [topic]);
+  const quizList = useMemo(() => list.map(questionQuiz), [list]);
   const q = list.find(x => x.id === qid) || list[0];
   const pos = list.indexOf(q);
   const text = drafts[q.id] || '';
 
   useEffect(() => save('drafts', drafts), [drafts]);
   useEffect(() => save('scores', scores), [scores]);
-  useEffect(() => { save('qid', q.id); setSec(0); setRunning(false); setHints(false); }, [q.id]);
+  useEffect(() => { save('qid', q.id); setSec(0); setRunning(false); setHints(false); if (stt.on) stt.stop(); }, [q.id]);
+  // 語音聽考念到哪一題，畫面就切到那一題。
+  useEffect(() => {
+    const k = tts.currentKey;
+    if (k && k.startsWith('qq-')) { const id = +k.slice(3); if (id !== q.id && list.some(x => x.id === id)) setQid(id); }
+  }, [tts.currentKey]);
   useEffect(() => { if (!running) return; const t = setInterval(() => setSec(s => s + 1), 1000); return () => clearInterval(t); }, [running]);
 
   const result = useMemo(() => graded[q.id] != null ? grade(q, graded[q.id]) : null, [q, graded]);
@@ -2133,10 +2445,27 @@ function Practice({ tts, game, topic, setTopic }) {
 
   const go = id => { setQid(id); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const setText = v => setDrafts(d => ({ ...d, [q.id]: v }));
-  const doGrade = () => {
-    const total = grade(q, text).total;
-    setGraded(g => ({ ...g, [q.id]: text })); setScores(s => ({ ...s, [q.id]: total })); setRunning(false);
+  const gradeNow = (id, t) => {
+    const total = grade(QUESTIONS.find(x => x.id === id), t).total;
+    setGraded(g => ({ ...g, [id]: t })); setScores(s => ({ ...s, [id]: total }));
   };
+  const doGrade = () => { gradeNow(q.id, text); setRunning(false); };
+  // 口說作答：「重新口說」先清空（保留一次復原），「接著說」接在原本的文字後面；說完自動檢查。
+  const hasText = !!text.trim() && text !== SAMPLE;
+  const talk = more => {
+    if (tts.player) tts.stop();
+    const id = q.id, prev = text === SAMPLE ? '' : text;
+    const base = more && prev.trim() ? prev.replace(/\s+$/, '') + '\n' : '';
+    const ok = stt.start({
+      onText: t => setDrafts(d => ({ ...d, [id]: base + t })),
+      onDone: t => { setRunning(false); if (t.trim()) { setDrafts(d => ({ ...d, [id]: base + t })); gradeNow(id, base + t); } },
+    });
+    if (!ok) return;
+    if (!more) { setUndo(prev.trim() ? { id, text: prev } : null); setDrafts(d => ({ ...d, [id]: '' })); setSec(0); }
+    setRunning(true);
+  };
+  const quizOn = !!(tts.player && tts.player.playing && tts.currentKey && tts.currentKey.startsWith('qq-'));
+  const listen = (key, label, body) => { if (stt.on) stt.stop(); if (speaking(key)) tts.pause(); else tts.play([{ key, label, text: body }]); };
   const draw = () => {
     if (list.length < 2) return;
     // 優先抽需要補強的題目；舊版最佳紀錄仍計入。
@@ -2181,31 +2510,44 @@ function Practice({ tts, game, topic, setTopic }) {
         <div className="progress" aria-label="練習進度">${list.map(x => html`<i key=${x.id} title=${x.id + '. ' + x.category} className=${(scores[x.id] != null || game.qstars[x.id] ? 'done' : '') + (x.id === q.id ? ' cur' : '')}></i>`)}</div>
         <span className="meta">全部 ${QUESTIONS.length} 題：已練 ${doneN} 題，曾達 90 分 ${goodN} 題。隨機抽題會優先抽需要補強的題目。</span>
       </div>
+      ${tts.supported && html`<div className="pfilter quiz-acts">
+        <button className=${'btn ' + (quizOn ? 'on' : '')} onClick=${() => { if (quizOn) { tts.pause(); return; } if (stt.on) stt.stop(); tts.play(quizList, pos); }}>${quizOn ? html`<${PauseI} />暫停聽考` : html`<${Speaker} />語音聽考：從第 ${q.id} 題開始（${list.length - pos} 題）`}</button>
+        <label className="gap-field" htmlFor="gap-practice">作答時間<${GapSelect} tts=${tts} id="gap-practice" /></label>
+      </div>`}
     </div>
     <div className="grid2">
       <section className="sheet sticky" aria-label="作答區">
         <div className="qhead"><span className="num">第 ${q.id} 題</span><span className="type">${q.type}</span><span>${topicName(q.topic)}</span></div>
         <p className="qtext">${q.question}</p>
         <div className="hintbar">
-          <button className=${'btn ' + (speaking(qKey) ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => speaking(qKey) ? tts.pause() : tts.play([{ key: qKey, label: `第 ${q.id} 題題目`, text: q.question }])}>
+          <button className=${'btn ' + (speaking(qKey) ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => listen(qKey, `第 ${q.id} 題題目`, q.question)}>
             ${speaking(qKey) ? html`<${PauseI} />停止` : html`<${Speaker} />聽題目`}</button>
           <button className="link" onClick=${() => setHints(h => !h)}>${hints ? '收起關鍵字提示' : '偷看關鍵字提示'}</button>
         </div>
         ${hints && html`<div className="kwhint">${q.keywords.map(k => html`<span key=${k.label}>${k.label}</span>`)}</div>`}
         ${q.id === 1 && text === SAMPLE && html`<p className="samplenote">↓ 這是範例回答（故意漏了幾個關鍵字），可直接清空換成你自己的。</p>`}
-        <label htmlFor="answer" className="meta">你的口試回答（對著麥克風講，用聽寫轉成文字；也可以打字）</label>
-        <textarea id="answer" className="answer" value=${text} onChange=${e => setText(e.target.value)}
-          placeholder="先講關鍵字，再講定義，最後舉課堂例子……"></textarea>
+        <label htmlFor="answer" className="meta">${stt.supported ? '你的口試回答（按「開始口說」直接說，也可以打字）' : '你的口試回答（對著麥克風講，用聽寫轉成文字；也可以打字）'}</label>
+        ${stt.supported && html`<div className="mic-row">
+          ${stt.on ? html`<button className="btn rec" onClick=${() => stt.stop()}><${StopI} />停止並檢查</button><span className="rec-dot" role="status">收音中</span>`
+            : hasText ? html`<button className="btn primary" onClick=${() => talk(false)}><${MicI} />重新口說</button><button className="btn" onClick=${() => talk(true)}><${MicI} />接著說</button>`
+            : html`<button className="btn primary" onClick=${() => talk(false)}><${MicI} />開始口說</button>`}
+          ${!stt.on && undo && undo.id === q.id && html`<button className="link" onClick=${() => { setText(undo.text); setUndo(null); }}>復原口說前的文字</button>`}
+        </div>`}
+        ${stt.err && html`<p className="mic-warn" role="alert">${stt.err}</p>`}
+        <textarea id="answer" className=${'answer' + (stt.on ? ' listening' : '')} value=${text} readOnly=${stt.on} onChange=${e => setText(e.target.value)}
+          placeholder=${stt.on ? '正在聽你說……' : '先講關鍵字，再講定義，最後舉課堂例子……'}></textarea>
         <div className="toolbar">
-          <button className="btn primary" onClick=${doGrade}>檢查回答</button>
-          <button className="btn" onClick=${() => setText('')}>清空</button>
+          <button className="btn primary" disabled=${stt.on} onClick=${doGrade}>檢查回答</button>
+          <button className="btn" disabled=${stt.on} onClick=${() => setText('')}>清空</button>
           <span className="spacer"></span>
           <span className="meta">${charCount} 字</span>
           <span className="timer">${mmss}</span>
           <button className="btn" onClick=${() => setRunning(r => !r)}>${running ? '暫停' : '計時'}</button>
           <button className="btn" onClick=${() => { setSec(0); setRunning(false); }}>歸零</button>
         </div>
-        <p className="tip">口說作答：iPhone、Android 點輸入框後按鍵盤上的麥克風；Mac 連按兩下 Fn 開啟聽寫。講完按「檢查回答」，看看有沒有漏掉重點。草稿只存在這台裝置。</p>
+        <p className="tip">${stt.supported
+          ? '講完按「停止並檢查」，會自動比對關鍵字。iPhone 要先開啟聽寫（設定 → 一般 → 鍵盤 → 啟用聽寫）並連上網路；術語聽錯可以直接改字，再按「檢查回答」。草稿只存在這台裝置。'
+          : '口說作答：iPhone、Android 點輸入框後按鍵盤上的麥克風；Mac 連按兩下 Fn 開啟聽寫。講完按「檢查回答」，看看有沒有漏掉重點。草稿只存在這台裝置。'}</p>
       </section>
 
       <section className="sheet" aria-label="批改結果" aria-live="polite">
@@ -2233,7 +2575,7 @@ function Practice({ tts, game, topic, setTopic }) {
           <h3 className="secttl">你的回答 <span className="legend"><span><i style=${{ background: 'var(--hl)' }}></i>命中</span><span><i style=${{ borderBottom: '2px solid var(--partial)' }}></i>部分命中</span></span></h3>
           ${gradedText ? html`<${Marked} text=${gradedText} hand=${true} prefix="m-" layers=${result.kws.map(k => ({ spans: k.spans, status: k.status === 'miss' ? 'hit' : k.status }))} />` : html`<p className="meta">（空白）</p>`}
           <h3 className="secttl">滿分範本
-            <button className=${'btn ' + (speaking(mKey) ? 'on' : '')} disabled=${!tts.supported} onClick=${() => speaking(mKey) ? tts.pause() : tts.play([{ key: mKey, label: `第 ${q.id} 題滿分範本`, text: q.model }])}>${speaking(mKey) ? html`<${PauseI} />停止` : html`<${Speaker} />聽範本`}</button>
+            <button className=${'btn ' + (speaking(mKey) ? 'on' : '')} disabled=${!tts.supported} onClick=${() => listen(mKey, `第 ${q.id} 題滿分範本`, q.model)}>${speaking(mKey) ? html`<${PauseI} />停止` : html`<${Speaker} />聽範本`}</button>
             <span className="legend"><span><i style=${{ background: 'var(--miss-bg)', outline: '1px solid var(--redpen)' }}></i>你漏掉的</span><span><i style=${{ background: 'var(--partial-bg)' }}></i>部分</span><span><i style=${{ background: 'var(--hit-bg)' }}></i>已命中</span></span></h3>
           <${Marked} text=${q.model} prefix="mm-" layers=${modelLayers} />
           <p className="disclaim">估計分只依字面比對關鍵字與句型，用來檢查有沒有漏講，實際給分以老師判斷為準。第 1～6 題來自課堂題庫，第 7～46 題依課堂知識庫補充。</p>
@@ -2246,14 +2588,32 @@ function Practice({ tts, game, topic, setTopic }) {
 /* ---------- 底部播放列 ---------- */
 const RATES = [0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.5];
 function Player({ tts }) {
-  const p = tts.player; if (!p) return null;
+  const p = tts.player, ref = useRef(null);
+  // 播放列高度隨字幕變動：寫進 --player-h，頁面底部留出同樣的空間。
+  useEffect(() => {
+    const el = ref.current, root = document.documentElement;
+    if (!el) return;
+    const put = () => root.style.setProperty('--player-h', el.offsetHeight + 'px');
+    put();
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(put) : null;
+    if (ro) ro.observe(el);
+    return () => { if (ro) ro.disconnect(); root.style.removeProperty('--player-h'); };
+  }, [!!p]);
+  if (!p) return null;
   const it = p.items[p.idx];
-  return html`<div className="player" role="region" aria-label="朗讀播放">
+  const gap = p.phase === 'gap' && !p.ended;
+  const status = p.error ? p.error : p.ended ? '播放完畢' : !p.playing ? (gap && p.left >= 0 ? `已暫停・作答剩 ${p.left} 秒` : '已暫停')
+    : gap ? (p.left < 0 ? '換你說，說完按「揭曉」' : `換你說・剩 ${p.left} 秒`)
+    : p.quiz ? (p.part === 'a' ? '答案' : '題目') : `第 ${p.unit + 1}／${p.total} 句`;
+  return html`<div className="player" role="region" aria-label="朗讀播放" ref=${ref}>
     <div className="in">
-      <div className="now"><b>${it.label}</b><span>${p.items.length > 1 ? `${p.idx + 1}／${p.items.length}・` : ''}${p.ended ? '播放完畢' : p.playing ? `第 ${p.chunk + 1}／${p.total} 段` : '已暫停'}</span></div>
+      <div className="now"><b>${it.label}</b><span className=${p.error ? 'warnline' : undefined}>${p.items.length > 1 ? `${p.idx + 1}／${p.items.length}・` : ''}${status}</span></div>
+      ${gap && p.playing && p.left >= 0 && p.gapTotal > 0 && html`<div className="dbar countdown" aria-hidden="true"><i style=${{ width: (p.left / p.gapTotal * 100) + '%' }}></i></div>`}
+      ${p.phase === 'say' && p.line && !p.ended && html`<p className="line">${p.line}</p>`}
       ${p.items.length > 1 && html`<button className="pbtn" aria-label="上一個" onClick=${() => tts.jump(-1)}><${PrevI} /></button>`}
       <button className="pbtn main" aria-label=${p.playing ? '暫停' : '播放'} onClick=${() => p.playing ? tts.pause() : tts.resume()}>${p.playing ? html`<${PauseI} />` : html`<${PlayI} />`}</button>
       ${p.items.length > 1 && html`<button className="pbtn" aria-label="下一個" onClick=${() => tts.jump(1)}><${NextI} /></button>`}
+      ${gap && html`<button className="btn primary reveal" onClick=${tts.reveal}>揭曉</button>`}
       <select className="hide-sm" aria-label="語速" value=${tts.rate} onChange=${e => tts.setRate(+e.target.value)}>
         ${RATES.map(r => html`<option key=${r} value=${r}>${r}×</option>`)}
         ${!RATES.includes(tts.rate) && html`<option value=${tts.rate}>${tts.rate}×</option>`}
@@ -2271,6 +2631,7 @@ function App() {
   const [focus, setFocus] = useState(null);
   const [theme, setTheme] = useState(() => load('theme', 'system'));
   const tts = useTTS(), game = useStudy();
+  useWakeLock(!!(tts.player && tts.player.playing));
   useEffect(() => save('tab', tab), [tab]);
   useEffect(() => save('ptopic', topic), [topic]);
   useEffect(() => { if (theme === 'system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = theme; save('theme', theme); }, [theme]);
@@ -2279,7 +2640,7 @@ function App() {
   const closeAttack = () => { if (tts.player) tts.stop(); setAttack(null); };
   const read = id => { closeAttack(); setTab('notes'); setFocus(id); };
   const practice = id => { setTopic(id); setTab('practice'); };
-  return html`<div style=${{ paddingBottom: tts.player ? '170px' : 0 }}>
+  return html`<div style=${{ paddingBottom: tts.player ? 'calc(var(--player-h, 170px) + 24px)' : 0 }}>
     <header className=${'mast' + (tab !== 'notes' ? ' compact' : '')}>
       <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓・圖解學習誌</p>
         <label className="theme-control">外觀<select aria-label="外觀" value=${theme} onChange=${e => setTheme(e.target.value)}><option value="system">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select></label></div>
@@ -2293,7 +2654,7 @@ function App() {
       ${[['notes','主題閱讀'],['review','回想練習'],['practice','口試練習']].map(([v,l]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} key=${v} onClick=${() => setTab(v)}>${l}</button>`)}
     </nav>
     ${tab === 'notes' && html`<${Notes} tts=${tts} game=${game} onPractice=${practice} onAttack=${startAttack} focus=${focus} clearFocus=${() => setFocus(null)} />`}
-    ${tab === 'review' && html`<${Review} game=${game} onAttack=${startAttack} onRead=${read} />`}
+    ${tab === 'review' && html`<${Review} game=${game} tts=${tts} onAttack=${startAttack} onRead=${read} />`}
     ${tab === 'practice' && html`<${Practice} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} />`}
     <footer>內容依課堂知識庫與題庫整理。朗讀使用裝置內建語音。熟悉程度、複習日期、答題紀錄與草稿只存在這個瀏覽器；舊版進度已接續保留。</footer>
     ${attack && html`<${RecallSession} key=${attack} id=${attack} game=${game} tts=${tts} onClose=${closeAttack} onRead=${read} />`}

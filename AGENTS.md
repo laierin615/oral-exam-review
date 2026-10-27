@@ -22,10 +22,15 @@
 |---|---|
 | `:root {` 與兩個深色區塊 | 色彩 token；深色值要在 `@media (prefers-color-scheme: dark)` 與 `:root[data-theme="dark"]` 兩處同步 |
 | `/* ---------- 部落風` 與 `/* ---------- 閱讀版` | 保留的歷史標記與現行閱讀介面 CSS |
+| `/* ---------- 語音複習` | 語音複習清單、跟讀標示、聽考、口說作答與播放列字幕的 CSS |
 | `const TOPICS` | 15 個理論主題：`open`（口試開場句）、`pts`（重點）、`traps`（易錯提醒）、`fig`（圖解 key） |
 | `const QUESTIONS` | 46 題口試題：`keywords[].groups`（必須講到的概念，可用正規式）、`examples`、`model`（滿分範本） |
 | `/* ---------- 比對引擎` | `grade()`：基本分＝關鍵字 50 分，闡述分＝定義句＋實例 50 分 |
-| `/* ---------- 朗讀` | 裝置內建 speechSynthesis、`useTTS()`、底部播放列 |
+| `/* ---------- 朗讀` | 裝置內建 speechSynthesis：`chunks()` 切成 `CHUNK_MAX` 字內的短句、`topicParts()` 跟讀段落、`useTTS()`（防卡住、停頓倒數、繼續上次） |
+| `/* ---------- 語音聽考` | `GAPS`、`gapFor()`、`recallSteps()`（回想練習共用）、`topicQuiz()`、`questionQuiz()`、`unitsOf()`、`estMinutes()`；夾在 `const synth` 與 `const Speaker` 之間，測試會切出來檢查 |
+| `/* ---------- 口說作答` | `useSTT()`：裝置的 SpeechRecognition，中斷會自動接續 |
+| `/* ---------- 播放或收音時` | `useWakeLock()`：播放或收音時讓螢幕保持亮著 |
+| `/* ---------- 底部播放列` | `Player`：目前句子字幕、聽考倒數與「揭曉」，高度寫進 `--player-h` |
 | `/* ---------- 圖解` 與 `互動：…` | 每個主題的 SVG 圖解，`FIGS` 以 key 對應 |
 | `const SHORT` | 主題簡稱，每個 TOPICS id 都要有 |
 | `useStudy()` | 沿用舊 village 進度、間隔複習與待複習狀態 |
@@ -40,6 +45,15 @@
 - 舊 `village`／`known` 進度接續；保留未使用的 `res`、`daily`、`streak`、`qstars` 等資料，不刪除。新增 needsReview、lastReview 欄位時保留既有欄位。
 - 舊 village 分頁自動開啟主題閱讀。口試練習仍保存 scores、drafts、qid，估分引擎與原題庫不變。
 
+## 語音複習規則（2026-10-27 使用者確認）
+
+- 主題閱讀的「語音複習」有四個連續播放清單：全部主題、待複習主題、只聽開場句、只聽易錯提醒。清單播放位置存在 `listen`，可「繼續上次」；播完清除。
+- 朗讀時主題卡用 `.reading` 標出正在念的開場句、第幾點重點或易錯提醒，播放列顯示目前句子；連續播放會跟著捲動。
+- 語音聽考：念題目 → 停頓（提示音＋倒數，可按「揭曉」）→ 念答案。主題聽考沿用 `recallSteps()` 的題目，口試題念題目後念滿分範本。作答時間存在 `gap`（`auto`、秒數或 `manual`）。
+- **聽考不寫入進度**：熟悉程度與複習日期只由回想練習的自評決定。
+- 口說作答：「開始口說／重新口說」先清空並保留一次復原，「接著說」接在原文字後；停止後自動檢查回答。不支援時保留鍵盤聽寫說明。收音前先停止朗讀，避免把朗讀聲音收進去。
+- 朗讀每句不超過 `CHUNK_MAX`（44）字，避免 Chrome 線上語音約 15 秒中斷；有看門狗計時，念到一半卡住會接下一句，連續 3 句失敗就暫停並提示換聲音。
+
 ## 插畫雜誌版視覺（2026-10-24 使用者確認）
 
 - 視覺參考為使用者提供的六張圖；實作採原創 SVG、紙感封面、彩色筆記卡與概念連線，不嵌入參考圖片或品牌。
@@ -53,7 +67,7 @@
 
 - **繁體中文（台灣用語）**：計畫非計劃、螢幕非屏幕、程式碼非代碼。介面文字短、直接。
 - **不使用 Supercell／部落衝突的官方素材、Logo、角色或遊戲名稱**；建築與圖示一律原創 SVG。
-- **localStorage 相容**：前綴 `exam-review-v2:`，鍵包括 `village`、`res`、`daily`、`streak`、`qstars`、`scores`、`drafts`、`qid`、`tab`、`ptopic`、`voice`、`rate`。改資料格式時要寫轉換，不能讓使用者的進度歸零。所有讀寫都包在 try/catch。
+- **localStorage 相容**：前綴 `exam-review-v2:`，鍵包括 `village`、`res`、`daily`、`streak`、`qstars`、`scores`、`drafts`、`qid`、`tab`、`ptopic`、`theme`、`voice`、`rate`、`gap`、`listen`。改資料格式時要寫轉換，不能讓使用者的進度歸零。所有讀寫都包在 try/catch。
 - **手機優先**：正文 18～20px，介面提示至少 16px；375px 寬頁面不能有橫向捲動（圖表與表格可在自己的區域滑動）；按鈕高度至少 40px；左右邊距用 `max(16px, env(safe-area-inset-*))`。
 - **深淺色都要可讀**：新顏色先加成 token，再到兩個深色區塊補值；不要寫死在元件裡（建築 SVG 的材質色除外）。
 - **CDN 版本固定**：react@18.3.1、react-dom@18.3.1（cdnjs）、htm@3.1.1（unpkg）。不要新增其他外部依賴。
@@ -61,6 +75,7 @@
 
 ## 驗證
 
-- 必跑：`node tests/check.mjs` 與 `node tests/progress.mjs`
+- 必跑：`node tests/check.mjs` 與 `node tests/progress.mjs`（check 另檢查朗讀句長、跟讀段落與每一步聽考都有題目、停頓、答案）
+- 語音改動：實際按按鈕測（程式呼叫沒有使用者手勢，iPhone 與 Chrome 可能不念）。麥克風在 Claude 的瀏覽器窗格會被擋，收音要在手機實測。
 - 介面改動：`python3 -m http.server 8765` 後用手機寬度（375×812）開 `http://127.0.0.1:8765/`，深淺色各看一次，確認主控台沒有錯誤。
 - 測試時寫進 localStorage 的假資料，測完要清掉。
