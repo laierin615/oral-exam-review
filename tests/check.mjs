@@ -25,10 +25,10 @@ const slice = (a, b) => {
 };
 const code = slice('const TOPICS', 'const RANK') + slice('const synth', 'const Speaker') +
   slice('const SHORT', 'TOPICS.forEach') +
-  '\n;globalThis.__out = { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX };';
+  '\n;globalThis.__out = { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX, mandarinVoices, pickVoice };';
 const ctx = { window: {}, console };
 vm.runInNewContext(code, ctx);
-const { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX } = ctx.__out;
+const { TOPICS, QUESTIONS, SHORT, grade, chunks, topicScript, topicParts, topicQuiz, questionQuiz, gapFor, CHUNK_MAX, mandarinVoices, pickVoice } = ctx.__out;
 
 // 3. 主題與題庫對應
 const ids = new Set(TOPICS.map(t => t.id));
@@ -75,6 +75,25 @@ QUESTIONS.forEach(q => {
 });
 if (gapFor('一二三', 'manual', 6, 30) !== -1 || gapFor('一二三', '10', 6, 30) !== 10 || gapFor('一二三', 'auto', 6, 30) !== 6) warn('作答時間設定換算錯誤');
 if (problems === before) console.log(`✓ 朗讀句都在 ${CHUNK_MAX + 1} 字內，${TOPICS.length} 個主題與 ${QUESTIONS.length} 題聽考都有題目、停頓、答案`);
+
+// 6. 自動選聲音：各平台挑最自然的中文聲音，機械音與粵語不列入
+const beforeVoice = problems;
+const V = (name, lang, voiceURI = name) => ({ name, lang, voiceURI });
+const apple = [V('美佳', 'zh-TW', 'com.apple.voice.compact.zh-TW.Meijia'), V('Eddy (中文（台灣）)', 'zh-TW', 'com.apple.eloquence.zh-TW.Eddy'),
+  V('Flo (中文（台灣）)', 'zh-TW'), V('善怡', 'yue-HK'), V('婷婷', 'zh-CN')];
+[
+  ['iPhone／Mac 基本語音', apple, '美佳'],
+  ['下載加強版後', [...apple, V('美佳', 'zh-TW', 'com.apple.voice.enhanced.zh-TW.Meijia')], 'com.apple.voice.enhanced.zh-TW.Meijia'],
+  ['Chrome', [V('美佳', 'zh-TW'), V('Eddy (中文（台灣）)', 'zh-TW'), V('Google 普通话（中国大陆）', 'zh-CN'), V('Google 國語（臺灣）', 'zh-TW'), V('Google 粤語（香港）', 'zh-HK')], 'Google 國語（臺灣）'],
+  ['Edge', [V('Microsoft Hanhan - Chinese (Traditional, Taiwan)', 'zh-TW'), V('Microsoft Xiaoxiao Online (Natural) - Chinese (Mainland)', 'zh-CN'),
+    V('Microsoft HsiaoChen Online (Natural) - Chinese (Taiwan)', 'zh-TW')], 'Microsoft HsiaoChen Online (Natural) - Chinese (Taiwan)'],
+].forEach(([label, list, want]) => {
+  const got = pickVoice(mandarinVoices(list), '');
+  if (!got || (got.name !== want && got.voiceURI !== want)) warn(`自動選聲音（${label}）應選「${want}」，實際「${got && got.name}」`);
+});
+if (mandarinVoices(apple).some(v => /Eddy|Flo|善怡/.test(v.name))) warn('聲音清單不應出現機械音或粵語');
+if (pickVoice(mandarinVoices(apple), 'com.apple.eloquence.zh-TW.Eddy')?.name !== '美佳') warn('之前選過的機械音應改回自動');
+if (problems === beforeVoice) console.log('✓ 自動選聲音：Edge 自然語音、加強版、Google 依序優先，機械音與粵語不列入');
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');

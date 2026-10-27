@@ -8,7 +8,7 @@
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=LXGW+WenKai+TC:wght@400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=LXGW+WenKai+TC:wght@400&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
 /* 閱讀優先：大字、留白、主題心智圖，讀懂後遮住答案主動回想。 */
 :root {
@@ -39,7 +39,10 @@
   --mint: #DCEAB6; --lilac: #E8DCF5; --sky: #DCEEF1; --peach: #F8DCCF; --yellow: #F7E493;
   --cover: #F0D975; --cover-ink: #30332D; --art-green: #5C9569; --art-blue: #78ADB7;
   --art-orange: #DB8F61; --art-paper: #FFFCED; --grid: rgba(48,51,45,.075); --caption: #EEF0E4;
-  --f-display: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  /* 社群卡片版（雜誌版暖色）：--lime 是灰綠重點色、--pink 是陶土粉；炭灰膠囊（標籤、分頁、播放列）與主要按鈕在深色區塊另有值 */
+  --lime: #D2E59E; --on-lime: #262923; --pink: #EFB49A; --on-pill: #F7F4E9; --on-pill-soft: #C9CBBE; --warn-on-pill: #F2A48F;
+  --pill: #30332D; --pill-edge: #30332D; --primary-bg: #30332D; --primary-ink: #F7F4E9; --primary-shadow: #C9A93F;
+  --f-display: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --f-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --f-game: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --f-hand: "LXGW WenKai TC", "Kaiti TC", "DFKai-SB", var(--f-body);
@@ -53,10 +56,12 @@
     --outline: #0E0A06; --wood: #7A4A22; --wood-dark: #4A2C11; --grass: #3D6A25; --grass-dot: rgba(255, 255, 255, .07);
     --gold: #F0B92A; --elixir: #CE7BEA;
     --paper: #1E2522; --sheet: #29312C; --ink: #F3F1E4; --ink-soft: #C4C8BA; --rule: #566253;
-    --accent: #BFDB9B; --accent-soft: #364D3B; --edge: #BBC5AF; --shadow: #101813;
+    --accent: #BFDB9B; --accent-soft: #364D3B; --edge: #A9B49D; --shadow: #111714;
     --mint: #3D523B; --lilac: #4B4059; --sky: #344E54; --peach: #574135; --yellow: #534E30;
     --cover: #D7C377; --cover-ink: #282D25; --art-green: #639875; --art-blue: #8CBAC2;
     --art-orange: #DBA17C; --art-paper: #F7EED5; --grid: rgba(235,241,221,.06); --caption: #344039;
+    --lime: #BFDB9B; --pink: #E3A88C; --on-pill: #F3F1E4; --on-pill-soft: #AEB4A6;
+    --pill: #141A17; --pill-edge: #566253; --primary-bg: #BFDB9B; --primary-ink: #1E2522; --primary-shadow: #111714;
     color-scheme: dark;
   }
 }
@@ -67,10 +72,12 @@
   --outline: #0E0A06; --wood: #7A4A22; --wood-dark: #4A2C11; --grass: #3D6A25; --grass-dot: rgba(255, 255, 255, .07);
   --gold: #F0B92A; --elixir: #CE7BEA;
   --paper: #1E2522; --sheet: #29312C; --ink: #F3F1E4; --ink-soft: #C4C8BA; --rule: #566253;
-  --accent: #BFDB9B; --accent-soft: #364D3B; --edge: #BBC5AF; --shadow: #101813;
+  --accent: #BFDB9B; --accent-soft: #364D3B; --edge: #A9B49D; --shadow: #111714;
   --mint: #3D523B; --lilac: #4B4059; --sky: #344E54; --peach: #574135; --yellow: #534E30;
   --cover: #D7C377; --cover-ink: #282D25; --art-green: #639875; --art-blue: #8CBAC2;
   --art-orange: #DBA17C; --art-paper: #F7EED5; --grid: rgba(235,241,221,.06); --caption: #344039;
+  --lime: #BFDB9B; --pink: #E3A88C; --on-pill: #F3F1E4; --on-pill-soft: #AEB4A6;
+  --pill: #141A17; --pill-edge: #566253; --primary-bg: #BFDB9B; --primary-ink: #1E2522; --primary-shadow: #111714;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -646,6 +653,193 @@ footer { border-top: 2px solid var(--edge); padding-top: 24px; margin-top: 40px;
   .quiz-acts .btn { width: 100%; }
 }
 
+/* ---------- 社群卡片版：粗框、實心陰影、方格紙與色塊（2026-10-27，版面蓋過上面的雜誌版，配色沿用雜誌版暖色） ---------- */
+:root { --bw: 2.5px; --module-color: var(--mint); }
+[data-module="0"] { --module-color: var(--mint); }
+[data-module="1"] { --module-color: var(--lilac); }
+[data-module="2"] { --module-color: var(--sky); }
+[data-module="3"] { --module-color: var(--peach); }
+[data-module="4"] { --module-color: var(--yellow); }
+body, .battle { background-color: var(--paper); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
+h1, h2 { font-weight: 900; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.reading { outline: 4px solid var(--accent); outline-offset: 4px; }
+
+/* 頂部黑色膠囊列、白天／晚上切換、封面與統計 */
+.mastrow { flex-wrap: nowrap; gap: 8px; padding: 4px 4px 4px 18px; background: var(--pill); color: var(--on-pill); border: var(--bw) solid var(--pill-edge); border-radius: 999px; }
+.mastrow .eyebrow { min-width: 0; color: var(--on-pill); font-weight: 900; }
+.issue-dot { background: var(--lime); }
+.theme-switch { display: flex; flex: none; gap: 2px; }
+.theme-switch button { min-height: 40px; padding: 0 12px; border: 0; border-radius: 999px; background: none; color: var(--on-pill); font-size: 16px; font-weight: 700; }
+.theme-switch button[aria-pressed="true"] { background: var(--lime); color: var(--on-lime); font-weight: 900; }
+.cover-layout { margin-top: 16px; background-color: var(--cover); background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; border: var(--bw) solid var(--cover-ink); border-radius: 26px; box-shadow: 6px 6px 0 var(--shadow); }
+.issue-label { display: inline-block; padding: 4px 12px; background: var(--pill); color: var(--lime); border: 0; border-radius: 10px; font-weight: 900; }
+.mast h1 { font-weight: 900; letter-spacing: .02em; }
+.cover-actions .btn.primary { background: var(--cover-ink); color: var(--art-paper); border-color: var(--cover-ink); box-shadow: 4px 4px 0 var(--primary-shadow); }
+.mast-meta { justify-content: flex-start; gap: 10px; padding: 18px 0 0; border-bottom: 0; }
+.mast-meta > span, .mast-meta > button { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 16px; background: var(--sheet); color: var(--ink); border: var(--bw) solid var(--edge); border-radius: 999px; box-shadow: 3px 3px 0 var(--shadow); }
+.mast-meta b { font-family: var(--f-body); font-weight: 900; }
+
+/* 15 個主題的進度圓點：萊姆＝已熟悉、粉紅＝待複習、白＝尚未完成回想 */
+.topic-dots { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); max-width: 600px; margin-top: 16px; padding: 0 8px; background: var(--pill); border: var(--bw) solid var(--pill-edge); border-radius: 999px; }
+.topic-dots button { display: grid; place-items: center; min-height: 40px; padding: 0; border: 0; background: none; }
+.topic-dots i { width: 16px; height: 16px; border-radius: 50%; background: var(--on-pill); transition: transform .15s; }
+.topic-dots .ok i { background: var(--lime); }
+.topic-dots .dmg i { background: var(--pink); }
+.topic-dots button:hover i { transform: scale(1.25); }
+.topic-dots button:focus-visible { outline: 0; }
+.topic-dots button:focus-visible i { outline: 3px solid var(--on-pill); outline-offset: 2px; }
+.dot-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; font-size: 16px; color: var(--ink-soft); }
+.dot-legend i { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -1px; border-radius: 50%; border: 2px solid var(--edge); background: var(--on-pill); }
+.dot-legend .ok { background: var(--lime); }
+.dot-legend .dmg { background: var(--pink); }
+
+/* 分頁：黑色膠囊，選中的分頁是萊姆綠 */
+.tabbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 8; padding: 14px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); background: var(--paper); }
+.tabs { position: static; gap: 4px; margin: 0; padding: 4px; background: var(--pill); border: var(--bw) solid var(--pill-edge); border-radius: 999px; }
+.tab { padding: 8px 4px; border: 0; border-radius: 999px; background: none; color: var(--on-pill); font-weight: 700; }
+.tab[aria-selected=true] { background: var(--lime); color: var(--on-lime); border: 0; font-weight: 900; }
+.tab[aria-selected=true]::after { display: none; }
+
+/* 按鈕：粗框＋實心陰影，按下去會往陰影方向壓 */
+.btn { background: var(--sheet); color: var(--ink); border: var(--bw) solid var(--edge); border-radius: 14px; font-weight: 900; box-shadow: 3px 3px 0 var(--shadow); }
+.btn:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+.btn:disabled { box-shadow: none; }
+.btn.primary, .btn.blue, .btn.gold { background: var(--primary-bg); color: var(--primary-ink); border-color: var(--edge); box-shadow: 3px 3px 0 var(--primary-shadow); }
+.btn.primary:active:not(:disabled), .btn.blue:active:not(:disabled) { box-shadow: 1px 1px 0 var(--primary-shadow); }
+.btn.primary:disabled, .btn.blue:disabled { box-shadow: none; }
+.btn.ghost { background: var(--sheet); color: var(--ink); border-color: var(--edge); }
+.btn.red { background: var(--yellow); color: var(--ink); border-color: var(--edge); }
+.btn.on { background: var(--lime); color: var(--on-lime); border-color: var(--edge); }
+.btn.rec { background: var(--redpen); color: var(--sheet); border-color: var(--edge); }
+.cover-link { font-weight: 900; text-decoration-thickness: 3px; text-decoration-color: var(--accent); }
+.cover-actions .cover-link { text-decoration-color: currentColor; }
+
+/* 卡片與主題卡 */
+.sheet { border: var(--bw) solid var(--edge); border-radius: 22px; box-shadow: 5px 5px 0 var(--shadow); }
+.topic { border-radius: 24px; scroll-margin-top: 96px; }
+.open, .pts > div, .traps { scroll-margin-top: 104px; }
+.topic.isknown { border-color: var(--edge); }
+.topic.playing, .review-list .sheet.playing { box-shadow: 5px 5px 0 var(--accent); }
+.thead { background: var(--module-color); border-bottom: var(--bw) solid var(--edge); }
+.topic-chapter { padding: 2px 10px; background: var(--pill); color: var(--lime); border-radius: 10px; font-weight: 900; }
+.study-status { padding: 1px 12px; background: var(--sheet); color: var(--ink); border: 2px solid var(--edge); border-radius: 999px; font-weight: 700; }
+.study-status.ok { background: var(--lime); color: var(--on-lime); }
+.study-status.dmg { background: var(--pink); color: var(--on-lime); }
+.topic-title { align-items: center; margin-top: 14px; }
+.tno, .isknown .tno { display: inline-grid; place-items: center; flex: none; width: 50px; height: 50px; border-radius: 50%; background: var(--pill); color: var(--lime); border: 2px solid var(--pill-edge); font-family: var(--f-body); font-size: 19px; font-weight: 900; line-height: 1; }
+.topic .thead .chapter-art { width: 132px; }
+.open { border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 4px 4px 0 var(--shadow); }
+.open .tag { background: var(--pill); color: var(--lime); border-bottom: var(--bw) solid var(--edge); font-weight: 900; letter-spacing: .04em; }
+.reading-label, .concept-map figcaption, .match-tool summary, .issue-directory > summary, .desk-heading h2, .reading-search label, .chapter-group h3, .feature-question h3, .review-list h3, .quiz-box h3, .bq { font-weight: 900; }
+.section-number { width: 38px; min-width: 38px; height: 38px; background: var(--pill); color: var(--lime); border: 2px solid var(--pill-edge); font-family: var(--f-body); font-weight: 900; }
+.pts > div { background: var(--sheet); border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 4px 4px 0 var(--shadow); }
+.pts dt { align-items: center; border-bottom: var(--bw) solid var(--edge); font-weight: 900; }
+.point-number { display: inline-grid; place-items: center; min-width: 34px; height: 34px; padding: 0 6px; background: var(--pill); color: var(--lime); border: 2px solid var(--pill-edge); border-radius: 999px; font-family: var(--f-body); font-weight: 900; }
+.traps { background: var(--yellow); color: var(--ink); border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 4px 4px 0 var(--shadow); }
+.traps b { color: var(--ink); font-weight: 900; }
+.traps b > span { background: var(--pill); color: var(--lime); border: 0; }
+.match-tool { background: var(--caption); border: var(--bw) solid var(--edge); border-radius: 18px; }
+.match-prompt { border: 2px solid var(--edge); border-left-width: 8px; border-radius: 12px; }
+.match-result { border: 2px solid var(--edge); border-radius: 14px; }
+.topic-end { border-top: var(--bw) solid var(--edge); }
+
+/* 圖解、表格與進度條 */
+.figure-wrap > figcaption { border-top: 2px dashed var(--edge); }
+.fig .panel, .fig .branch, .fig .tl-step, .fig .factor, .fig .kcell, .fig .target, .fig .shift, .fig .box, .fig .decrow, .fig .calc .val { border: 2px solid var(--edge); border-radius: 14px; }
+.fig .tl-step { border-top: 10px solid var(--module-color); }
+.fig .panel h3, .fig .branch > .hd { font-weight: 900; }
+.fig .branch > .hd { border-radius: 0; border-bottom: 2px solid var(--edge); }
+.fig .stair { border-width: 2px; }
+.fig .stair.top { background: var(--pill); color: var(--lime); }
+.fig .stair.top small { color: var(--on-pill-soft); }
+table.cmp { border-collapse: separate; border-spacing: 0; border: 2px solid var(--edge); border-radius: 14px; overflow: hidden; }
+.cmp thead th, .cmp thead th.pf { background: var(--pill); color: var(--lime); border-bottom: 0; font-weight: 900; }
+.chart-scroll { border: 2px solid var(--edge); border-radius: 14px; }
+.presets button { border: 2px solid var(--edge); border-radius: 999px; font-weight: 700; }
+.presets button[aria-pressed="true"] { background: var(--lime); color: var(--on-lime); border-color: var(--edge); }
+.item { border: 2px solid var(--edge); border-radius: 14px; }
+.item .acts button { border: 2px solid var(--edge); border-radius: 10px; }
+.field input, .voicebox select, .gap-field select, .pfilter select { background: var(--sheet); border: 2px solid var(--edge); border-radius: 12px; }
+.dbar, .track { height: 14px; background: var(--sheet); border: 2px solid var(--edge); border-radius: 99px; }
+.dbar i { background: var(--lime); border-radius: 99px; }
+.track i { background: var(--accent); }
+
+/* 概念連線：膠囊節點，點開的節點變黑底並加萊姆框 */
+.concept-map { border: var(--bw) solid var(--edge); border-radius: 22px; box-shadow: 4px 4px 0 var(--shadow); }
+.map-root { background: var(--yellow); border: var(--bw) solid var(--edge); border-radius: 16px; font-weight: 900; box-shadow: 3px 3px 0 var(--shadow); }
+.map-branches { border-left: var(--bw) solid var(--edge); }
+.map-node { align-items: center; border: 2px solid var(--edge); border-radius: 18px; font-weight: 700; }
+.map-node::before { border-top: var(--bw) solid var(--edge); }
+.map-node > span:first-child { display: inline-grid; place-items: center; min-width: 34px; height: 28px; padding: 0 6px; background: var(--module-color); color: var(--ink); border: 2px solid var(--edge); border-radius: 999px; font-family: var(--f-body); font-weight: 900; }
+.map-node[aria-expanded=true] { background: var(--pill); color: var(--on-pill); border-color: var(--pill-edge); box-shadow: 0 0 0 3px var(--lime); }
+.map-node[aria-expanded=true] > span:first-child { background: var(--lime); color: var(--on-lime); border-color: var(--lime); }
+.map-explanation { border: var(--bw) solid var(--edge); border-radius: 16px; box-shadow: 3px 3px 0 var(--shadow); }
+
+/* 主題導讀、目錄與語音複習 */
+.feature-question { border: var(--bw) solid var(--edge); border-radius: 24px; box-shadow: 5px 5px 0 var(--shadow); }
+.small-label { padding: 2px 10px; background: var(--pill); color: var(--lime); border-radius: 8px; font-weight: 900; }
+.reading-search input { border: var(--bw) solid var(--edge); border-radius: 16px; box-shadow: 3px 3px 0 var(--shadow); }
+.issue-directory { border-top: 0; padding-top: 4px; }
+.chapter-group { border: var(--bw) solid var(--edge); border-radius: 22px; box-shadow: 4px 4px 0 var(--shadow); }
+.chapter-group > header { border-bottom: var(--bw) solid var(--edge); }
+.chapter-index { display: inline-grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--pill); color: var(--lime); border: 2px solid var(--pill-edge); font-family: var(--f-body); font-size: 17px; font-weight: 900; }
+.toc a { align-items: center; border-top: 2px solid var(--edge); }
+.toc > a:first-child { border-top: 0; }
+.toc a > span:first-child { display: inline-grid; place-items: center; min-width: 38px; height: 28px; padding: 0 6px; background: var(--sheet); color: var(--ink); border: 2px solid var(--edge); border-radius: 999px; font-family: var(--f-body); font-size: 16px; font-weight: 900; }
+.toc a.ok > span:first-child { background: var(--lime); color: var(--on-lime); }
+.toc a.dmg > span:first-child { background: var(--pink); color: var(--on-lime); }
+.toc a.cur { background: var(--accent-soft); }
+.voicebox { background: var(--caption) !important; border: 2px solid var(--edge) !important; }
+.listen-desk .voicebox { border-radius: 16px; }
+
+/* 回想練習與聽考 */
+.section-intro { border: var(--bw) solid var(--edge); border-radius: 24px; box-shadow: 5px 5px 0 var(--shadow); }
+.reading-path > div { border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 3px 3px 0 var(--shadow); }
+.reading-path span { display: inline-grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--pill); color: var(--lime); border: 2px solid var(--pill-edge); font-family: var(--f-body); font-size: 17px; font-weight: 900; }
+.bcard { border: var(--bw) solid var(--edge); border-radius: 24px; box-shadow: 6px 6px 0 var(--shadow); }
+.bhead { border-bottom: var(--bw) solid var(--edge); }
+.bans { border: 2px solid var(--edge); border-radius: 16px; }
+.cover { border: 2px dashed var(--edge); border-radius: 14px; }
+
+/* 口試練習 */
+.pbar { border: var(--bw) solid var(--edge); border-radius: 24px; box-shadow: 5px 5px 0 var(--shadow); }
+.progress { gap: 4px; }
+.progress i { width: 14px; height: 14px; border-radius: 50%; background: var(--sheet); border: 2px solid var(--edge); }
+.progress i.done { background: var(--lime); }
+.progress i.cur { outline: 3px solid var(--accent); outline-offset: 1px; }
+.qhead .num { color: var(--accent); font-family: var(--f-body); font-weight: 900; }
+.qhead .type { padding: 0 10px; color: var(--ink); border: 2px solid var(--edge); border-radius: 999px; }
+.qtext { border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 4px 4px 0 var(--shadow); font-weight: 700; }
+.kwhint span { border-radius: 999px; font-weight: 700; }
+.answer { border: var(--bw) solid var(--edge); border-radius: 16px; }
+.score { border: var(--bw) solid var(--edge); border-radius: 18px; box-shadow: 4px 4px 0 var(--shadow); }
+.score .big { font-family: var(--f-body); font-weight: 900; }
+
+/* 底部播放列：黑底，播放鍵與倒數用萊姆綠 */
+.player { background: var(--pill); color: var(--on-pill); border-top: var(--bw) solid var(--pill-edge); border-radius: 22px 22px 0 0; box-shadow: none; }
+.player .now span { color: var(--on-pill-soft); }
+.player .warnline { color: var(--warn-on-pill); }
+.player .pbtn { background: none; color: var(--on-pill); border: 2px solid var(--on-pill-soft); }
+.player .pbtn.main { background: var(--lime); color: var(--on-lime); border-color: var(--lime); }
+.bhead .pbtn { background: var(--sheet); color: var(--ink); border: var(--bw) solid var(--edge); box-shadow: 2px 2px 0 var(--shadow); }
+.player select { background: var(--pill); color: var(--on-pill); border: 2px solid var(--on-pill-soft); border-radius: 10px; }
+.player .reveal { background: var(--lime); color: var(--on-lime); border-color: var(--lime); box-shadow: none; }
+.player .dbar { background: none; border-color: var(--on-pill-soft); }
+footer { border-top: var(--bw) solid var(--edge); }
+
+@media (max-width: 700px) {
+  .cover-layout { padding: 22px 18px 20px; border-radius: 22px; }
+  .cover-illustration { max-width: 230px; margin-top: 8px; }
+  .mast h1 { font-size: 44px; }
+  .mast-meta > span, .mast-meta > button { padding-inline: 12px; }
+  .tno, .isknown .tno { width: 44px; height: 44px; font-size: 17px; }
+  .topic .thead .chapter-art { display: none; }
+  .feature-question h3 br { display: inline; }
+}
+@media (max-width: 480px) {
+  .eyebrow-sub { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1490,13 +1684,20 @@ function estMinutes(items, rate, setting) {
   items.forEach(it => unitsOf(it).forEach(u => { s += u.gap ? Math.max(0, gapFor(u.gap.ans, setting, u.gap.lo, u.gap.hi)) : u.say.length / (4.5 * rate) + 0.4; }));
   return Math.max(1, Math.round(s / 60));
 }
-function pickVoice(voices, uri) {
-  if (!voices.length) return null;
-  const byUri = voices.find(v => v.voiceURI === uri); if (byUri) return byUri;
-  const tw = voices.filter(v => /zh[-_]TW|cmn[-_]Hant|zh[-_]Hant/i.test(v.lang));
-  const pool = tw.length ? tw : voices.filter(v => /^zh|^cmn/i.test(v.lang));
-  return pool.find(v => /premium|enhanced|加強|優化|neural|natural/i.test(v.name)) || pool.find(v => /meijia|美佳|google/i.test(v.name)) || pool[0] || null;
+// 中文聲音由自然到機械排序：神經網路（Natural）＞高品質＞加強版＞Google 線上＞系統基本＞微軟桌面版，同一級台灣華語優先。
+// Eddy、Flo 等趣味聲音太機械，粵語會把內容念成廣東話，都不列入。
+const ROBOTIC = /^(Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley)\b/i;
+function voiceTier(v) {
+  const s = v.name + ' ' + v.voiceURI;
+  return /natural|neural/i.test(s) ? 5 : /premium|高品質|優質|siri/i.test(s) ? 4 : /enhanced|增強|加強|強化/i.test(s) ? 3 : /google/i.test(s) ? 2 : /microsoft/i.test(s) ? 0 : 1;
 }
+const voiceRank = v => voiceTier(v) * 2 + (/TW|Hant/i.test(v.lang) ? 1 : 0);
+function mandarinVoices(all) {
+  return all.filter(v => /^(zh|cmn)/i.test(v.lang) && !/HK|MO|yue/i.test(v.lang) && !ROBOTIC.test(v.name) && !/eloquence/i.test(v.voiceURI))
+    .sort((a, b) => voiceRank(b) - voiceRank(a));
+}
+// 有自己選過且還在清單裡就用它，否則用最自然的那個。
+const pickVoice = (voices, uri) => voices.find(v => v.voiceURI === uri) || voices[0] || null;
 // 聽考提示音：Web Audio 要在使用者點按時啟動（iPhone 的規定），手機靜音時可能聽不到。
 let actx = null;
 function primeAudio() {
@@ -1532,7 +1733,7 @@ function useTTS() {
   voiceRef.current = pickVoice(voices, voiceURI);
   useEffect(() => {
     if (!synth) return;
-    const f = () => setVoices(synth.getVoices().filter(v => /^(zh|cmn|yue)/i.test(v.lang)));
+    const f = () => setVoices(mandarinVoices(synth.getVoices()));
     f();
     if (synth.addEventListener) synth.addEventListener('voiceschanged', f); else synth.onvoiceschanged = f;
     const t = setTimeout(f, 800);
@@ -1617,7 +1818,7 @@ function useTTS() {
   const reveal = () => { const p = player; if (p && p.phase === 'gap' && !p.ended) { beep(880); play(p.items, p.idx, p.unit + 1, opt(p)); } };
   const stop = () => { halt(); setPlayer(null); };
   const currentKey = player && player.items[player.idx] ? player.items[player.idx].key : null;
-  return { supported: !!synth, voices, voice: voiceRef.current, setVoiceURI, rate, setRate, gap, setGap, last, player, play, pause, resume, jump, reveal, stop, currentKey };
+  return { supported: !!synth, voices, voice: voiceRef.current, voiceURI, setVoiceURI, rate, setRate, gap, setGap, last, player, play, pause, resume, jump, reveal, stop, currentKey };
 }
 
 const Speaker = () => html`<svg className="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"></path><path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"></path></svg>`;
@@ -2122,7 +2323,7 @@ function useStudy() {
     setVillage(v => ({ ...v, [id]: { ...prev, stage, due, best: Math.max(prev.best || 0, complete ? 3 : 0), needsReview: !complete, lastReview: today() } }));
     return { due, complete };
   }
-  return { status, qstars, recordRecall, builtN: TOPICS.filter(t => status(t.id).stage > 0).length,
+  return { status, qstars, recordRecall, okN: TOPICS.filter(t => status(t.id).kind === 'ok').length,
     dueN: TOPICS.filter(t => status(t.id).kind === 'dmg').length };
 }
 
@@ -2275,7 +2476,7 @@ function Review({ game, tts, onAttack, onRead }) {
   return html`<section className="review-page">
     <div className="section-intro"><h2>回想練習</h2><p>每個主題依序練開場句、重點與易錯提醒。全部能獨立說出後，安排下次複習。</p></div>
     <div className="reading-path" aria-label="回想步驟">${[['01','遮住答案'],['02','自己說一遍'],['03','對照並補強']].map(([n,x]) => html`<div key=${n}><span>${n}</span><b>${x}</b></div>`)}</div>
-    <p className="note">已熟悉 ${game.builtN}／15 個主題，待複習 ${game.dueN} 個。複習間隔為 1、3、7、14 天；提早練習不延後原日期。</p>
+    <p className="note">已熟悉 ${game.okN}／15 個主題，待複習 ${game.dueN} 個。複習間隔為 1、3、7、14 天；提早練習不延後原日期。</p>
     <div className="filter-row" role="group" aria-label="回想主題篩選">${[['due','待複習'],['new','尚未完成'],['all','全部主題']].map(([v,l]) => html`<button className=${'btn ' + (filter === v ? 'on' : '')} aria-pressed=${filter === v} onClick=${() => setFilter(v)} key=${v}>${l}</button>`)}</div>
     <section className="sheet quiz-box" aria-label="語音聽考">
       <h3>語音聽考</h3>
@@ -2296,12 +2497,13 @@ function GapSelect({ tts, id }) {
   return html`<select id=${id} value=${tts.gap} onChange=${e => tts.setGap(e.target.value)}>${GAPS.map(([v, l]) => html`<option key=${v} value=${v}>${l}</option>`)}</select>`;
 }
 function VoiceSettings({ tts }) {
+  const best = tts.voices[0];
   return html`<details className="voicebox"><summary>朗讀設定</summary>
     ${!tts.supported ? html`<p className="warn">這個瀏覽器不支援朗讀。請改用 iPhone 的 Safari、Android 的 Chrome，或電腦版 Chrome、Safari 開啟。</p>` : html`<div>
       <div className="row"><label htmlFor="voice">聲音</label>
-        <select id="voice" value=${tts.voice ? tts.voice.voiceURI : ''} onChange=${e => tts.setVoiceURI(e.target.value)}>
-          ${tts.voices.length === 0 && html`<option value="">（系統預設）</option>`}
-          ${tts.voices.map(v => html`<option key=${v.voiceURI} value=${v.voiceURI}>${v.name}（${v.lang}）</option>`)}
+        <select id="voice" value=${tts.voice && tts.voice.voiceURI === tts.voiceURI ? tts.voiceURI : ''} onChange=${e => tts.setVoiceURI(e.target.value)}>
+          <option value="">自動（最自然）：${best ? best.name : '系統預設'}</option>
+          ${tts.voices.map(v => html`<option key=${v.voiceURI} value=${v.voiceURI}>${v.name}（${v.lang}）${voiceTier(v) >= 2 ? '・自然' : ''}</option>`)}
         </select></div>
       <div className="row"><label htmlFor="rate">語速</label>
         <div><input id="rate" type="range" min="0.6" max="1.6" step="0.1" value=${tts.rate} onInput=${e => tts.setRate(+e.target.value)} onChange=${e => tts.setRate(+e.target.value)} />
@@ -2309,8 +2511,8 @@ function VoiceSettings({ tts }) {
       <div className="row"><label htmlFor="gap">作答時間</label><${GapSelect} tts=${tts} id="gap" /></div>
       <div className="toolbar"><button className="btn" onClick=${() => tts.play([{ key: 'test', label: '試聽', text: '效度是正確性，信度是穩定性。先求效度，再談信度。' }])}><${Speaker} />試聽</button></div>
       ${tts.voices.length === 0 && html`<p className="warn">還沒抓到中文語音，請先按一次「試聽」；若仍沒有聲音，到系統設定下載中文（台灣）語音。</p>`}
+      ${best && voiceTier(best) < 2 && html`<p className="warn">這台裝置只有基本語音，聽起來比較機械。iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文 → 中文（台灣）」下載「美佳（加強版）」，回到這頁重新整理就會自動改用；電腦可改用 Edge 開啟，會自動用微軟的自然語音。</p>`}
       <p className="hint">作答時間用於語音聽考：選「自動」時，主題重點依答案長短停 6～30 秒，口試題停 20～120 秒。</p>
-      <p className="hint">聲音更自然：iPhone 到「設定 → 輔助使用 → 朗讀內容 → 聲音 → 中文 → 中文（台灣）」，下載「美佳（加強版）」後回來選它。</p>
       <p className="hint">播放時會讓螢幕保持亮著（支援的瀏覽器）；螢幕鎖定或切到其他 App，朗讀會停。iPhone 沒有聲音時，先確認側邊的靜音開關沒有打開。</p>
     </div>`}
   </details>`;
@@ -2389,10 +2591,10 @@ function Notes({ tts, game, onPractice, onAttack, focus, clearFocus }) {
         const st = game.status(t.id);
         if ((selected !== 'all' && selected !== t.id) || (onlyDue && st.kind !== 'dmg') || (query.trim() && ![t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) return null;
         return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '') + (st.kind === 'ok' ? ' isknown' : '')} id=${key} key=${t.id} data-module=${moduleOf(t.id)}>
-          <header className="thead"><div className="topic-heading"><div className="tmod"><span className="topic-chapter">${t.mod}</span><span className="study-status">${studyLabel(st)}</span></div><div className="topic-title"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h2>${t.title}</h2></div></div><${ChapterArt} kind=${moduleOf(t.id)} /></header>
+          <header className="thead"><div className="topic-heading"><div className="tmod"><span className="topic-chapter">${t.mod}</span><span className=${'study-status ' + st.kind}>${studyLabel(st)}</span></div><div className="topic-title"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h2>${t.title}</h2></div></div><${ChapterArt} kind=${moduleOf(t.id)} /></header>
           <div className="tacts">
             <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([lists.all[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
-            <button className="btn red" onClick=${() => onAttack(t.id)}>回想練習</button>
+            <button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button>
             <button className="btn" onClick=${() => onPractice(t.id)}>口試題（${n}）→</button>
           </div>
           <div className=${'open' + (rp === 'open' ? ' reading' : '')} id=${key + '-open'}><span className="tag">口試開場句</span><p>${t.open}</p></div>
@@ -2642,17 +2844,19 @@ function App() {
   const practice = id => { setTopic(id); setTab('practice'); };
   return html`<div style=${{ paddingBottom: tts.player ? 'calc(var(--player-h, 170px) + 24px)' : 0 }}>
     <header className=${'mast' + (tab !== 'notes' ? ' compact' : '')}>
-      <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓・圖解學習誌</p>
-        <label className="theme-control">外觀<select aria-label="外觀" value=${theme} onChange=${e => setTheme(e.target.value)}><option value="system">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select></label></div>
+      <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓<span className="eyebrow-sub">・圖解學習誌</span></p>
+        <div className="theme-switch" role="group" aria-label="外觀">${[['system', '自動', '跟隨裝置的深淺色設定'], ['light', '白天', '白天版：淺色'], ['dark', '晚上', '晚上版：深色']].map(([v, l, tip]) => html`<button key=${v} aria-pressed=${theme === v} title=${tip} onClick=${() => setTheme(v)}>${l}</button>`)}</div></div>
       <div className="cover-layout"><div className="cover-copy"><p className="issue-label">本期專題｜測驗與學習評量</p>
         <h1>評量筆記</h1>
         ${tab === 'notes' && html`<div className="cover-actions"><button className="btn primary" onClick=${() => read('process')}>開始閱讀 <span aria-hidden="true">↗</span></button><button className="cover-link" onClick=${() => setTab('review')}>回想練習 →</button></div>`}
       </div>${tab === 'notes' && html`<div className="cover-illustration"><${CoverArt} /></div>`}</div>
       <div className="mast-meta"><span><b>15</b> 個理論主題</span><span><b>46</b> 題口試練習</span><button onClick=${() => setTab('review')}><b>${game.dueN}</b> 個主題待複習 <span aria-hidden="true">↗</span></button></div>
+      <div className="topic-dots" role="group" aria-label="15 個主題的熟悉程度，點圓點到該主題">${TOPICS.map((t, i) => { const st = game.status(t.id), lab = `${String(i + 1).padStart(2, '0')} ${t.title}：${studyLabel(st)}`; return html`<button key=${t.id} className=${st.kind} title=${lab} aria-label=${lab} onClick=${() => read(t.id)}><i></i></button>`; })}</div>
+      <p className="dot-legend" aria-hidden="true"><span><i className="ok"></i>已熟悉</span><span><i className="dmg"></i>待複習</span><span><i></i>尚未完成回想</span></p>
     </header>
-    <nav className="tabs" aria-label="學習分頁">
+    <div className="tabbar"><nav className="tabs" aria-label="學習分頁">
       ${[['notes','主題閱讀'],['review','回想練習'],['practice','口試練習']].map(([v,l]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} key=${v} onClick=${() => setTab(v)}>${l}</button>`)}
-    </nav>
+    </nav></div>
     ${tab === 'notes' && html`<${Notes} tts=${tts} game=${game} onPractice=${practice} onAttack=${startAttack} focus=${focus} clearFocus=${() => setFocus(null)} />`}
     ${tab === 'review' && html`<${Review} game=${game} tts=${tts} onAttack=${startAttack} onRead=${read} />`}
     ${tab === 'practice' && html`<${Practice} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} />`}
