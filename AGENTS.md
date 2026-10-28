@@ -25,7 +25,7 @@
 | `/* ---------- 語音複習` | 語音複習清單、跟讀標示、聽考、口說作答與播放列字幕的 CSS |
 | `/* ---------- 社群卡片版` | 現行視覺（粗黑框、實心陰影、方格紙、螢光色塊），放在 `</style>` 前，蓋過上面的雜誌版；改外觀先改這裡 |
 | `const TOPICS` | 15 個理論主題：`open`（口試開場句）、`pts`（重點）、`traps`（易錯提醒）、`fig`（圖解 key） |
-| `const QUESTIONS` | 46 題口試題：`keywords[].groups`（必須講到的概念，可用正規式）、`examples`、`model`（滿分範本） |
+| `const QUESTIONS` | 49 題口試題：`keywords[].groups`（必須講到的概念，可用正規式）、`examples`、`model`（滿分範本） |
 | `/* ---------- 比對引擎` | `grade()`：基本分＝關鍵字 50 分，闡述分＝定義句＋實例 50 分 |
 | `/* ---------- 朗讀` | 裝置內建 speechSynthesis：`chunks()` 切成 `CHUNK_MAX` 字內的短句、`topicParts()` 跟讀段落、`useTTS()`（防卡住、停頓倒數、繼續上次） |
 | `/* ---------- 語音聽考` | `GAPS`、`gapFor()`、`recallSteps()`（回想練習共用）、`topicQuiz()`、`questionQuiz()`、`unitsOf()`、`estMinutes()`、`mandarinVoices()`／`pickVoice()`（自動選最自然的中文聲音）；夾在 `const synth` 與 `const Speaker` 之間，測試會切出來檢查 |
