@@ -29,7 +29,7 @@
 | `/* ---------- 比對引擎` | `grade()`：基本分＝關鍵字 50 分，闡述分＝定義句＋實例 50 分 |
 | `/* ---------- 朗讀` | 裝置內建 speechSynthesis：`chunks()` 切成 `CHUNK_MAX` 字內的短句、`topicParts()` 跟讀段落、`useTTS()`（防卡住、停頓倒數、繼續上次） |
 | `/* ---------- 語音聽考` | `GAPS`、`gapFor()`、`recallSteps()`（回想練習共用）、`topicQuiz()`、`questionQuiz()`、`unitsOf()`、`estMinutes()`、`mandarinVoices()`／`pickVoice()`（自動選最自然的中文聲音）；夾在 `const synth` 與 `const Speaker` 之間，測試會切出來檢查 |
-| `/* ---------- 考古題` | `MCQ`（198 題：n 題號、q 題幹、o 選項、a 正解字母，空字串＝不計分、al、c、e、p、x，以及初學者解析 u 原理單元 id、k 這題在考什麼、s 解題步驟、w 各選項說明（正解以 ✓ 開頭）、m 一句話記住）、`UNITS`（21 個原理單元，fig 指向 `UNIT_FIGS` 或 `FIGS`）與 `MCQPage`，作答紀錄存在 `mcq`、篩選 `mcqf`、目前題號 `mcqn`；`tests/check.mjs` 切 `const MCQ =` 到 `const MCQ_FILTERS`、`const UNITS = [` 到 `function MCQPage` 檢查 |
+| `/* ---------- 考古題` | `MCQ`（198 題：n 題號、q 題幹、o 選項、a 正解字母，空字串＝不計分、al、c、e、p、x，以及初學者解析 u 原理單元 id、k 這題在考什麼、s 解題步驟、w 各選項說明（正解以 ✓ 開頭）、m 一句話記住）、`UNITS`（21 個原理單元，fig 指向 `UNIT_FIGS` 或 `FIGS`）與 `MCQPage`，作答紀錄存在 `mcq`、篩選 `mcqf`、目前題號 `mcqn`、口試主題篩選 `mcqt`；`UNIT_TOPIC`／`topicOfUnit` 把原理單元對到口試主題，`mcqN` 是各主題的考古題數；`tests/check.mjs` 切 `const MCQ =` 到 `const MCQ_FILTERS`、`const UNITS = [` 到 `function MCQPage` 檢查 |
 | `/* ---------- 口說作答` | `useSTT()`：裝置的 SpeechRecognition，中斷會自動接續 |
 | `/* ---------- 播放或收音時` | `useWakeLock()`：播放或收音時讓螢幕保持亮著 |
 | `/* ---------- 底部播放列` | `Player`：目前句子字幕、聽考倒數與「揭曉」，高度寫進 `--player-h` |

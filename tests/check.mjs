@@ -110,6 +110,12 @@ MCQ.forEach(x => {
   else if (x.a && !x.w[x.a].startsWith('✓')) warn(`考古題第 ${x.n} 題正解 ${x.a} 的說明沒有標 ✓`);
 });
 if (MCQ.filter(x => !x.a).map(x => x.n).join() !== '73,133') warn('不計分的題目應只有第 73、133 題');
+// 考古題與口試的雙向連結：除了四種量尺，每個單元都接到存在的口試主題
+const linkCtx = { TOPICS, MCQ };
+vm.runInNewContext(slice('const UNIT_TOPIC', 'function MCQPage') + ';globalThis.__link = { topicOfUnit, mcqN };', linkCtx);
+const { topicOfUnit, mcqN } = linkCtx.__link;
+[...unitIds].forEach(u => { if (u !== 'scales' && !ids.has(topicOfUnit(u))) warn(`原理單元 ${u} 沒有對應到口試主題`); });
+if (Object.values(mcqN).reduce((a, b) => a + b, 0) !== MCQ.filter(x => x.u !== 'scales').length) warn('各口試主題的考古題數加總不對');
 if (problems === beforeMcq) console.log(`✓ 考古題 ${MCQ.length} 題都有題幹、選項、答案、初學者解析與原理卡`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
