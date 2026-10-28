@@ -100,13 +100,17 @@ const beforeMcq = problems;
 const mcqCtx = {};
 vm.runInNewContext(slice('const MCQ =', 'const MCQ_FILTERS') + ';globalThis.__mcq = MCQ;', mcqCtx);
 const MCQ = mcqCtx.__mcq, nums = new Set(MCQ.map(x => x.n));
+const unitIds = new Set([...slice('const UNITS = [', 'function MCQPage').matchAll(/\{ id: '([a-z]+)', t: '/g)].map(m => m[1]));
+if (unitIds.size !== 21) warn(`原理單元應有 21 個，實際 ${unitIds.size} 個`);
 if (MCQ.length !== 198 || nums.size !== 198 || nums.has(93) || nums.has(137)) warn(`考古題應為 198 題且缺 93、137，實際 ${MCQ.length} 題`);
 MCQ.forEach(x => {
   if (!x.q || x.o.length !== 4 || x.o.slice(0, x.n === 199 ? 3 : 4).some(o => !o)) warn(`考古題第 ${x.n} 題題幹或選項不完整`);
   if (!x.e || !x.al || (x.a && !'ABCD'.includes(x.a))) warn(`考古題第 ${x.n} 題缺答案或解析`);
+  if (!unitIds.has(x.u) || !x.k || !x.m || Object.keys(x.w || {}).join('') !== 'ABCD') warn(`考古題第 ${x.n} 題缺初學者解析或原理單元`);
+  else if (x.a && !x.w[x.a].startsWith('✓')) warn(`考古題第 ${x.n} 題正解 ${x.a} 的說明沒有標 ✓`);
 });
 if (MCQ.filter(x => !x.a).map(x => x.n).join() !== '73,133') warn('不計分的題目應只有第 73、133 題');
-if (problems === beforeMcq) console.log(`✓ 考古題 ${MCQ.length} 題都有題幹、選項、答案與解析`);
+if (problems === beforeMcq) console.log(`✓ 考古題 ${MCQ.length} 題都有題幹、選項、答案、初學者解析與原理卡`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');
