@@ -80,7 +80,8 @@ if (problems === before) console.log(`✓ 朗讀句都在 ${CHUNK_MAX + 1} 字�
 const beforeVoice = problems;
 const V = (name, lang, voiceURI = name) => ({ name, lang, voiceURI });
 const apple = [V('美佳', 'zh-TW', 'com.apple.voice.compact.zh-TW.Meijia'), V('Eddy (中文（台灣）)', 'zh-TW', 'com.apple.eloquence.zh-TW.Eddy'),
-  V('Flo (中文（台灣）)', 'zh-TW'), V('善怡', 'yue-HK'), V('婷婷', 'zh-CN')];
+  V('Flo (中文（台灣）)', 'zh-TW'), V('善怡', 'yue-HK'), V('婷婷', 'zh-CN'),
+  V('Siri 聲音 2', 'zh-TW', 'com.apple.speech.synthesis.voice.custom.siri.zh-TW.voice2')];
 [
   ['iPhone／Mac 基本語音', apple, '美佳'],
   ['下載加強版後', [...apple, V('美佳', 'zh-TW', 'com.apple.voice.enhanced.zh-TW.Meijia')], 'com.apple.voice.enhanced.zh-TW.Meijia'],
@@ -91,9 +92,21 @@ const apple = [V('美佳', 'zh-TW', 'com.apple.voice.compact.zh-TW.Meijia'), V('
   const got = pickVoice(mandarinVoices(list), '');
   if (!got || (got.name !== want && got.voiceURI !== want)) warn(`自動選聲音（${label}）應選「${want}」，實際「${got && got.name}」`);
 });
-if (mandarinVoices(apple).some(v => /Eddy|Flo|善怡/.test(v.name))) warn('聲音清單不應出現機械音或粵語');
+if (mandarinVoices(apple).some(v => /Eddy|Flo|善怡|Siri/.test(v.name))) warn('聲音清單不應出現機械音、粵語或 Siri 聲音');
 if (pickVoice(mandarinVoices(apple), 'com.apple.eloquence.zh-TW.Eddy')?.name !== '美佳') warn('之前選過的機械音應改回自動');
-if (problems === beforeVoice) console.log('✓ 自動選聲音：Edge 自然語音、加強版、Google 依序優先，機械音與粵語不列入');
-console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題`);
+if (problems === beforeVoice) console.log('✓ 自動選聲音：Edge 自然語音、加強版、Google 依序優先，機械音、粵語與 Siri 聲音不列入');
+// 7. 考古題：198 題（原題號 1～200，缺 93、137），每題有題幹、四個選項（199 題 D 原缺文）、答案與解析
+const beforeMcq = problems;
+const mcqCtx = {};
+vm.runInNewContext(slice('const MCQ =', 'const MCQ_FILTERS') + ';globalThis.__mcq = MCQ;', mcqCtx);
+const MCQ = mcqCtx.__mcq, nums = new Set(MCQ.map(x => x.n));
+if (MCQ.length !== 198 || nums.size !== 198 || nums.has(93) || nums.has(137)) warn(`考古題應為 198 題且缺 93、137，實際 ${MCQ.length} 題`);
+MCQ.forEach(x => {
+  if (!x.q || x.o.length !== 4 || x.o.slice(0, x.n === 199 ? 3 : 4).some(o => !o)) warn(`考古題第 ${x.n} 題題幹或選項不完整`);
+  if (!x.e || !x.al || (x.a && !'ABCD'.includes(x.a))) warn(`考古題第 ${x.n} 題缺答案或解析`);
+});
+if (MCQ.filter(x => !x.a).map(x => x.n).join() !== '73,133') warn('不計分的題目應只有第 73、133 題');
+if (problems === beforeMcq) console.log(`✓ 考古題 ${MCQ.length} 題都有題幹、選項、答案與解析`);
+console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');
