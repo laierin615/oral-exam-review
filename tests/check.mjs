@@ -117,6 +117,23 @@ const { topicOfUnit, mcqN } = linkCtx.__link;
 [...unitIds].forEach(u => { if (u !== 'scales' && !ids.has(topicOfUnit(u))) warn(`原理單元 ${u} 沒有對應到口試主題`); });
 if (Object.values(mcqN).reduce((a, b) => a + b, 0) !== MCQ.filter(x => x.u !== 'scales').length) warn('各口試主題的考古題數加總不對');
 if (problems === beforeMcq) console.log(`✓ 考古題 ${MCQ.length} 題都有題幹、選項、答案、初學者解析與原理卡`);
+// 8. 考前一頁：每個主題一張速記卡，口訣來自原理卡，三個關鍵詞，朗讀句不超長
+const beforeCard = problems;
+const unitM = Object.fromEntries([...slice('const UNITS = [', 'const CARDS').matchAll(/\{ id: '([a-z]+)', t: '[^']*', fig: '[a-zA-Z]+', m: '([^']*)'/g)].map(m => [m[1], m[2]]));
+const cardCtx = {}; vm.runInNewContext(slice('const CARDS', 'const cardOf') + ';globalThis.__cards = CARDS;', cardCtx);
+const CARDS = cardCtx.__cards;
+TOPICS.forEach(t => {
+  const c = CARDS[t.id];
+  if (!c) return warn(`主題 ${t.id} 沒有速記卡`);
+  const hook = unitM[c.u || t.id];
+  if (!hook) warn(`主題 ${t.id} 的速記卡找不到口訣來源單元 ${c.u || t.id}`);
+  if (!Array.isArray(c.keys) || c.keys.length !== 3 || !c.num) warn(`主題 ${t.id} 的速記卡要有三個關鍵詞與一個數字或例子`);
+  if (hook && hook.length > 40) warn(`主題 ${t.id} 的口訣超過 40 字`);
+  const long = chunks(`口訣：${hook}。關鍵詞：${c.keys.join('。')}。記住：${c.num}`).filter(x => x.length > CHUNK_MAX + 1);
+  if (long.length) warn(`主題 ${t.id} 速記卡有超過 ${CHUNK_MAX + 1} 字的朗讀句：${long[0]}`);
+});
+if (Object.keys(CARDS).some(id => !ids.has(id))) warn('速記卡有不存在的主題 id');
+if (problems === beforeCard) console.log(`✓ 考前一頁 ${Object.keys(CARDS).length} 張速記卡都有口訣、三個關鍵詞與數字`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');
