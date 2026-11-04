@@ -148,7 +148,7 @@ if (!pair('再測', '重測') || !pair('PR', '百分等級') || !pair('臺', '�
 if (findDocs('時距記錄').hits.length !== findDocs('時距紀錄').hits.length) warn('索引搜尋「記錄／紀錄」沒有互通');
 const hbPages = JSON.parse(readFileSync(new URL('../handbook/pages.json', import.meta.url), 'utf8'));
 if (hbPages.length !== 80 || hbPages.some((o, i) => o.p !== i + 1 || !o.h || !o.l.length)) warn('handbook/pages.json 應有 80 頁，每頁有頁碼、章節與文字');
-const missImg = hbPages.filter(o => !existsSync(new URL(`../handbook/p-${String(o.p).padStart(2, '0')}.jpg`, import.meta.url)));
+const missImg = hbPages.filter(o => ['', 'hd/'].some(d => !existsSync(new URL(`../handbook/${d}p-${String(o.p).padStart(2, '0')}.jpg`, import.meta.url))));
 if (missImg.length || !existsSync(new URL('../handbook/handbook.pdf', import.meta.url))) warn(`手冊缺圖片或 PDF：${missImg.map(o => o.p).join('、')}`);
 const hbDocs = hbPages.map(findCtx.__find.hbDoc);
 for (const t of ['代碼與符號總表', 'SEM', '情境漫畫', 'of／for／as learning']) if (!findDocs(t, hbDocs).hits.some(d => d.kind === 'hb')) warn(`手冊搜不到「${t}」`);

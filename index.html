@@ -970,6 +970,15 @@ footer { border-top: var(--bw) solid var(--edge); }
 .hit-acts a.btn { text-decoration: none; color: inherit; }
 .section-intro a.btn, .finder-index a.btn { text-decoration: none; }
 @media print { .find-fab { display: none; } }
+/* ---------- 網站內看手冊圖 ---------- */
+.pic-view { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; background: var(--paper); padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); }
+.pic-bar, .pic-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; }
+.pic-bar b { font-size: 18px; }
+.pic-scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; border: var(--bw, 2px) solid var(--pill-edge); border-radius: 14px; background: #fff; touch-action: pan-x pan-y pinch-zoom; }
+.pic-scroll img { display: block; width: 100%; height: auto; cursor: zoom-in; }
+.pic-scroll img { background-repeat: no-repeat; }
+.pic-scroll img.big { width: 250%; max-width: none; cursor: zoom-out; }
+.pic-nav .btn:disabled { opacity: .4; }
 footer { margin-bottom: 72px; }
 </style>
 </head>
@@ -2780,13 +2789,41 @@ function VoiceSettings({ tts }) {
 // c 概念頁、x 練習頁（頁碼），圖在 handbook/p-XX.jpg
 const HB_TOPIC = { process: { c: 11, x: [12, 13, 14, 15] }, reference: { c: 16, x: [17, 18, 19, 20] }, standard: { c: 21, x: [22, 23] }, perform: { c: 24, x: [25, 26] }, relval: { c: 27, x: [28, 29] }, validity: { c: 30, x: [31, 32, 33, 34, 35] }, reliability: { c: 36, x: [37, 38, 39, 40] }, skew: { c: 41, x: [42, 43, 44] }, normal: { c: 45, x: [46, 47, 48, 49, 50] }, item: { c: 51, x: [52, 53, 54, 55, 56] }, bloom: { c: 57, x: [58, 59, 60] }, trend: { c: 61, x: [62, 63, 64, 65, 66] }, performance: { c: 67, x: [68, 69, 70] }, portfolio: { c: 71, x: [72, 73, 74] }, observe: { c: 75, x: [76, 77, 78] } };
 const hbImg = p => 'handbook/p-' + String(p).padStart(2, '0') + '.jpg';
+const hbHd = p => 'handbook/hd/p-' + String(p).padStart(2, '0') + '.jpg'; // 看圖視窗用 300dpi
+// 在網站內看手冊圖（不另開分頁，返回鍵／返回手勢可關閉）
+const openPic = (p, e) => { if (e) { e.preventDefault(); e.stopPropagation(); } window.dispatchEvent(new CustomEvent('hbpic', { detail: p })); };
+function PicViewer() {
+  const [pic, setPic] = useState(null);
+  const [big, setBig] = useState(false);
+  useEffect(() => {
+    const on = e => { setBig(false); setPic(cur => { if (cur == null) history.pushState({ hbpic: 1 }, ''); return e.detail; }); };
+    const pop = () => setPic(null);
+    window.addEventListener('hbpic', on); window.addEventListener('popstate', pop);
+    return () => { window.removeEventListener('hbpic', on); window.removeEventListener('popstate', pop); };
+  }, []);
+  const close = () => { if (history.state && history.state.hbpic) history.back(); else setPic(null); };
+  useEffect(() => {
+    if (pic == null) return;
+    const k = e => { if (e.key === 'Escape') close(); };
+    window.addEventListener('keydown', k);
+    const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    return () => { window.removeEventListener('keydown', k); document.body.style.overflow = prev; };
+  }, [pic == null]);
+  if (pic == null) return null;
+  const go = d => { setBig(false); setPic(p => Math.min(80, Math.max(1, p + d))); };
+  return html`<div className="pic-view" role="dialog" aria-modal="true" aria-label=${'手冊第 ' + pic + ' 頁'}>
+    <div className="pic-bar"><button className="btn primary" onClick=${close}>← 返回</button><b>手冊 p.${pic}</b><button className="btn" onClick=${() => setBig(b => !b)}>${big ? '縮回整頁' : '放大'}</button></div>
+    <div className="pic-scroll"><img key=${pic} className=${big ? 'big' : ''} src=${hbHd(pic)} style=${{ backgroundImage: 'url(' + hbImg(pic) + ')', backgroundSize: '100% auto' }} alt=${'圖解背誦手冊第 ' + pic + ' 頁'} onClick=${() => setBig(b => !b)} /></div>
+    <div className="pic-nav"><button className="btn" disabled=${pic <= 1} onClick=${() => go(-1)}>← 上一頁</button><button className="btn" disabled=${pic >= 80} onClick=${() => go(1)}>下一頁 →</button></div>
+  </div>`;
+}
 function HbFig({ t }) {
   const h = HB_TOPIC[t.id];
   if (!h) return null;
   return html`<figure className="hb-fig">
-    <a href=${hbImg(h.c)} target="_blank" rel="noopener" title="開大圖，可放大"><img src=${hbImg(h.c)} alt=${'圖解背誦手冊第 ' + h.c + ' 頁：' + t.title} loading="lazy" /></a>
+    <a href=${hbHd(h.c)} title="開大圖，可放大" onClick=${e => openPic(h.c, e)}><img src=${hbImg(h.c)} alt=${'圖解背誦手冊第 ' + h.c + ' 頁：' + t.title} loading="lazy" /></a>
     <figcaption>手冊 p.${h.c}｜${t.title}・概念頁（點圖放大）</figcaption>
-    <div className="hb-pages"><span>練習頁</span>${h.x.map(p => html`<a key=${p} className="btn" href=${hbImg(p)} target="_blank" rel="noopener">p.${p}</a>`)}<a className="btn" href=${'handbook/handbook.pdf#page=' + h.c} target="_blank" rel="noopener">開 PDF</a></div>
+    <div className="hb-pages"><span>練習頁</span>${h.x.map(p => html`<a key=${p} className="btn" href=${hbHd(p)} onClick=${e => openPic(p, e)}>p.${p}</a>`)}<a className="btn" href=${'handbook/handbook.pdf#page=' + h.c} target="_blank" rel="noopener">開 PDF</a></div>
   </figure>`;
 }
 
@@ -3180,7 +3217,7 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
         <ul className="card-keys">${c.keys.map(k => html`<li key=${k}>${k}</li>`)}</ul>
         ${open && html`<p className="card-num"><b>記住</b>${c.num}</p>`}
         ${HB_TOPIC[t.id] && html`<button className="btn pic-btn" aria-expanded=${!!pics[t.id]} onClick=${e => { e.stopPropagation(); setPics(o => ({ ...o, [t.id]: !o[t.id] })); }}>${pics[t.id] ? '收起手冊圖' : `看手冊圖（p.${HB_TOPIC[t.id].c}）`}</button>`}
-        ${pics[t.id] && HB_TOPIC[t.id] && html`<a href=${hbImg(HB_TOPIC[t.id].c)} target="_blank" rel="noopener" title="開大圖，可放大" onClick=${e => e.stopPropagation()}><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} /></a>`}
+        ${pics[t.id] && HB_TOPIC[t.id] && html`<a href=${hbHd(HB_TOPIC[t.id].c)} title="開大圖，可放大" onClick=${e => openPic(HB_TOPIC[t.id].c, e)}><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} /></a>`}
         ${!hide && html`<div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button><button className="btn" onClick=${() => onRead(t.id)}>讀主題</button>${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）</button>`}</div>`}
       </article>`; })}</div>
     <h2 className="cram-h2">數字總表</h2>
@@ -3336,7 +3373,7 @@ function HbHit({ d, re, groups }) {
   return html`<article className="hit">
     <div className="hit-top"><span className="hit-title"><${Hl} text=${d.title} re=${re} /></span><span className="hit-tag">手冊</span></div>
     ${lines.map((l, i) => html`<p key=${i}><${Hl} text=${snip(l, re, 50)} re=${re} /></p>`)}
-    ${open && html`<a href=${'handbook/p-' + page + '.jpg'} target="_blank" rel="noopener" title="開大圖，可放大"><img className="hb-page" src=${'handbook/p-' + page + '.jpg'} alt=${'圖解背誦手冊第 ' + d.p + ' 頁'} loading="lazy" /></a>`}
+    ${open && html`<a href=${hbHd(d.p)} title="開大圖，可放大" onClick=${e => openPic(d.p, e)}><img className="hb-page" src=${'handbook/p-' + page + '.jpg'} alt=${'圖解背誦手冊第 ' + d.p + ' 頁'} loading="lazy" /></a>`}
     <div className="hit-acts">
       <button className="btn" aria-expanded=${open} onClick=${() => setOpen(o => !o)}>${open ? '收起這一頁' : '看這一頁'}</button>
       <a className="btn" href=${'handbook/handbook.pdf#page=' + d.p} target="_blank" rel="noopener">開 PDF 第 ${d.p} 頁</a>
@@ -3455,6 +3492,7 @@ function App() {
     ${!finding && !attack && html`<button className="find-fab" aria-label="索引搜尋" style=${{ bottom: tts.player ? 'calc(var(--player-h, 170px) + 12px)' : 'max(16px, env(safe-area-inset-bottom))' }} onClick=${() => setFinding(true)}><${SearchI} />查</button>`}
     ${finding && html`<${Finder} onClose=${() => setFinding(false)} onGo=${goFind} />`}
     <${Player} tts=${tts} />
+    <${PicViewer} />
   </div>`;
 }
 
