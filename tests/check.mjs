@@ -134,6 +134,19 @@ TOPICS.forEach(t => {
 });
 if (Object.keys(CARDS).some(id => !ids.has(id))) warn('速記卡有不存在的主題 id');
 if (problems === beforeCard) console.log(`✓ 考前一頁 ${Object.keys(CARDS).length} 張速記卡都有口訣、三個關鍵詞與數字`);
+// 9. 索引搜尋：每個速記卡的主題名與熱門詞都找得到，同義詞互通，口試題與考古題都進了索引
+const beforeFind = problems;
+const findCtx = { html: () => null, console };
+vm.runInNewContext(slice('const TOPICS', 'const RANK') + slice('const SHORT', 'TOPICS.forEach') + 'TOPICS.forEach(t => { t.short = SHORT[t.id]; });' +
+  slice('const UNITS = [', 'const SHORT') + slice('const MCQ =', 'const MCQ_FILTERS') + slice('const UNIT_TOPIC', 'function MCQPage') +
+  slice('/* ---------- 索引搜尋', 'function Hit(') + ';globalThis.__find = { findDocs, FIND_DOCS, HOT, FIND_INDEX };', findCtx);
+const { findDocs, FIND_DOCS, HOT, FIND_INDEX } = findCtx.__find;
+if (FIND_DOCS.filter(d => d.kind === 'oral').length !== QUESTIONS.length || FIND_DOCS.filter(d => d.kind === 'mcq').length !== MCQ.length) warn('索引沒有收進全部口試題或考古題');
+for (const t of [...HOT, ...FIND_INDEX.flatMap(x => x.terms), ...Object.values(SHORT)]) if (!findDocs(t).hits.length) warn(`索引搜尋「${t}」找不到任何結果`);
+const pair = (a, b) => findDocs(a).hits.length === findDocs(b).hits.length;
+if (!pair('再測', '重測') || !pair('PR', '百分等級') || !pair('臺', '台') || !pair('ＰＲ', 'pr')) warn('索引搜尋的同義詞或全形半形沒有互通');
+if (findDocs('時距記錄').hits.length !== findDocs('時距紀錄').hits.length) warn('索引搜尋「記錄／紀錄」沒有互通');
+if (problems === beforeFind) console.log(`✓ 索引搜尋收錄 ${FIND_DOCS.length} 筆，熱門詞與索引詞都找得到`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');

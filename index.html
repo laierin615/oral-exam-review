@@ -913,6 +913,38 @@ footer { border-top: var(--bw) solid var(--edge); }
 /* 五個分頁：窄螢幕用短名稱，避免換行 */
 .t-short { display: none; }
 @media (max-width: 480px) { .t-full { display: none; } .t-short { display: inline; } .tab { flex: 1 1 auto; white-space: nowrap; padding: 8px 4px; font-size: 17px; } }
+/* ---------- 索引搜尋：浮動「查」按鈕與全螢幕面板 ---------- */
+.find-fab { position: fixed; right: max(16px, env(safe-area-inset-right)); z-index: 25; display: inline-flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 20px; border-radius: 999px; border: var(--bw, 2px) solid var(--pill-edge); background: var(--pill); color: var(--on-pill); font: 900 18px var(--f-body); box-shadow: 3px 3px 0 var(--primary-shadow); cursor: pointer; }
+.find-fab svg { width: 20px; height: 20px; }
+.finder { position: fixed; inset: 0; z-index: 30; overflow-y: auto; background: var(--paper); padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left)); }
+.finder-in { max-width: 760px; margin: 0 auto; }
+.finder-bar { position: sticky; top: 0; z-index: 2; display: flex; gap: 8px; align-items: center; padding: 8px 0 12px; background: var(--paper); }
+.finder-bar input { flex: 1; min-width: 0; font: 700 18px var(--f-body); color: var(--ink); background: var(--sheet); border: var(--bw, 2px) solid var(--edge); border-radius: 16px; padding: 12px 14px; box-shadow: 3px 3px 0 var(--shadow); }
+.finder-bar .btn { flex: none; }
+.finder-sum { margin: 0 0 12px; color: var(--ink-soft); font-size: 15px; }
+.finder-groups { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.finder-groups button { border: 1.5px solid var(--edge); border-radius: 999px; background: var(--sheet); color: var(--ink); padding: 4px 12px; font: 700 15px var(--f-body); }
+.finder h3 { font-size: 18px; margin: 22px 0 10px; display: flex; gap: 8px; align-items: baseline; }
+.finder h3 small { color: var(--ink-soft); font-weight: 700; font-size: 14px; }
+.hit { background: var(--sheet); border: var(--bw, 2px) solid var(--edge); border-radius: 16px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 3px 3px 0 var(--shadow); }
+.hit-top { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.hit-title { font-weight: 900; font-size: 16.5px; }
+.hit-tag { flex: none; font-size: 13px; font-weight: 700; color: var(--ink-soft); }
+.hit p { margin: 6px 0 0; line-height: 1.7; font-size: 16px; overflow-wrap: anywhere; }
+.hit .hook { font-family: var(--f-hand); font-size: 17px; }
+.hit .ans { font-weight: 900; color: var(--hit); }
+.hit ul, .hit ol { margin: 6px 0 0; padding-left: 1.3em; line-height: 1.7; }
+.hit mark { background: var(--hl); color: inherit; border-radius: 3px; padding: 0 1px; }
+.hit-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.hit-acts .btn { min-height: 36px; padding: 4px 12px; font-size: 15px; }
+.hit-more { display: block; width: 100%; margin: 4px 0 8px; }
+.finder-index h3 { margin-top: 18px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { border: 1.5px solid var(--rule); border-radius: 999px; background: var(--sheet); color: var(--ink); padding: 5px 12px; font: 600 15.5px var(--f-body); }
+.chips.hot button { border-color: var(--edge); background: var(--lime); color: var(--on-lime); font-weight: 800; }
+.finder-empty { padding: 24px 0; color: var(--ink-soft); }
+@media print { .find-fab { display: none; } }
+footer { margin-bottom: 72px; }
 </style>
 </head>
 <body>
@@ -3192,6 +3224,117 @@ function MCQPage({ mtopic, setMtopic, onRead, onPractice }) {
   </div>`;
 }
 
+/* ---------- 索引搜尋：輸入關鍵字，全站找答案與說明 ---------- */
+// 正規化：全形轉半形、小寫、台＝臺、記錄＝紀錄、去空白
+const fnorm = s => String(s).replace(/[！-～]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).toLowerCase().replace(/臺/g, '台').replace(/記錄/g, '紀錄').replace(/\s+/g, '');
+// 同義詞：打其中一個，其他也一起找
+const ALIASES = [
+  ['再測', '重測'], ['百分等級', 'pr'], ['鑑別度', 'd值'], ['難度', 'p值'], ['評分規準', 'rubric', '評分指標'], ['評定量表', '等級量表'],
+  ['建構效度', '構念效度'], ['標準參照', '效標參照'], ['電腦適性', 'cat', '適性評量'], ['折半', '分半'], ['α', 'alpha', 'cronbach'],
+  ['檔案評量', '卷宗評量', '歷程檔案'], ['雙向細目表', '細目表'], ['常態分配', '常態分布'], ['正偏', '右偏'], ['負偏', '左偏'],
+  ['實作評量', '表現評量'], ['iq', '智商', '智力'], ['布魯姆', 'bloom'], ['動態評量', '中介', '鷹架'], ['最大表現', '最佳表現'],
+  ['另類評量', '多元評量'], ['安置性', '安置'], ['形成性', '形成'], ['診斷性', '診斷'], ['總結性', '總結'],
+];
+const fterms = q => fnorm(q) ? String(q).split(/\s+/).map(fnorm).filter(Boolean).map(t => {
+  const g = ALIASES.find(a => a.some(x => fnorm(x) === t));
+  return g ? [...new Set([t, ...g.map(fnorm)])] : [t];
+}) : [];
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const termRe = groups => { const v = groups.flat().sort((a, b) => b.length - a.length).map(x => escRe(x).replace(/台/g, '[台臺]').replace(/紀錄/g, '[紀記]錄')); return v.length ? new RegExp('(' + v.join('|') + ')', 'gi') : null; };
+function Hl({ text, re }) {
+  if (!re) return text;
+  const s = String(text); return s.split(re).map((x, i) => i % 2 ? html`<mark key=${i}>${x}</mark>` : x);
+}
+// 摘要：取第一個命中位置前後各一段
+const snip = (s, re, n = 60) => { s = String(s); if (!re || s.length <= n * 2) return s; re.lastIndex = 0; const m = re.exec(s); re.lastIndex = 0; if (!m) return s.slice(0, n * 2) + '…'; const a = Math.max(0, m.index - n / 2); return (a ? '…' : '') + s.slice(a, a + n * 2) + (a + n * 2 < s.length ? '…' : ''); };
+const FIND_KINDS = [['card', '速記卡'], ['unit', '原理卡'], ['topic', '主題重點'], ['num', '數字總表'], ['oral', '口試題'], ['mcq', '考古題']];
+const FIND_DOCS = (() => {
+  const D = [], tt = id => TOPICS.find(t => t.id === id);
+  TOPICS.forEach(t => {
+    const c = cardOf(t);
+    D.push({ kind: 'card', id: 'c-' + t.id, title: t.title, hook: c.hook, list: c.keys, note: c.num, topic: t.id });
+    D.push({ kind: 'topic', id: 'o-' + t.id, title: `${t.title}｜開場句`, body: t.open, topic: t.id });
+    t.pts.forEach((p, i) => D.push({ kind: 'topic', id: `p-${t.id}-${i}`, title: `${t.title}｜${p[0]}`, body: p[1], topic: t.id }));
+    if (t.traps.length) D.push({ kind: 'topic', id: 'x-' + t.id, title: `${t.title}｜易錯提醒`, list: t.traps, topic: t.id });
+  });
+  UNITS.forEach(u => D.push({ kind: 'unit', id: 'u-' + u.id, title: u.t, hook: u.m, list: u.b, topic: topicOfUnit(u.id) }));
+  NUMBERS.forEach((tb, i) => tb.rows.forEach((r, j) => D.push({ kind: 'num', id: `n-${i}-${j}`, title: tb.t, body: tb.head.map((h, k) => `${h}：${r[k]}`).join('｜') })));
+  QUESTIONS.forEach(q => D.push({ kind: 'oral', id: 'q-' + q.id, n: q.id, title: `口試 ${q.id}｜${(tt(q.topic) || {}).short || ''}`, body: q.question, keys: q.keywords.map(k => k.label || k), more: q.model, topic: q.topic }));
+  MCQ.forEach(m => { const i = 'ABCD'.indexOf(m.a); D.push({ kind: 'mcq', id: 'm-' + m.n, n: m.n, title: `考古題 ${m.n}`, body: m.q, ans: `正解 (${m.a}) ${m.o[i] || ''}`, hook: m.m, more: [m.k, ...(m.s || []), ...Object.entries(m.w || {}).map(([k, v]) => `(${k}) ${m.o['ABCD'.indexOf(k)] || ''}：${v}`)], topic: topicOfUnit(m.u) }); });
+  D.forEach(d => {
+    d.head = fnorm(d.title + (d.hook || ''));
+    d.text = fnorm([d.title, d.hook, d.body, d.note, d.ans, ...(d.list || []), ...(d.keys || []), ...[].concat(d.more || [])].filter(Boolean).join(' '));
+  });
+  return D;
+})();
+const KIND_W = { card: 6, unit: 5, topic: 4, num: 4, oral: 2, mcq: 1 };
+function findDocs(q) {
+  const g = fterms(q);
+  if (!g.length) return { groups: g, hits: [] };
+  const hits = FIND_DOCS.filter(d => g.every(v => v.some(x => d.text.includes(x))))
+    .map(d => ({ d, s: KIND_W[d.kind] + (g.every(v => v.some(x => d.head.includes(x))) ? 10 : 0) }))
+    .sort((a, b) => b.s - a.s).map(x => x.d);
+  return { groups: g, hits };
+}
+const HOT = ['信度', '效度', '鑑別度', 'PR', '常模參照', '標準參照', '動態評量', '雙向細目表', '評分規準', '偏態', '時距紀錄', '檔案評量'];
+const FIND_INDEX = TOPICS.map(t => ({ t, terms: [...new Set([...t.pts.map(p => p[0].split('｜')[0].replace(/（.*?）|\(.*?\)/g, '').trim()), ...UNITS.filter(u => topicOfUnit(u.id) === t.id).map(u => u.t)])] }));
+
+function Hit({ d, re, onGo }) {
+  const [open, setOpen] = useState(false);
+  const tag = FIND_KINDS.find(k => k[0] === d.kind)[1];
+  const more = [].concat(d.more || []);
+  return html`<article className="hit">
+    <div className="hit-top"><span className="hit-title"><${Hl} text=${d.title} re=${re} /></span><span className="hit-tag">${tag}</span></div>
+    ${d.hook && html`<p className="hook">口訣：<${Hl} text=${d.hook} re=${re} /></p>`}
+    ${d.body && html`<p><${Hl} text=${open || d.kind !== 'mcq' ? d.body : snip(d.body, re, 70)} re=${re} /></p>`}
+    ${d.ans && html`<p className="ans">${d.ans}</p>`}
+    ${d.list && html`<ul>${d.list.map((x, i) => html`<li key=${i}><${Hl} text=${x} re=${re} /></li>`)}</ul>`}
+    ${d.note && html`<p><b>數字／例子：</b><${Hl} text=${d.note} re=${re} /></p>`}
+    ${d.keys && html`<p><b>關鍵詞：</b><${Hl} text=${d.keys.join('、')} re=${re} /></p>`}
+    ${open && more.length > 0 && (d.kind === 'oral' ? html`<p><b>滿分範本：</b></p>${String(d.more).split('\n').map((x, i) => html`<p key=${i}><${Hl} text=${x} re=${re} /></p>`)}` : html`<p><b>解析：</b></p>${more.map((x, i) => html`<p key=${i}><${Hl} text=${x} re=${re} /></p>`)}`)}
+    <div className="hit-acts">
+      ${more.length > 0 && html`<button className="btn" aria-expanded=${open} onClick=${() => setOpen(o => !o)}>${open ? '收起' : d.kind === 'oral' ? '看滿分範本' : '看完整解析'}</button>`}
+      ${(d.topic || d.kind === 'num') && html`<button className="btn" onClick=${() => onGo(d)}>去原頁 →</button>`}
+    </div>
+  </article>`;
+}
+
+function Finder({ onClose, onGo }) {
+  const [q, setQ] = useState(() => load('findq', ''));
+  const [lim, setLim] = useState({});
+  const inp = useRef(null);
+  useEffect(() => { save('findq', q); setLim({}); }, [q]);
+  useEffect(() => {
+    const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    const k = e => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', k); if (inp.current) inp.current.focus();
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', k); };
+  }, []);
+  const { groups, hits } = useMemo(() => findDocs(q), [q]);
+  const re = useMemo(() => termRe(groups), [groups]);
+  const pick = t => { setQ(t); const el = document.querySelector('.finder'); if (el) el.scrollTop = 0; };
+  const by = FIND_KINDS.map(([k, l]) => ({ k, l, list: hits.filter(d => d.kind === k) })).filter(g => g.list.length);
+  return html`<div className="finder" role="dialog" aria-modal="true" aria-label="索引搜尋"><div className="finder-in">
+    <div className="finder-bar">
+      <input ref=${inp} type="search" enterKeyHint="search" placeholder="輸入關鍵字，例如：鑑別度、時距、PR" aria-label="搜尋關鍵字" value=${q} onInput=${e => setQ(e.target.value)} />
+      ${q && html`<button className="btn" onClick=${() => { setQ(''); inp.current && inp.current.focus(); }}>清除</button>`}
+      <button className="btn primary" onClick=${onClose}>關閉</button>
+    </div>
+    ${!q.trim() ? html`<div className="finder-index">
+      <p className="finder-sum">可以打多個字、用空白隔開（例如「信度 最低」）。同義詞會一起找：再測＝重測、PR＝百分等級、Rubrics＝評分規準。</p>
+      <h3>常查</h3><div className="chips hot">${HOT.map(t => html`<button key=${t} onClick=${() => pick(t)}>${t}</button>`)}</div>
+      ${FIND_INDEX.map(({ t, terms }, i) => html`<section key=${t.id}><h3>${String(i + 1).padStart(2, '0')} ${t.title}</h3><div className="chips">${terms.map(x => html`<button key=${x} onClick=${() => pick(x)}>${x}</button>`)}</div></section>`)}
+    </div>` : !hits.length ? html`<p className="finder-empty">找不到「${q}」。試試短一點的詞，或按「清除」回到索引。</p>` : html`
+      <p className="finder-sum" aria-live="polite">共 ${hits.length} 筆，依「速記卡→原理卡→主題重點→數字→口試→考古題」排列。</p>
+      <div className="finder-groups">${by.map(g => html`<button key=${g.k} onClick=${() => { const el = document.getElementById('fg-' + g.k); if (el) el.scrollIntoView({ block: 'start' }); }}>${g.l} ${g.list.length}</button>`)}</div>
+      ${by.map(g => { const n = lim[g.k] || 6; return html`<section key=${g.k} id=${'fg-' + g.k}><h3>${g.l}<small>${g.list.length} 筆</small></h3>
+        ${g.list.slice(0, n).map(d => html`<${Hit} key=${d.id} d=${d} re=${re} onGo=${onGo} />`)}
+        ${g.list.length > n && html`<button className="btn hit-more" onClick=${() => setLim(L => ({ ...L, [g.k]: n + 10 }))}>再顯示 ${Math.min(10, g.list.length - n)} 筆（還有 ${g.list.length - n} 筆）</button>`}
+      </section>`; })}`}
+  </div></div>`;
+}
+const SearchI = () => html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>`;
+
 function App() {
   const TABS = ['notes', 'review', 'practice', 'mcq', 'cram'];
   const [tab, setTabRaw] = useState(() => { const h = (location.hash || '').slice(1); const old = load('tab', 'notes'); return TABS.includes(h) ? h : TABS.includes(old) ? old : 'notes'; });
@@ -3199,6 +3342,8 @@ function App() {
   const [mtopic, setMtopic] = useState(() => { const p = load('mcqt', 'all'); return p === 'all' || TOPICS.some(t => t.id === p) ? p : 'all'; });
   const [attack, setAttack] = useState(null);
   const [focus, setFocus] = useState(null);
+  const [finding, setFinding] = useState(false);
+  const [nav, setNav] = useState(0);
   const [theme, setTheme] = useState(() => load('theme', 'system'));
   const tts = useTTS(), game = useStudy();
   useWakeLock(!!(tts.player && tts.player.playing));
@@ -3212,6 +3357,14 @@ function App() {
   const read = id => { closeAttack(); setTab('notes'); setFocus(id); };
   const practice = id => { setTopic(id); setTab('practice'); };
   const mcq = id => { setMtopic(id); setTab('mcq'); };
+  // 從索引搜尋跳到原頁：口試題、考古題先存好題號，再重新掛載該頁讀進來
+  const goFind = d => {
+    setFinding(false);
+    if (d.kind === 'oral') { save('qid', d.n); setTopic(d.topic); setNav(n => n + 1); setTab('practice'); }
+    else if (d.kind === 'mcq') { save('mcqn', d.n); save('mcqf', 'all'); setMtopic('all'); setNav(n => n + 1); setTab('mcq'); }
+    else if (d.kind === 'num') setTab('cram');
+    else read(d.topic);
+  };
   return html`<div style=${{ paddingBottom: tts.player ? 'calc(var(--player-h, 170px) + 24px)' : 0 }}>
     <header className=${'mast' + (tab !== 'notes' ? ' compact' : '')}>
       <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓<span className="eyebrow-sub">・圖解學習誌</span></p>
@@ -3229,11 +3382,13 @@ function App() {
     </nav></div>
     ${tab === 'notes' && html`<${Notes} tts=${tts} game=${game} onPractice=${practice} onMcq=${mcq} onAttack=${startAttack} focus=${focus} clearFocus=${() => setFocus(null)} />`}
     ${tab === 'review' && html`<${Review} game=${game} tts=${tts} onAttack=${startAttack} onRead=${read} />`}
-    ${tab === 'practice' && html`<${Practice} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} onMcq=${mcq} />`}
-    ${tab === 'mcq' && html`<${MCQPage} mtopic=${mtopic} setMtopic=${setMtopic} onRead=${read} onPractice=${practice} />`}
+    ${tab === 'practice' && html`<${Practice} key=${'p' + nav} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} onMcq=${mcq} />`}
+    ${tab === 'mcq' && html`<${MCQPage} key=${'m' + nav} mtopic=${mtopic} setMtopic=${setMtopic} onRead=${read} onPractice=${practice} />`}
     ${tab === 'cram' && html`<${Cram} tts=${tts} game=${game} onAttack=${startAttack} onRead=${read} onMcq=${mcq} />`}
     <footer>內容依課堂知識庫與題庫整理。朗讀使用裝置內建語音。熟悉程度、複習日期、答題紀錄與草稿只存在這個瀏覽器；舊版進度已接續保留。</footer>
     ${attack && html`<${RecallSession} key=${attack} id=${attack} game=${game} tts=${tts} onClose=${closeAttack} onRead=${read} />`}
+    ${!finding && !attack && html`<button className="find-fab" aria-label="索引搜尋" style=${{ bottom: tts.player ? 'calc(var(--player-h, 170px) + 12px)' : 'max(16px, env(safe-area-inset-bottom))' }} onClick=${() => setFinding(true)}><${SearchI} />查</button>`}
+    ${finding && html`<${Finder} onClose=${() => setFinding(false)} onGo=${goFind} />`}
     <${Player} tts=${tts} />
   </div>`;
 }
