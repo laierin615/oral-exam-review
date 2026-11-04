@@ -922,6 +922,20 @@ footer { border-top: var(--bw) solid var(--edge); }
 .hb-pages .btn { min-height: 34px; padding: 2px 12px; font-size: 15px; text-decoration: none; color: inherit; }
 .site-fig { margin: 0 0 18px; }
 .site-fig > summary { cursor: pointer; font-weight: 800; color: var(--ink-soft); padding: 6px 0; }
+/* ---------- 精簡頂部、更多練習摺疊 ---------- */
+.mast.slim { padding-bottom: 8px; }
+.slim-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 0 4px; }
+.slim-row h1 { margin: 0; font-size: 30px; line-height: 1.2; }
+.slim-row .mast-meta { padding: 0; gap: 8px; border: 0; }
+.slim-row .mast-meta > button, .slim-row .mast-meta > a.dl { min-height: 40px; padding: 2px 14px; font-size: 15.5px; }
+.slim-row .mast-meta b { font-size: 18px; margin: 0 2px 0 4px; }
+.more-practice { margin: 8px 0 18px; border: var(--bw, 2px) dashed var(--rule); border-radius: 14px; padding: 4px 14px; }
+.more-practice[open] { padding-bottom: 14px; }
+.more-practice > summary { cursor: pointer; font-weight: 800; padding: 10px 0; color: var(--ink-soft); }
+.slim-row .mast-meta > * { flex: 0 0 auto !important; width: auto !important; grid-column: auto !important; }
+.card-head h3 { flex: 1 1 60%; min-width: 9em; }
+.pic-btn { margin-top: 10px; min-height: 36px; padding: 4px 12px; font-size: 15px; }
+.card-hb { margin-top: 10px; }
 /* ---------- 索引搜尋：浮動「查」按鈕與全螢幕面板 ---------- */
 .find-fab { position: fixed; right: max(16px, env(safe-area-inset-right)); z-index: 25; display: inline-flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 20px; border-radius: 999px; border: var(--bw, 2px) solid var(--pill-edge); background: var(--pill); color: var(--on-pill); font: 900 18px var(--f-body); box-shadow: 3px 3px 0 var(--primary-shadow); cursor: pointer; }
 .find-fab svg { width: 20px; height: 20px; }
@@ -2858,10 +2872,13 @@ function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
             ${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）→</button>`}
           </div>
           <div className=${'open' + (rp === 'open' ? ' reading' : '')} id=${key + '-open'}><span className="tag">口試開場句</span><p>${t.open}</p></div>
-          <h3 className="reading-label"><span className="section-number">01</span> 圖解</h3><${HbFig} t=${t} /><details className="site-fig"><summary>網站互動圖（可操作）</summary><figure className="figure-wrap"><div className="fig">${FIGS[t.fig]()}</div><figcaption>圖解 ${String(i + 1).padStart(2, '0')}｜${t.title}</figcaption></figure></details><${ConceptMap} t=${t} /><h3 className="reading-label"><span className="section-number">03</span> 重點整理</h3>
+          ${t.traps.length > 0 && html`<div className=${'traps' + (rp === 'traps' ? ' reading' : '')} id=${key + '-traps'}><b><span aria-hidden="true">！</span> 易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
+          <h3 className="reading-label"><span className="section-number">01</span> 手冊圖解</h3><${HbFig} t=${t} />
+          <details className="more-practice" open=${(cur === key && tts.player) || undefined}><summary>更多練習：網站互動圖、概念連線、重點整理、概念配對</summary>
+          <figure className="figure-wrap"><div className="fig">${FIGS[t.fig]()}</div><figcaption>網站互動圖｜${t.title}</figcaption></figure><${ConceptMap} t=${t} /><h3 className="reading-label"><span className="section-number">03</span> 重點整理</h3>
           <dl className="pts">${t.pts.map(([h, d], pi) => html`<div key=${h} id=${key + '-pt-' + pi} className=${rp === 'pt-' + pi ? 'reading' : undefined}><dt><span className="point-number">${String(pi + 1).padStart(2, '0')}</span>${h}</dt><dd>${d}</dd></div>`)}</dl>
           <h3 className="reading-label"><span className="section-number">04</span> 概念配對</h3><${ConceptMatch} t=${t} />
-          ${t.traps.length > 0 && html`<div className=${'traps' + (rp === 'traps' ? ' reading' : '')} id=${key + '-traps'}><b><span aria-hidden="true">！</span> 易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
+          </details>
           <div className="topic-end"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想練習 →</button></div>
         </article>`;
       })}
@@ -3142,6 +3159,7 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
   const [hide, setHide] = useState(false);
   const [weak, setWeak] = useState(false);
   const [shown, setShown] = useState({});
+  const [pics, setPics] = useState({});
   const rank = { dmg: 0, new: 1, ok: 2 };
   const list = useMemo(() => { const L = TOPICS.map((t, i) => ({ t, i })); return weak ? [...L].sort((a, b) => rank[game.status(a.t.id).kind] - rank[game.status(b.t.id).kind] || a.i - b.i) : L; }, [weak, game.okN, game.dueN]);
   useEffect(() => { setShown({}); }, [hide]);
@@ -3149,7 +3167,7 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
   const playing = tts.player && tts.player.playing && tts.player.items === items;
   const curKey = tts.player && tts.currentKey;
   return html`<section className="cram-page">
-    <div className="section-intro"><h2>考前一頁</h2><p>考前 30 分鐘掃一遍：15 張速記卡，每張一句口訣、三個關鍵詞、一個數字或例子；下面是數字總表。開「背誦模式」會遮住口訣和數字，點卡片才翻開。</p><p><a className="btn primary" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載《期中口試圖解背誦手冊 v3》PDF（80 頁，約 2MB）</a></p></div>
+    <div className="section-intro"><h2>考前一頁</h2><p>考前 30 分鐘掃一遍：15 張速記卡，每張一句口訣、三個關鍵詞、一個數字或例子，需要時點「看手冊圖」；下面是數字總表。開「背誦模式」會遮住口訣和數字，點卡片才翻開。</p><p><a className="btn primary" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載《期中口試圖解背誦手冊 v3》PDF（80 頁，約 2MB）</a></p></div>
     <div className="filter-row" role="group" aria-label="考前一頁工具">
       <button className=${'btn ' + (hide ? 'on' : '')} aria-pressed=${hide} onClick=${() => setHide(h => !h)}>${hide ? '背誦模式：遮住口訣' : '背誦模式'}</button>
       <button className=${'btn ' + (weak ? 'on' : '')} aria-pressed=${weak} onClick=${() => setWeak(w => !w)}>${weak ? '最弱在前' : '依單元順序'}</button>
@@ -3158,10 +3176,11 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
     <div className="cards">${list.map(({ t, i }) => { const c = cardOf(t), st = game.status(t.id), open = !hide || shown[t.id]; return html`
       <article key=${t.id} className=${'sheet card' + (curKey === 'card-' + t.id && tts.player ? ' playing' : '') + (hide ? ' quiz' : '')} data-module=${moduleOf(t.id)} onClick=${hide ? () => setShown(o => ({ ...o, [t.id]: !o[t.id] })) : undefined}>
         <div className="card-head"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h3>${t.title}</h3><span className=${'study-status ' + st.kind}>${studyLabel(st)}</span></div>
-        ${open && HB_TOPIC[t.id] && (hide ? html`<img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁'} loading="lazy" />` : html`<a href=${hbImg(HB_TOPIC[t.id].c)} target="_blank" rel="noopener" title="開大圖，可放大"><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} loading="lazy" /></a>`)}
-        <p className=${'card-hook' + (open ? '' : ' hidden')}>${open ? c.hook : '點一下翻開手冊圖與口訣'}</p>
+        <p className=${'card-hook' + (open ? '' : ' hidden')}>${open ? c.hook : '點一下翻開口訣'}</p>
         <ul className="card-keys">${c.keys.map(k => html`<li key=${k}>${k}</li>`)}</ul>
         ${open && html`<p className="card-num"><b>記住</b>${c.num}</p>`}
+        ${HB_TOPIC[t.id] && html`<button className="btn pic-btn" aria-expanded=${!!pics[t.id]} onClick=${e => { e.stopPropagation(); setPics(o => ({ ...o, [t.id]: !o[t.id] })); }}>${pics[t.id] ? '收起手冊圖' : `看手冊圖（p.${HB_TOPIC[t.id].c}）`}</button>`}
+        ${pics[t.id] && HB_TOPIC[t.id] && html`<a href=${hbImg(HB_TOPIC[t.id].c)} target="_blank" rel="noopener" title="開大圖，可放大" onClick=${e => e.stopPropagation()}><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} /></a>`}
         ${!hide && html`<div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button><button className="btn" onClick=${() => onRead(t.id)}>讀主題</button>${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）</button>`}</div>`}
       </article>`; })}</div>
     <h2 className="cram-h2">數字總表</h2>
@@ -3418,16 +3437,10 @@ function App() {
     else read(d.topic);
   };
   return html`<div style=${{ paddingBottom: tts.player ? 'calc(var(--player-h, 170px) + 24px)' : 0 }}>
-    <header className=${'mast' + (tab !== 'notes' ? ' compact' : '')}>
+    <header className="mast slim">
       <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓<span className="eyebrow-sub">・圖解學習誌</span></p>
         <div className="theme-switch" role="group" aria-label="外觀">${[['system', '自動', '跟隨裝置的深淺色設定'], ['light', '白天', '白天版：淺色'], ['dark', '晚上', '晚上版：深色']].map(([v, l, tip]) => html`<button key=${v} aria-pressed=${theme === v} title=${tip} onClick=${() => setTheme(v)}>${l}</button>`)}</div></div>
-      <div className="cover-layout"><div className="cover-copy"><p className="issue-label">本期專題｜測驗與學習評量</p>
-        <h1>評量筆記</h1>
-        ${tab === 'notes' && html`<div className="cover-actions"><button className="btn primary" onClick=${() => read('process')}>開始閱讀 <span aria-hidden="true">↗</span></button><button className="cover-link" onClick=${() => setTab('review')}>回想練習 →</button></div>`}
-      </div>${tab === 'notes' && html`<div className="cover-illustration"><${CoverArt} /></div>`}</div>
-      <div className="mast-meta"><span><b>15</b> 個理論主題</span><span><b>${QUESTIONS.length}</b> 題口試練習</span><button onClick=${() => setTab('mcq')}><b>${MCQ.length}</b> 題考古題 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('cram')}>考前一頁 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('review')}><b>${game.dueN}</b> 個主題待複習 <span aria-hidden="true">↗</span></button><a className="dl" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 PDF <span aria-hidden="true">↓</span></a></div>
-      <div className="topic-dots" role="group" aria-label="15 個主題的熟悉程度，點圓點到該主題">${TOPICS.map((t, i) => { const st = game.status(t.id), lab = `${String(i + 1).padStart(2, '0')} ${t.title}：${studyLabel(st)}`; return html`<button key=${t.id} className=${st.kind} title=${lab} aria-label=${lab} onClick=${() => read(t.id)}><i></i></button>`; })}</div>
-      <p className="dot-legend" aria-hidden="true"><span><i className="ok"></i>已熟悉</span><span><i className="dmg"></i>待複習</span><span><i></i>尚未完成回想</span></p>
+      <div className="slim-row"><h1>評量筆記</h1><div className="mast-meta"><button onClick=${() => setTab('review')}>待複習 <b>${game.dueN}</b> <span aria-hidden="true">↗</span></button><a className="dl" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 <span aria-hidden="true">↓</span></a></div></div>
     </header>
     <div className="tabbar"><nav className="tabs" aria-label="學習分頁">
       ${[['notes','主題閱讀','主題'],['review','回想練習','回想'],['practice','口試練習','口試'],['mcq','考古題','考古題'],['cram','考前一頁','考前一頁']].map(([v,l,sh]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} aria-label=${l} key=${v} onClick=${() => setTab(v)}><span className="t-full">${l}</span><span className="t-short" aria-hidden="true">${sh}</span></button>`)}

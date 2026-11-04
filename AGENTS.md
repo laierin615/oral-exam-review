@@ -63,7 +63,7 @@
 
 - 參考使用者提供的三張社群卡片圖，只取版面：粗框、實心偏移陰影、方格紙底、膠囊標籤與分頁。不放參考圖的品牌名稱、標誌、照片或文案。
 - 配色：使用者看過紫色＋螢光綠版後，覺得雜誌版暖色比較舒服，改回暖色。白天是米白紙、暖黃封面、深綠重點色；晚上是深墨綠底、芥末黃封面、米白插畫。不要再換成高彩度的紫色或螢光色。
-- `EDITIONS` 對應五章與主題 id；`ChapterArt` 是各章插畫（手機版主題卡隱藏），`CoverArt` 是封面插畫（手機版縮到 230px，讓進度圓點留在第一屏）。
+- `EDITIONS` 對應五章與主題 id；`ChapterArt` 是各章插畫（手機版主題卡隱藏），`CoverArt` 已不在頂部使用（2026-11-04 精簡：頂部改 `.mast.slim` 一行，移除封面、主題圓點與圖例；主題卡額外練習收進 `details.more-practice`；Cram 速記卡用 `pics` 狀態按 `.pic-btn` 展開手冊圖）。
 - 五章色 `data-module`（與雜誌版相同）：0 `--mint` 綠、1 `--lilac` 紫、2 `--sky` 藍、3 `--peach` 橘、4 `--yellow` 黃。易錯提醒卡用 `--yellow`。
 - 社群卡片版 token：`--lime`（灰綠重點色，名稱沿用）、`--on-lime`、`--pink`（陶土粉，待複習）、`--pill`、`--pill-edge`、`--on-pill`、`--on-pill-soft`、`--warn-on-pill`、`--primary-bg`、`--primary-ink`、`--primary-shadow`。主要按鈕白天炭灰底米白字配芥末黃陰影，晚上灰綠底深色字；封面按鈕固定炭灰底米白字（`--cover-ink`／`--art-paper`）。新增 token 要在兩個深色區塊同步。
 - 外觀切換：刊頭右側「自動｜白天｜晚上」，存在 `theme`（`system`／`light`／`dark`），套在 `<html data-theme>`；自動時跟隨裝置深淺色。
