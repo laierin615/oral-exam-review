@@ -90,3 +90,4 @@
 - 測試時寫進 localStorage 的假資料，測完要清掉。
 - 返回機制：全螢幕畫面（`RecallSession`、`Finder`、`PicView`）都呼叫 `useBackClose(onClose)`（檔頭 hooks 之後）。開啟時 pushState `{ov: 深度}`，手機返回手勢只關最上層；用按鈕關閉時元件卸載會自動 history.back()。新增全螢幕畫面要一併套用，並放明顯的「← 返回」按鈕。
 - 2026-11-04 使用者要求拿掉回想：只移除入口（TABS、分頁按鈕、待複習、onAttack 按鈕、Review／RecallSession 的渲染、狀態標籤、「最弱在前」），`Review`、`RecallSession`、`useStudy` 程式碼保留未刪（progress.mjs 仍測排程）。要恢復就把入口加回。
+- 名詞解釋：`GLOSS` 由 UNITS 標題、TOPICS 的 pts、NUMBERS 中 `stack: true` 的列，以及 `GLOSS_EXTRA`（手冊代碼總表與補充名詞，第 4 欄沒有，出處依索引區間判斷）組成；`glossFind(q)` 只處理單一詞，完全相符 30、開頭相符 20、包含 10，最多 3 張。新增 GLOSS_EXTRA 時注意 src 的索引區間。
