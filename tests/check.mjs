@@ -152,6 +152,8 @@ const missImg = hbPages.filter(o => !existsSync(new URL(`../handbook/p-${String(
 if (missImg.length || !existsSync(new URL('../handbook/handbook.pdf', import.meta.url))) warn(`手冊缺圖片或 PDF：${missImg.map(o => o.p).join('、')}`);
 const hbDocs = hbPages.map(findCtx.__find.hbDoc);
 for (const t of ['代碼與符號總表', 'SEM', '情境漫畫', 'of／for／as learning']) if (!findDocs(t, hbDocs).hits.some(d => d.kind === 'hb')) warn(`手冊搜不到「${t}」`);
+const hbMap = {}; vm.runInNewContext(slice('const HB_TOPIC', 'const hbImg') + ';globalThis.__hb = HB_TOPIC;', hbMap);
+for (const t of TOPICS) { const h = hbMap.__hb[t.id], pg = h && hbPages.find(o => o.p === h.c); if (!pg || !pg.h.startsWith(t.title)) warn(`主題 ${t.id} 的手冊概念頁對不上`); }
 if (problems === beforeFind) console.log(`✓ 索引搜尋收錄 ${FIND_DOCS.length} 筆＋手冊 ${hbDocs.length} 頁，熱門詞與索引詞都找得到`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }

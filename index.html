@@ -913,6 +913,14 @@ footer { border-top: var(--bw) solid var(--edge); }
 /* 五個分頁：窄螢幕用短名稱，避免換行 */
 .t-short { display: none; }
 @media (max-width: 480px) { .t-full { display: none; } .t-short { display: inline; } .tab { flex: 1 1 auto; white-space: nowrap; padding: 8px 4px; font-size: 17px; } }
+.hb-fig { margin: 12px 0 20px; }
+.hb-fig img, .card-hb { display: block; width: 100%; height: auto; border: var(--bw, 2px) solid var(--edge); border-radius: 12px; background: #fff; box-shadow: 3px 3px 0 var(--shadow); }
+.card-hb { margin: 4px 0 12px; box-shadow: none; border-width: 1.5px; }
+.hb-fig figcaption { margin-top: 10px; color: var(--ink-soft); font-size: 15px; }
+.hb-pages { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; font-size: 15px; font-weight: 700; }
+.hb-pages .btn { min-height: 34px; padding: 2px 12px; font-size: 15px; text-decoration: none; color: inherit; }
+.site-fig { margin: 0 0 18px; }
+.site-fig > summary { cursor: pointer; font-weight: 800; color: var(--ink-soft); padding: 6px 0; }
 /* ---------- 索引搜尋：浮動「查」按鈕與全螢幕面板 ---------- */
 .find-fab { position: fixed; right: max(16px, env(safe-area-inset-right)); z-index: 25; display: inline-flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 20px; border-radius: 999px; border: var(--bw, 2px) solid var(--pill-edge); background: var(--pill); color: var(--on-pill); font: 900 18px var(--f-body); box-shadow: 3px 3px 0 var(--primary-shadow); cursor: pointer; }
 .find-fab svg { width: 20px; height: 20px; }
@@ -2752,6 +2760,20 @@ function VoiceSettings({ tts }) {
     </div>`}
   </details>`;
 }
+/* ---------- 手冊圖解：每個主題對應《期中口試圖解背誦手冊 v3》的概念頁與練習頁 ---------- */
+// c 概念頁、x 練習頁（頁碼），圖在 handbook/p-XX.jpg
+const HB_TOPIC = { process: { c: 11, x: [12, 13, 14, 15] }, reference: { c: 16, x: [17, 18, 19, 20] }, standard: { c: 21, x: [22, 23] }, perform: { c: 24, x: [25, 26] }, relval: { c: 27, x: [28, 29] }, validity: { c: 30, x: [31, 32, 33, 34, 35] }, reliability: { c: 36, x: [37, 38, 39, 40] }, skew: { c: 41, x: [42, 43, 44] }, normal: { c: 45, x: [46, 47, 48, 49, 50] }, item: { c: 51, x: [52, 53, 54, 55, 56] }, bloom: { c: 57, x: [58, 59, 60] }, trend: { c: 61, x: [62, 63, 64, 65, 66] }, performance: { c: 67, x: [68, 69, 70] }, portfolio: { c: 71, x: [72, 73, 74] }, observe: { c: 75, x: [76, 77, 78] } };
+const hbImg = p => 'handbook/p-' + String(p).padStart(2, '0') + '.jpg';
+function HbFig({ t }) {
+  const h = HB_TOPIC[t.id];
+  if (!h) return null;
+  return html`<figure className="hb-fig">
+    <a href=${hbImg(h.c)} target="_blank" rel="noopener" title="開大圖，可放大"><img src=${hbImg(h.c)} alt=${'圖解背誦手冊第 ' + h.c + ' 頁：' + t.title} loading="lazy" /></a>
+    <figcaption>手冊 p.${h.c}｜${t.title}・概念頁（點圖放大）</figcaption>
+    <div className="hb-pages"><span>練習頁</span>${h.x.map(p => html`<a key=${p} className="btn" href=${hbImg(p)} target="_blank" rel="noopener">p.${p}</a>`)}<a className="btn" href=${'handbook/handbook.pdf#page=' + h.c} target="_blank" rel="noopener">開 PDF</a></div>
+  </figure>`;
+}
+
 function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
   const lists = useMemo(() => {
     const no = i => String(i + 1).padStart(2, '0');
@@ -2834,7 +2856,7 @@ function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
             ${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）→</button>`}
           </div>
           <div className=${'open' + (rp === 'open' ? ' reading' : '')} id=${key + '-open'}><span className="tag">口試開場句</span><p>${t.open}</p></div>
-          <h3 className="reading-label"><span className="section-number">01</span> 圖解</h3><figure className="figure-wrap"><div className="fig">${FIGS[t.fig]()}</div><figcaption>圖解 ${String(i + 1).padStart(2, '0')}｜${t.title}</figcaption></figure><${ConceptMap} t=${t} /><h3 className="reading-label"><span className="section-number">03</span> 重點整理</h3>
+          <h3 className="reading-label"><span className="section-number">01</span> 圖解</h3><${HbFig} t=${t} /><details className="site-fig"><summary>網站互動圖（可操作）</summary><figure className="figure-wrap"><div className="fig">${FIGS[t.fig]()}</div><figcaption>圖解 ${String(i + 1).padStart(2, '0')}｜${t.title}</figcaption></figure></details><${ConceptMap} t=${t} /><h3 className="reading-label"><span className="section-number">03</span> 重點整理</h3>
           <dl className="pts">${t.pts.map(([h, d], pi) => html`<div key=${h} id=${key + '-pt-' + pi} className=${rp === 'pt-' + pi ? 'reading' : undefined}><dt><span className="point-number">${String(pi + 1).padStart(2, '0')}</span>${h}</dt><dd>${d}</dd></div>`)}</dl>
           <h3 className="reading-label"><span className="section-number">04</span> 概念配對</h3><${ConceptMatch} t=${t} />
           ${t.traps.length > 0 && html`<div className=${'traps' + (rp === 'traps' ? ' reading' : '')} id=${key + '-traps'}><b><span aria-hidden="true">！</span> 易錯提醒</b><ul>${t.traps.map(x => html`<li key=${x}>${x}</li>`)}</ul></div>`}
@@ -3134,7 +3156,8 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
     <div className="cards">${list.map(({ t, i }) => { const c = cardOf(t), st = game.status(t.id), open = !hide || shown[t.id]; return html`
       <article key=${t.id} className=${'sheet card' + (curKey === 'card-' + t.id && tts.player ? ' playing' : '') + (hide ? ' quiz' : '')} data-module=${moduleOf(t.id)} onClick=${hide ? () => setShown(o => ({ ...o, [t.id]: !o[t.id] })) : undefined}>
         <div className="card-head"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h3>${t.title}</h3><span className=${'study-status ' + st.kind}>${studyLabel(st)}</span></div>
-        <p className=${'card-hook' + (open ? '' : ' hidden')}>${open ? c.hook : '點一下翻開口訣'}</p>
+        ${open && HB_TOPIC[t.id] && (hide ? html`<img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁'} loading="lazy" />` : html`<a href=${hbImg(HB_TOPIC[t.id].c)} target="_blank" rel="noopener" title="開大圖，可放大"><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} loading="lazy" /></a>`)}
+        <p className=${'card-hook' + (open ? '' : ' hidden')}>${open ? c.hook : '點一下翻開手冊圖與口訣'}</p>
         <ul className="card-keys">${c.keys.map(k => html`<li key=${k}>${k}</li>`)}</ul>
         ${open && html`<p className="card-num"><b>記住</b>${c.num}</p>`}
         ${!hide && html`<div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button><button className="btn" onClick=${() => onRead(t.id)}>讀主題</button>${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）</button>`}</div>`}
