@@ -943,6 +943,8 @@ footer { border-top: var(--bw) solid var(--edge); }
 .chips button { border: 1.5px solid var(--rule); border-radius: 999px; background: var(--sheet); color: var(--ink); padding: 5px 12px; font: 600 15.5px var(--f-body); }
 .chips.hot button { border-color: var(--edge); background: var(--lime); color: var(--on-lime); font-weight: 800; }
 .finder-empty { padding: 24px 0; color: var(--ink-soft); }
+.hb-page { display: block; width: 100%; height: auto; margin-top: 10px; border: 1.5px solid var(--rule); border-radius: 8px; background: #fff; }
+.hit-acts a.btn { text-decoration: none; color: inherit; }
 @media print { .find-fab { display: none; } }
 footer { margin-bottom: 72px; }
 </style>
@@ -3247,7 +3249,7 @@ function Hl({ text, re }) {
 }
 // 摘要：取第一個命中位置前後各一段
 const snip = (s, re, n = 60) => { s = String(s); if (!re || s.length <= n * 2) return s; re.lastIndex = 0; const m = re.exec(s); re.lastIndex = 0; if (!m) return s.slice(0, n * 2) + '…'; const a = Math.max(0, m.index - n / 2); return (a ? '…' : '') + s.slice(a, a + n * 2) + (a + n * 2 < s.length ? '…' : ''); };
-const FIND_KINDS = [['card', '速記卡'], ['unit', '原理卡'], ['topic', '主題重點'], ['num', '數字總表'], ['oral', '口試題'], ['mcq', '考古題']];
+const FIND_KINDS = [['card', '速記卡'], ['unit', '原理卡'], ['topic', '主題重點'], ['num', '數字總表'], ['hb', '手冊'], ['oral', '口試題'], ['mcq', '考古題']];
 const FIND_DOCS = (() => {
   const D = [], tt = id => TOPICS.find(t => t.id === id);
   TOPICS.forEach(t => {
@@ -3267,17 +3269,36 @@ const FIND_DOCS = (() => {
   });
   return D;
 })();
-const KIND_W = { card: 6, unit: 5, topic: 4, num: 4, oral: 2, mcq: 1 };
-function findDocs(q) {
+const KIND_W = { card: 6, unit: 5, topic: 4, num: 4, hb: 3, oral: 2, mcq: 1 };
+// 圖解背誦手冊（handbook/pages.json，每頁一筆；開搜尋面板時才載入）
+const hbDoc = o => ({ kind: 'hb', id: 'h-' + o.p, p: o.p, title: `手冊 p.${o.p}｜${o.h}`, lines: o.l, head: fnorm(o.h), text: fnorm(o.l.join(' ')) });
+let HB_DOCS = null;
+function findDocs(q, extra = []) {
   const g = fterms(q);
   if (!g.length) return { groups: g, hits: [] };
-  const hits = FIND_DOCS.filter(d => g.every(v => v.some(x => d.text.includes(x))))
-    .map(d => ({ d, s: KIND_W[d.kind] + (g.every(v => v.some(x => d.head.includes(x))) ? 10 : 0) }))
+  const lineN = d => d.lines ? Math.min(9, d.lines.filter(l => { const n = fnorm(l); return g.some(v => v.some(x => n.includes(x))); }).length) / 10 : 0;
+  const hits = FIND_DOCS.concat(extra).filter(d => g.every(v => v.some(x => d.text.includes(x))))
+    .map(d => ({ d, s: KIND_W[d.kind] + (g.every(v => v.some(x => d.head.includes(x))) ? 10 : 0) + lineN(d) }))
     .sort((a, b) => b.s - a.s).map(x => x.d);
   return { groups: g, hits };
 }
 const HOT = ['信度', '效度', '鑑別度', 'PR', '常模參照', '標準參照', '動態評量', '雙向細目表', '評分規準', '偏態', '時距紀錄', '檔案評量'];
 const FIND_INDEX = TOPICS.map(t => ({ t, terms: [...new Set([...t.pts.map(p => p[0].split('｜')[0].replace(/（.*?）|\(.*?\)/g, '').trim()), ...UNITS.filter(u => topicOfUnit(u.id) === t.id).map(u => u.t)])] }));
+
+function HbHit({ d, re, groups }) {
+  const [open, setOpen] = useState(false);
+  const page = String(d.p).padStart(2, '0');
+  const lines = d.lines.filter(l => { const n = fnorm(l); return groups.some(v => v.some(x => n.includes(x))); }).slice(0, 3);
+  return html`<article className="hit">
+    <div className="hit-top"><span className="hit-title"><${Hl} text=${d.title} re=${re} /></span><span className="hit-tag">手冊</span></div>
+    ${lines.map((l, i) => html`<p key=${i}><${Hl} text=${snip(l, re, 50)} re=${re} /></p>`)}
+    ${open && html`<a href=${'handbook/p-' + page + '.jpg'} target="_blank" rel="noopener" title="開大圖，可放大"><img className="hb-page" src=${'handbook/p-' + page + '.jpg'} alt=${'圖解背誦手冊第 ' + d.p + ' 頁'} loading="lazy" /></a>`}
+    <div className="hit-acts">
+      <button className="btn" aria-expanded=${open} onClick=${() => setOpen(o => !o)}>${open ? '收起這一頁' : '看這一頁'}</button>
+      <a className="btn" href=${'handbook/handbook.pdf#page=' + d.p} target="_blank" rel="noopener">開 PDF 第 ${d.p} 頁</a>
+    </div>
+  </article>`;
+}
 
 function Hit({ d, re, onGo }) {
   const [open, setOpen] = useState(false);
@@ -3310,7 +3331,12 @@ function Finder({ onClose, onGo }) {
     window.addEventListener('keydown', k); if (inp.current) inp.current.focus();
     return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', k); };
   }, []);
-  const { groups, hits } = useMemo(() => findDocs(q), [q]);
+  const [hb, setHb] = useState(HB_DOCS);
+  useEffect(() => {
+    if (HB_DOCS) return;
+    fetch('handbook/pages.json').then(r => r.json()).then(P => { HB_DOCS = P.map(hbDoc); setHb(HB_DOCS); }).catch(() => setHb([]));
+  }, []);
+  const { groups, hits } = useMemo(() => findDocs(q, hb || []), [q, hb]);
   const re = useMemo(() => termRe(groups), [groups]);
   const pick = t => { setQ(t); const el = document.querySelector('.finder'); if (el) el.scrollTop = 0; };
   const by = FIND_KINDS.map(([k, l]) => ({ k, l, list: hits.filter(d => d.kind === k) })).filter(g => g.list.length);
@@ -3321,14 +3347,14 @@ function Finder({ onClose, onGo }) {
       <button className="btn primary" onClick=${onClose}>關閉</button>
     </div>
     ${!q.trim() ? html`<div className="finder-index">
-      <p className="finder-sum">可以打多個字、用空白隔開（例如「信度 最低」）。同義詞會一起找：再測＝重測、PR＝百分等級、Rubrics＝評分規準。</p>
+      <p className="finder-sum">可以打多個字、用空白隔開（例如「信度 最低」）。同義詞會一起找：再測＝重測、PR＝百分等級、Rubrics＝評分規準。${hb && hb.length ? `也會搜《期中口試圖解背誦手冊》${hb.length} 頁，點「看這一頁」直接看圖。` : hb ? '手冊沒有載入，只搜網站內容。' : ''}</p>
       <h3>常查</h3><div className="chips hot">${HOT.map(t => html`<button key=${t} onClick=${() => pick(t)}>${t}</button>`)}</div>
       ${FIND_INDEX.map(({ t, terms }, i) => html`<section key=${t.id}><h3>${String(i + 1).padStart(2, '0')} ${t.title}</h3><div className="chips">${terms.map(x => html`<button key=${x} onClick=${() => pick(x)}>${x}</button>`)}</div></section>`)}
     </div>` : !hits.length ? html`<p className="finder-empty">找不到「${q}」。試試短一點的詞，或按「清除」回到索引。</p>` : html`
-      <p className="finder-sum" aria-live="polite">共 ${hits.length} 筆，依「速記卡→原理卡→主題重點→數字→口試→考古題」排列。</p>
+      <p className="finder-sum" aria-live="polite">共 ${hits.length} 筆，依「速記卡→原理卡→主題重點→數字→手冊→口試→考古題」排列。</p>
       <div className="finder-groups">${by.map(g => html`<button key=${g.k} onClick=${() => { const el = document.getElementById('fg-' + g.k); if (el) el.scrollIntoView({ block: 'start' }); }}>${g.l} ${g.list.length}</button>`)}</div>
       ${by.map(g => { const n = lim[g.k] || 6; return html`<section key=${g.k} id=${'fg-' + g.k}><h3>${g.l}<small>${g.list.length} 筆</small></h3>
-        ${g.list.slice(0, n).map(d => html`<${Hit} key=${d.id} d=${d} re=${re} onGo=${onGo} />`)}
+        ${g.list.slice(0, n).map(d => d.kind === 'hb' ? html`<${HbHit} key=${d.id} d=${d} re=${re} groups=${groups} />` : html`<${Hit} key=${d.id} d=${d} re=${re} onGo=${onGo} />`)}
         ${g.list.length > n && html`<button className="btn hit-more" onClick=${() => setLim(L => ({ ...L, [g.k]: n + 10 }))}>再顯示 ${Math.min(10, g.list.length - n)} 筆（還有 ${g.list.length - n} 筆）</button>`}
       </section>`; })}`}
   </div></div>`;

@@ -1,6 +1,6 @@
 // 改完 index.html 後執行：node tests/check.mjs
 // 檢查：script 語法、主題與題庫的對應、46 份滿分範本是否全部命中關鍵字且估計分 ≥ 85
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import vm from 'node:vm';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -139,14 +139,20 @@ const beforeFind = problems;
 const findCtx = { html: () => null, console };
 vm.runInNewContext(slice('const TOPICS', 'const RANK') + slice('const SHORT', 'TOPICS.forEach') + 'TOPICS.forEach(t => { t.short = SHORT[t.id]; });' +
   slice('const UNITS = [', 'const SHORT') + slice('const MCQ =', 'const MCQ_FILTERS') + slice('const UNIT_TOPIC', 'function MCQPage') +
-  slice('/* ---------- 索引搜尋', 'function Hit(') + ';globalThis.__find = { findDocs, FIND_DOCS, HOT, FIND_INDEX };', findCtx);
+  slice('/* ---------- 索引搜尋', 'function HbHit(') + ';globalThis.__find = { findDocs, FIND_DOCS, HOT, FIND_INDEX, hbDoc };', findCtx);
 const { findDocs, FIND_DOCS, HOT, FIND_INDEX } = findCtx.__find;
 if (FIND_DOCS.filter(d => d.kind === 'oral').length !== QUESTIONS.length || FIND_DOCS.filter(d => d.kind === 'mcq').length !== MCQ.length) warn('索引沒有收進全部口試題或考古題');
 for (const t of [...HOT, ...FIND_INDEX.flatMap(x => x.terms), ...Object.values(SHORT)]) if (!findDocs(t).hits.length) warn(`索引搜尋「${t}」找不到任何結果`);
 const pair = (a, b) => findDocs(a).hits.length === findDocs(b).hits.length;
 if (!pair('再測', '重測') || !pair('PR', '百分等級') || !pair('臺', '台') || !pair('ＰＲ', 'pr')) warn('索引搜尋的同義詞或全形半形沒有互通');
 if (findDocs('時距記錄').hits.length !== findDocs('時距紀錄').hits.length) warn('索引搜尋「記錄／紀錄」沒有互通');
-if (problems === beforeFind) console.log(`✓ 索引搜尋收錄 ${FIND_DOCS.length} 筆，熱門詞與索引詞都找得到`);
+const hbPages = JSON.parse(readFileSync(new URL('../handbook/pages.json', import.meta.url), 'utf8'));
+if (hbPages.length !== 80 || hbPages.some((o, i) => o.p !== i + 1 || !o.h || !o.l.length)) warn('handbook/pages.json 應有 80 頁，每頁有頁碼、章節與文字');
+const missImg = hbPages.filter(o => !existsSync(new URL(`../handbook/p-${String(o.p).padStart(2, '0')}.jpg`, import.meta.url)));
+if (missImg.length || !existsSync(new URL('../handbook/handbook.pdf', import.meta.url))) warn(`手冊缺圖片或 PDF：${missImg.map(o => o.p).join('、')}`);
+const hbDocs = hbPages.map(findCtx.__find.hbDoc);
+for (const t of ['代碼與符號總表', 'SEM', '情境漫畫', 'of／for／as learning']) if (!findDocs(t, hbDocs).hits.some(d => d.kind === 'hb')) warn(`手冊搜不到「${t}」`);
+if (problems === beforeFind) console.log(`✓ 索引搜尋收錄 ${FIND_DOCS.length} 筆＋手冊 ${hbDocs.length} 頁，熱門詞與索引詞都找得到`);
 console.log(`主題 ${TOPICS.length} 個、口試題 ${QUESTIONS.length} 題、考古題 ${MCQ.length} 題`);
 if (problems) { console.error(`共 ${problems} 個問題`); process.exit(1); }
 console.log('✓ 全部通過');
