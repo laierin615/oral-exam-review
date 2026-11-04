@@ -385,6 +385,7 @@ button, select { max-width: 100%; }
 .cover-art { width: 100%; display: block; height: auto; }
 .mast-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid var(--edge); padding: 20px 0 16px; font-size: 16px; }
 .mast-meta b { font-family: var(--f-mono); font-size: 24px; margin-right: 6px; }
+.mast-meta > a.dl { text-decoration: none; color: inherit; font-weight: 800; }
 .mast-meta button { font-size: inherit; color: inherit; border: 0; background: none; padding: 0; }
 .mast.compact .cover-layout { padding: 24px; grid-template-columns: 1fr; border-radius: 0 0 16px 16px; }
 .mast.compact h1 { font-size: 30px; }
@@ -677,7 +678,7 @@ h1, h2 { font-weight: 900; }
 .mast h1 { font-weight: 900; letter-spacing: .02em; }
 .cover-actions .btn.primary { background: var(--cover-ink); color: var(--art-paper); border-color: var(--cover-ink); box-shadow: 4px 4px 0 var(--primary-shadow); }
 .mast-meta { justify-content: flex-start; gap: 10px; padding: 18px 0 0; border-bottom: 0; }
-.mast-meta > span, .mast-meta > button { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 16px; background: var(--sheet); color: var(--ink); border: var(--bw) solid var(--edge); border-radius: 999px; box-shadow: 3px 3px 0 var(--shadow); }
+.mast-meta > span, .mast-meta > button, .mast-meta > a.dl { display: inline-flex; align-items: center; min-height: 44px; padding: 4px 16px; background: var(--sheet); color: var(--ink); border: var(--bw) solid var(--edge); border-radius: 999px; box-shadow: 3px 3px 0 var(--shadow); }
 .mast-meta b { font-family: var(--f-body); font-weight: 900; }
 
 /* 15 個主題的進度圓點：萊姆＝已熟悉、粉紅＝待複習、白＝尚未完成回想 */
@@ -832,7 +833,7 @@ footer { border-top: var(--bw) solid var(--edge); }
   .cover-layout { padding: 22px 18px 20px; border-radius: 22px; }
   .cover-illustration { max-width: 230px; margin-top: 8px; }
   .mast h1 { font-size: 44px; }
-  .mast-meta > span, .mast-meta > button { padding-inline: 12px; }
+  .mast-meta > span, .mast-meta > button, .mast-meta > a.dl { padding-inline: 12px; }
   .tno, .isknown .tno { width: 44px; height: 44px; font-size: 17px; }
   .topic .thead .chapter-art { display: none; }
   .feature-question h3 br { display: inline; }
@@ -953,6 +954,7 @@ footer { border-top: var(--bw) solid var(--edge); }
 .finder-empty { padding: 24px 0; color: var(--ink-soft); }
 .hb-page { display: block; width: 100%; height: auto; margin-top: 10px; border: 1.5px solid var(--rule); border-radius: 8px; background: #fff; }
 .hit-acts a.btn { text-decoration: none; color: inherit; }
+.section-intro a.btn, .finder-index a.btn { text-decoration: none; }
 @media print { .find-fab { display: none; } }
 footer { margin-bottom: 72px; }
 </style>
@@ -3147,7 +3149,7 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
   const playing = tts.player && tts.player.playing && tts.player.items === items;
   const curKey = tts.player && tts.currentKey;
   return html`<section className="cram-page">
-    <div className="section-intro"><h2>考前一頁</h2><p>考前 30 分鐘掃一遍：15 張速記卡，每張一句口訣、三個關鍵詞、一個數字或例子；下面是數字總表。開「背誦模式」會遮住口訣和數字，點卡片才翻開。</p></div>
+    <div className="section-intro"><h2>考前一頁</h2><p>考前 30 分鐘掃一遍：15 張速記卡，每張一句口訣、三個關鍵詞、一個數字或例子；下面是數字總表。開「背誦模式」會遮住口訣和數字，點卡片才翻開。</p><p><a className="btn primary" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載《期中口試圖解背誦手冊 v3》PDF（80 頁，約 2MB）</a></p></div>
     <div className="filter-row" role="group" aria-label="考前一頁工具">
       <button className=${'btn ' + (hide ? 'on' : '')} aria-pressed=${hide} onClick=${() => setHide(h => !h)}>${hide ? '背誦模式：遮住口訣' : '背誦模式'}</button>
       <button className=${'btn ' + (weak ? 'on' : '')} aria-pressed=${weak} onClick=${() => setWeak(w => !w)}>${weak ? '最弱在前' : '依單元順序'}</button>
@@ -3371,6 +3373,7 @@ function Finder({ onClose, onGo }) {
     </div>
     ${!q.trim() ? html`<div className="finder-index">
       <p className="finder-sum">可以打多個字、用空白隔開（例如「信度 最低」）。同義詞會一起找：再測＝重測、PR＝百分等級、Rubrics＝評分規準。${hb && hb.length ? `也會搜《期中口試圖解背誦手冊》${hb.length} 頁，點「看這一頁」直接看圖。` : hb ? '手冊沒有載入，只搜網站內容。' : ''}</p>
+      <p><a className="btn" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 PDF</a></p>
       <h3>常查</h3><div className="chips hot">${HOT.map(t => html`<button key=${t} onClick=${() => pick(t)}>${t}</button>`)}</div>
       ${FIND_INDEX.map(({ t, terms }, i) => html`<section key=${t.id}><h3>${String(i + 1).padStart(2, '0')} ${t.title}</h3><div className="chips">${terms.map(x => html`<button key=${x} onClick=${() => pick(x)}>${x}</button>`)}</div></section>`)}
     </div>` : !hits.length ? html`<p className="finder-empty">找不到「${q}」。試試短一點的詞，或按「清除」回到索引。</p>` : html`
@@ -3422,7 +3425,7 @@ function App() {
         <h1>評量筆記</h1>
         ${tab === 'notes' && html`<div className="cover-actions"><button className="btn primary" onClick=${() => read('process')}>開始閱讀 <span aria-hidden="true">↗</span></button><button className="cover-link" onClick=${() => setTab('review')}>回想練習 →</button></div>`}
       </div>${tab === 'notes' && html`<div className="cover-illustration"><${CoverArt} /></div>`}</div>
-      <div className="mast-meta"><span><b>15</b> 個理論主題</span><span><b>${QUESTIONS.length}</b> 題口試練習</span><button onClick=${() => setTab('mcq')}><b>${MCQ.length}</b> 題考古題 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('cram')}>考前一頁 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('review')}><b>${game.dueN}</b> 個主題待複習 <span aria-hidden="true">↗</span></button></div>
+      <div className="mast-meta"><span><b>15</b> 個理論主題</span><span><b>${QUESTIONS.length}</b> 題口試練習</span><button onClick=${() => setTab('mcq')}><b>${MCQ.length}</b> 題考古題 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('cram')}>考前一頁 <span aria-hidden="true">↗</span></button><button onClick=${() => setTab('review')}><b>${game.dueN}</b> 個主題待複習 <span aria-hidden="true">↗</span></button><a className="dl" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 PDF <span aria-hidden="true">↓</span></a></div>
       <div className="topic-dots" role="group" aria-label="15 個主題的熟悉程度，點圓點到該主題">${TOPICS.map((t, i) => { const st = game.status(t.id), lab = `${String(i + 1).padStart(2, '0')} ${t.title}：${studyLabel(st)}`; return html`<button key=${t.id} className=${st.kind} title=${lab} aria-label=${lab} onClick=${() => read(t.id)}><i></i></button>`; })}</div>
       <p className="dot-legend" aria-hidden="true"><span><i className="ok"></i>已熟悉</span><span><i className="dmg"></i>待複習</span><span><i></i>尚未完成回想</span></p>
     </header>
