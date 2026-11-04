@@ -522,6 +522,8 @@ summary { cursor: pointer; min-height: 44px; font-size: 18px; font-weight: 700; 
 .bcard { width: 100%; max-width: 680px; margin: 24px auto; background: var(--sheet); border: 1.5px solid var(--edge); border-radius: 12px; box-shadow: 5px 5px 0 var(--shadow); overflow: clip; }
 .bhead { padding: 20px; display: flex; gap: 12px; align-items: flex-start; background: var(--lilac); border-bottom: 1.5px solid var(--edge); }
 .bhead h2 { flex: 1; font-size: 22px; }
+.bhead { align-items: center; }
+.bhead .back-btn { flex: none; white-space: nowrap; }
 .bbody { padding: 24px; display: grid; gap: 20px; }
 .bq { font-size: 24px; font-weight: 700; }
 .bprompt, .bans { font-size: 19px; }
@@ -990,6 +992,18 @@ footer { margin-bottom: 72px; }
 <script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
 <script>
 const { useState, useEffect, useMemo, useRef } = React;
+// 全螢幕畫面（回想練習、查詢、看圖）共用：開啟時推一筆瀏覽紀錄，手機返回手勢只關畫面、不離開網站
+let ovDepth = 0;
+function useBackClose(close) {
+  const ref = useRef(close); ref.current = close;
+  useEffect(() => {
+    const d = ++ovDepth; history.pushState({ ov: d }, '');
+    let popped = false;
+    const pop = e => { if (((e.state && e.state.ov) || 0) < d) { popped = true; ref.current(); } };
+    window.addEventListener('popstate', pop);
+    return () => { window.removeEventListener('popstate', pop); ovDepth = d - 1; if (!popped && history.state && history.state.ov === d) history.back(); };
+  }, []);
+}
 const html = htm.bind(React.createElement);
 
 /* ---------- 本機暫存（只存在這台瀏覽器） ---------- */
@@ -2601,6 +2615,7 @@ function RecallSession({ id, game, tts, onClose, onRead }) {
   const [marks, setMarks] = useState([]);
   const [result, setResult] = useState(null);
   const btnRef = useRef(null);
+  useBackClose(onClose);
   const pctOf = m => Math.round(m.length / steps.length * 100);
   useEffect(() => {
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
@@ -2635,9 +2650,8 @@ function RecallSession({ id, game, tts, onClose, onRead }) {
   return html`<div className="battle" role="dialog" aria-modal="true" aria-label=${`${head}：${t.short}`}>
     <div className="bcard">
       <div className="bhead">
+        <button className="btn primary back-btn" aria-label="返回，結束回想練習" onClick=${onClose}>← 返回</button>
         <h2 className="gtitle">${head}：${t.short}</h2>
-
-        <button className="pbtn" aria-label="關閉回想練習" onClick=${onClose}><${StopI} /></button>
       </div>
       ${!result ? html`<div className="bbody">
         <div>
@@ -2794,25 +2808,21 @@ const hbHd = p => 'handbook/hd/p-' + String(p).padStart(2, '0') + '.jpg'; // 看
 const openPic = (p, e) => { if (e) { e.preventDefault(); e.stopPropagation(); } window.dispatchEvent(new CustomEvent('hbpic', { detail: p })); };
 function PicViewer() {
   const [pic, setPic] = useState(null);
+  useEffect(() => { const on = e => setPic(e.detail); window.addEventListener('hbpic', on); return () => window.removeEventListener('hbpic', on); }, []);
+  return pic == null ? null : html`<${PicView} pic=${pic} setPic=${setPic} onClose=${() => setPic(null)} />`;
+}
+function PicView({ pic, setPic, onClose }) {
   const [big, setBig] = useState(false);
+  useBackClose(onClose);
   useEffect(() => {
-    const on = e => { setBig(false); setPic(cur => { if (cur == null) history.pushState({ hbpic: 1 }, ''); return e.detail; }); };
-    const pop = () => setPic(null);
-    window.addEventListener('hbpic', on); window.addEventListener('popstate', pop);
-    return () => { window.removeEventListener('hbpic', on); window.removeEventListener('popstate', pop); };
-  }, []);
-  const close = () => { if (history.state && history.state.hbpic) history.back(); else setPic(null); };
-  useEffect(() => {
-    if (pic == null) return;
-    const k = e => { if (e.key === 'Escape') close(); };
+    const k = e => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', k);
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
     return () => { window.removeEventListener('keydown', k); document.body.style.overflow = prev; };
-  }, [pic == null]);
-  if (pic == null) return null;
+  }, []);
   const go = d => { setBig(false); setPic(p => Math.min(80, Math.max(1, p + d))); };
   return html`<div className="pic-view" role="dialog" aria-modal="true" aria-label=${'手冊第 ' + pic + ' 頁'}>
-    <div className="pic-bar"><button className="btn primary" onClick=${close}>← 返回</button><b>手冊 p.${pic}</b><button className="btn" onClick=${() => setBig(b => !b)}>${big ? '縮回整頁' : '放大'}</button></div>
+    <div className="pic-bar"><button className="btn primary" onClick=${onClose}>← 返回</button><b>手冊 p.${pic}</b><button className="btn" onClick=${() => setBig(b => !b)}>${big ? '縮回整頁' : '放大'}</button></div>
     <div className="pic-scroll"><img key=${pic} className=${big ? 'big' : ''} src=${hbHd(pic)} style=${{ backgroundImage: 'url(' + hbImg(pic) + ')', backgroundSize: '100% auto' }} alt=${'圖解背誦手冊第 ' + pic + ' 頁'} onClick=${() => setBig(b => !b)} /></div>
     <div className="pic-nav"><button className="btn" disabled=${pic <= 1} onClick=${() => go(-1)}>← 上一頁</button><button className="btn" disabled=${pic >= 80} onClick=${() => go(1)}>下一頁 →</button></div>
   </div>`;
@@ -2873,7 +2883,7 @@ function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
         <div className="desk-heading"><h2>主題導讀</h2></div>
         <div className="feature-question"><div className="feature-art" data-module="1"><${ChapterArt} kind=${1} /></div><div><span className="small-label">概念比較</span><h3>測得很穩，<br />就一定測得準嗎？</h3><button className="cover-link" onClick=${() => { setSelected('relval'); setQuery(''); setOnlyDue(false); setTimeout(() => document.getElementById('topic-relval')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); }}>信度與效度 →</button></div></div>
         <div className="reading-search"><label htmlFor="topic-search">搜尋主題</label><input id="topic-search" type="search" placeholder="搜尋信度、偏態、檔案評量…" value=${query} onChange=${e => { setQuery(e.target.value); setSelected('all'); }} /></div>
-        <div className="filter-row"><button className="btn" onClick=${() => { setSelected('all'); setQuery(''); setOnlyDue(false); }}>看全部主題</button><button className=${'btn ' + (onlyDue ? 'on' : '')} aria-pressed=${onlyDue} onClick=${() => { setOnlyDue(v => !v); setSelected('all'); }}>只看待複習</button></div>
+        <div className="filter-row"><button className="btn" onClick=${() => { setSelected('all'); setQuery(''); setOnlyDue(false); }}>看全部主題</button></div>
         <details className="issue-directory" open=${selected === 'all' && !query && !onlyDue}><summary>本期目錄 <span>5 個章節・15 個主題</span></summary>
           <nav className="chapter-directory" aria-label="主題目錄">${EDITIONS.map((m, mi) => html`<section className="chapter-group" data-module=${mi} key=${m.name}><header><span className="chapter-index">${String(mi + 1).padStart(2,'0')}</span><h3>${m.name}</h3><${ChapterArt} kind=${mi} /></header><div className="toc">${m.ids.map(id => { const t = TOPICS.find(x => x.id === id), i = TOPICS.indexOf(t), st = game.status(id); return html`<a key=${id} href=${'#topic-' + id} className=${(st.kind === 'ok' ? 'ok ' : st.kind === 'dmg' ? 'dmg ' : '') + (cur === 'topic-' + id ? 'cur' : '')} onClick=${e => { e.preventDefault(); setSelected(id); setQuery(''); setOnlyDue(false); setTimeout(() => document.getElementById('topic-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30); }}><span>${String(i + 1).padStart(2,'0')}</span><b>${t.title}</b><span className="toc-arrow" aria-hidden="true">↗</span></a>`; })}</div></section>`)}</nav>
         </details>
@@ -2900,11 +2910,10 @@ function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
         const n = QUESTIONS.filter(q => inTopic(q, t.id)).length;
         const st = game.status(t.id);
         if ((selected !== 'all' && selected !== t.id) || (onlyDue && st.kind !== 'dmg') || (query.trim() && ![t.title, t.open, ...t.pts.flat(), ...t.traps].join(' ').toLowerCase().includes(query.trim().toLowerCase()))) return null;
-        return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '') + (st.kind === 'ok' ? ' isknown' : '')} id=${key} key=${t.id} data-module=${moduleOf(t.id)}>
-          <header className="thead"><div className="topic-heading"><div className="tmod"><span className="topic-chapter">${t.mod}</span><span className=${'study-status ' + st.kind}>${studyLabel(st)}</span></div><div className="topic-title"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h2>${t.title}</h2></div></div><${ChapterArt} kind=${moduleOf(t.id)} /></header>
+        return html`<article className=${'sheet topic' + (cur === key && tts.player ? ' playing' : '')} id=${key} key=${t.id} data-module=${moduleOf(t.id)}>
+          <header className="thead"><div className="topic-heading"><div className="tmod"><span className="topic-chapter">${t.mod}</span></div><div className="topic-title"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h2>${t.title}</h2></div></div><${ChapterArt} kind=${moduleOf(t.id)} /></header>
           <div className="tacts">
             <button className=${'btn ' + (playing ? 'on' : 'ghost')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play([lists.all[i]])}>${playing ? html`<${PauseI} />暫停` : html`<${Speaker} />朗讀`}</button>
-            <button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button>
             <button className="btn" onClick=${() => onPractice(t.id)}>口試題（${n}）→</button>
             ${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）→</button>`}
           </div>
@@ -2916,7 +2925,6 @@ function Notes({ tts, game, onPractice, onMcq, onAttack, focus, clearFocus }) {
           <dl className="pts">${t.pts.map(([h, d], pi) => html`<div key=${h} id=${key + '-pt-' + pi} className=${rp === 'pt-' + pi ? 'reading' : undefined}><dt><span className="point-number">${String(pi + 1).padStart(2, '0')}</span>${h}</dt><dd>${d}</dd></div>`)}</dl>
           <h3 className="reading-label"><span className="section-number">04</span> 概念配對</h3><${ConceptMatch} t=${t} />
           </details>
-          <div className="topic-end"><button className="btn primary" onClick=${() => onAttack(t.id)}>開始回想練習 →</button></div>
         </article>`;
       })}
     </div>
@@ -3190,7 +3198,7 @@ const NUMBERS = [
   { t: '常態分配各區間比例', head: ['區間', '合計', '單側'], rows: [['±1SD', '68.26%', '0～1SD 34.13%'], ['±2SD', '95.44%', '1～2SD 13.59%'], ['±3SD', '99.74%', '2～3SD 2.14%']], note: '上下超過 2 個標準差要特殊教育安置：IQ ≥ 130 資優班、IQ ≤ 70 資源班。' },
   { t: '試題分析', head: ['項目', '數字', '意思'], rows: [['高低分組', '前後各 27%', '掐頭去尾法；也可前後各 50%'], ['難度 P', '.50 最佳，.40～.60 理想', 'P＝(PH＋PL)÷2，越大越簡單'], ['鑑別度 D', '正值越大越好；負值有問題', 'D＝PH−PL；P＝.50 時 D 最大'], ['D 的分級（教科書 Ebel）', '≥.40 非常優良、.30～.39 良好、.20～.29 尚可、<.20 要修改', '講義沒列，口試可補充']] },
   { t: '偏態與三個集中量數', head: ['偏態', '尾巴', '題目', '順序'], rows: [['正偏（右偏）', '拖向右（高分）', '太難、地板效應', '平均數＞中位數＞眾數'], ['負偏（左偏）', '拖向左（低分）', '太易、天花板效應', '平均數＜中位數＜眾數'], ['常態', '對稱', '適中 P≈.50', '三者同一點']] },
-  { t: '其他要背的數字', head: ['數字', '出處'], rows: [['12～16 週', '動態評量一個個案的時間'], ['1、3、7、14 天', '間隔複習（本站回想練習的排程）'], ['30%＋30%＋40%', '多元評量例：閱讀省思、小組辯論、專題報告'], ['r＝.60 → r²＝.36', '決定係數：能解釋 36%，64% 解釋不了'], ['60 分', '教檢及格線＝標準參照；教甄前 20%＝常模參照']] },
+  { t: '其他要背的數字', head: ['數字', '出處'], rows: [['12～16 週', '動態評量一個個案的時間'], ['1、3、7、14 天', '間隔複習的排程'], ['30%＋30%＋40%', '多元評量例：閱讀省思、小組辯論、專題報告'], ['r＝.60 → r²＝.36', '決定係數：能解釋 36%，64% 解釋不了'], ['60 分', '教檢及格線＝標準參照；教甄前 20%＝常模參照']] },
 ];
 function Cram({ tts, game, onAttack, onRead, onMcq }) {
   const [hide, setHide] = useState(false);
@@ -3207,18 +3215,17 @@ function Cram({ tts, game, onAttack, onRead, onMcq }) {
     <div className="section-intro"><h2>考前一頁</h2><p>考前 30 分鐘掃一遍：15 張速記卡，每張一句口訣、三個關鍵詞、一個數字或例子，需要時點「看手冊圖」；下面是數字總表。開「背誦模式」會遮住口訣和數字，點卡片才翻開。</p><p><a className="btn primary" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載《期中口試圖解背誦手冊 v3》PDF（80 頁，約 2MB）</a></p></div>
     <div className="filter-row" role="group" aria-label="考前一頁工具">
       <button className=${'btn ' + (hide ? 'on' : '')} aria-pressed=${hide} onClick=${() => setHide(h => !h)}>${hide ? '背誦模式：遮住口訣' : '背誦模式'}</button>
-      <button className=${'btn ' + (weak ? 'on' : '')} aria-pressed=${weak} onClick=${() => setWeak(w => !w)}>${weak ? '最弱在前' : '依單元順序'}</button>
       <button className=${'btn ' + (playing ? 'on' : 'primary')} disabled=${!tts.supported} onClick=${() => playing ? tts.pause() : tts.play(items)}>${playing ? html`<${PauseI} />暫停朗讀` : html`<${Speaker} />朗讀 15 張卡（約 ${estMinutes(items, tts.rate, tts.gap)} 分）`}</button>
     </div>
     <div className="cards">${list.map(({ t, i }) => { const c = cardOf(t), st = game.status(t.id), open = !hide || shown[t.id]; return html`
       <article key=${t.id} className=${'sheet card' + (curKey === 'card-' + t.id && tts.player ? ' playing' : '') + (hide ? ' quiz' : '')} data-module=${moduleOf(t.id)} onClick=${hide ? () => setShown(o => ({ ...o, [t.id]: !o[t.id] })) : undefined}>
-        <div className="card-head"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h3>${t.title}</h3><span className=${'study-status ' + st.kind}>${studyLabel(st)}</span></div>
+        <div className="card-head"><span className="tno">${String(i + 1).padStart(2, '0')}</span><h3>${t.title}</h3></div>
         <p className=${'card-hook' + (open ? '' : ' hidden')}>${open ? c.hook : '點一下翻開口訣'}</p>
         <ul className="card-keys">${c.keys.map(k => html`<li key=${k}>${k}</li>`)}</ul>
         ${open && html`<p className="card-num"><b>記住</b>${c.num}</p>`}
         ${HB_TOPIC[t.id] && html`<button className="btn pic-btn" aria-expanded=${!!pics[t.id]} onClick=${e => { e.stopPropagation(); setPics(o => ({ ...o, [t.id]: !o[t.id] })); }}>${pics[t.id] ? '收起手冊圖' : `看手冊圖（p.${HB_TOPIC[t.id].c}）`}</button>`}
         ${pics[t.id] && HB_TOPIC[t.id] && html`<a href=${hbHd(HB_TOPIC[t.id].c)} title="開大圖，可放大" onClick=${e => openPic(HB_TOPIC[t.id].c, e)}><img className="card-hb" src=${hbImg(HB_TOPIC[t.id].c)} alt=${'手冊第 ' + HB_TOPIC[t.id].c + ' 頁：' + t.title} /></a>`}
-        ${!hide && html`<div className="tacts"><button className="btn primary" onClick=${() => onAttack(t.id)}>回想練習</button><button className="btn" onClick=${() => onRead(t.id)}>讀主題</button>${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）</button>`}</div>`}
+        ${!hide && html`<div className="tacts"><button className="btn primary" onClick=${() => onRead(t.id)}>讀主題</button>${mcqN[t.id] > 0 && html`<button className="btn" onClick=${() => onMcq(t.id)}>考古題（${mcqN[t.id]}）</button>`}</div>`}
       </article>`; })}</div>
     <h2 className="cram-h2">數字總表</h2>
     <div className="numbers">${NUMBERS.map(n => html`<section className="sheet" key=${n.t}><h3>${n.t}</h3>
@@ -3405,10 +3412,11 @@ function Finder({ onClose, onGo }) {
   const [q, setQ] = useState(() => load('findq', ''));
   const [lim, setLim] = useState({});
   const inp = useRef(null);
+  useBackClose(onClose);
   useEffect(() => { save('findq', q); setLim({}); }, [q]);
   useEffect(() => {
     const prev = document.body.style.overflow; document.body.style.overflow = 'hidden';
-    const k = e => { if (e.key === 'Escape') onClose(); };
+    const k = e => { if (e.key === 'Escape' && !document.querySelector('.pic-view')) onClose(); };
     window.addEventListener('keydown', k); if (inp.current) inp.current.focus();
     return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', k); };
   }, []);
@@ -3425,7 +3433,7 @@ function Finder({ onClose, onGo }) {
     <div className="finder-bar">
       <input ref=${inp} type="search" enterKeyHint="search" placeholder="輸入關鍵字，例如：鑑別度、時距、PR" aria-label="搜尋關鍵字" value=${q} onInput=${e => setQ(e.target.value)} />
       ${q && html`<button className="btn" onClick=${() => { setQ(''); inp.current && inp.current.focus(); }}>清除</button>`}
-      <button className="btn primary" onClick=${onClose}>關閉</button>
+      <button className="btn primary" onClick=${onClose}>← 返回</button>
     </div>
     ${!q.trim() ? html`<div className="finder-index">
       <p className="finder-sum">可以打多個字、用空白隔開（例如「信度 最低」）。同義詞會一起找：再測＝重測、PR＝百分等級、Rubrics＝評分規準。${hb && hb.length ? `也會搜《期中口試圖解背誦手冊》${hb.length} 頁，點「看這一頁」直接看圖。` : hb ? '手冊沒有載入，只搜網站內容。' : ''}</p>
@@ -3444,7 +3452,7 @@ function Finder({ onClose, onGo }) {
 const SearchI = () => html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>`;
 
 function App() {
-  const TABS = ['notes', 'review', 'practice', 'mcq', 'cram'];
+  const TABS = ['notes', 'practice', 'mcq', 'cram'];
   const [tab, setTabRaw] = useState(() => { const h = (location.hash || '').slice(1); const old = load('tab', 'notes'); return TABS.includes(h) ? h : TABS.includes(old) ? old : 'notes'; });
   const [topic, setTopic] = useState(() => { const p = load('ptopic', 'all'); return p === 'all' || TOPICS.some(t => t.id === p) ? p : 'all'; });
   const [mtopic, setMtopic] = useState(() => { const p = load('mcqt', 'all'); return p === 'all' || TOPICS.some(t => t.id === p) ? p : 'all'; });
@@ -3477,18 +3485,16 @@ function App() {
     <header className="mast slim">
       <div className="mastrow"><p className="eyebrow"><span className="issue-dot"></span>口試特訓<span className="eyebrow-sub">・圖解學習誌</span></p>
         <div className="theme-switch" role="group" aria-label="外觀">${[['system', '自動', '跟隨裝置的深淺色設定'], ['light', '白天', '白天版：淺色'], ['dark', '晚上', '晚上版：深色']].map(([v, l, tip]) => html`<button key=${v} aria-pressed=${theme === v} title=${tip} onClick=${() => setTheme(v)}>${l}</button>`)}</div></div>
-      <div className="slim-row"><h1>評量筆記</h1><div className="mast-meta"><button onClick=${() => setTab('review')}>待複習 <b>${game.dueN}</b> <span aria-hidden="true">↗</span></button><a className="dl" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 <span aria-hidden="true">↓</span></a></div></div>
+      <div className="slim-row"><h1>評量筆記</h1><div className="mast-meta"><a className="dl" href="handbook/handbook.pdf" download="期中口試圖解背誦手冊 v3.pdf">下載手冊 <span aria-hidden="true">↓</span></a></div></div>
     </header>
     <div className="tabbar"><nav className="tabs" aria-label="學習分頁">
-      ${[['notes','主題閱讀','主題'],['review','回想練習','回想'],['practice','口試練習','口試'],['mcq','考古題','考古題'],['cram','考前一頁','考前一頁']].map(([v,l,sh]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} aria-label=${l} key=${v} onClick=${() => setTab(v)}><span className="t-full">${l}</span><span className="t-short" aria-hidden="true">${sh}</span></button>`)}
+      ${[['notes','主題閱讀','主題'],['practice','口試練習','口試'],['mcq','考古題','考古題'],['cram','考前一頁','考前一頁']].map(([v,l,sh]) => html`<button className="tab" aria-current=${tab === v ? 'page' : undefined} aria-selected=${tab === v} aria-label=${l} key=${v} onClick=${() => setTab(v)}><span className="t-full">${l}</span><span className="t-short" aria-hidden="true">${sh}</span></button>`)}
     </nav></div>
     ${tab === 'notes' && html`<${Notes} tts=${tts} game=${game} onPractice=${practice} onMcq=${mcq} onAttack=${startAttack} focus=${focus} clearFocus=${() => setFocus(null)} />`}
-    ${tab === 'review' && html`<${Review} game=${game} tts=${tts} onAttack=${startAttack} onRead=${read} />`}
     ${tab === 'practice' && html`<${Practice} key=${'p' + nav} tts=${tts} game=${game} topic=${topic} setTopic=${setTopic} onMcq=${mcq} />`}
     ${tab === 'mcq' && html`<${MCQPage} key=${'m' + nav} mtopic=${mtopic} setMtopic=${setMtopic} onRead=${read} onPractice=${practice} />`}
     ${tab === 'cram' && html`<${Cram} tts=${tts} game=${game} onAttack=${startAttack} onRead=${read} onMcq=${mcq} />`}
     <footer>內容依課堂知識庫與題庫整理。朗讀使用裝置內建語音。熟悉程度、複習日期、答題紀錄與草稿只存在這個瀏覽器；舊版進度已接續保留。</footer>
-    ${attack && html`<${RecallSession} key=${attack} id=${attack} game=${game} tts=${tts} onClose=${closeAttack} onRead=${read} />`}
     ${!finding && !attack && html`<button className="find-fab" aria-label="索引搜尋" style=${{ bottom: tts.player ? 'calc(var(--player-h, 170px) + 12px)' : 'max(16px, env(safe-area-inset-bottom))' }} onClick=${() => setFinding(true)}><${SearchI} />查</button>`}
     ${finding && html`<${Finder} onClose=${() => setFinding(false)} onGo=${goFind} />`}
     <${Player} tts=${tts} />
