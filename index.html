@@ -3405,21 +3405,47 @@ const GLOSS_EXTRA = [
   ['Bloom 修訂版', 'Bloom、布魯姆', '2001 年 Anderson 等人修訂。認知歷程由低到高：記憶、了解、應用、分析、評鑑、創造（記、了、應、分、評、創）；知識向度分事實、概念、程序、後設認知。'],
   ['信度的種類', '信度種類', '四種：再測信度（隔一段時間再考同一份，課堂說法通常最高）、複本信度（A、B 兩卷）、內部一致性信度（折半信度、Cronbach α，只考一次）、評分者信度（多位評分者的一致程度，課堂說法最低）。', 'reliability'],
   ['效度的種類', '效度種類、三大效度', '三大類：內容效度（所教即所考，成就測驗最重視）、效標關聯效度（分同時效度與預測效度）、建構（構念）效度（抽象心理特質，如動機、焦慮）。', 'validity'],
+  ['專家效度', '專家審題、專家判斷', '請學科專家逐題審查試題是否涵蓋教學目標與教材範圍、題意是否恰當，是檢驗「內容效度」的方式；常和雙向細目表一起用。成就測驗最重視。', 'validity'],
+  ['雙向細目表', '雙向細目、細目表、命題藍圖', '命題藍圖：一個向度是「教材內容（單元）」，另一個向度是「認知歷程目標」（Bloom 記憶到創造）。用來確保內容效度；各單元配分依重要性與教學時間分配，各認知層次比例不強求相等。編製測驗第一步是確定測驗目的。', 'bloom'],
+  ['試題難易度等級表', '難易度、難度等級、鑑別度等級、Ebel、伊貝爾', '難度 P＝答對比例，越大越容易：.50 最佳、.40～.60 理想；高於 .60 偏易、低於 .40 偏難（以理想範圍為界）；P 接近 0 或 1 時鑑別度 D 都會趨近 0。鑑別度 D 的 Ebel 分級：≥ .40 非常優良、.30～.39 良好、.20～.29 尚可、＜ .20 要修改；負值表示題目有問題。', 'item'],
+  ['知識向度', '四大知識向度、四種知識', 'Bloom 修訂版另加的知識向度，分四種：事實知識（具體名詞細節）、概念知識（抽象分類）、程序知識（有固定步驟的方法）、後設認知知識（策略與自我知識）。', 'bloom'],
+  ['事實知識', '事實性知識', '具體的名詞與細節，例如動物園裡的豬、狗、斑馬。', 'bloom'],
+  ['概念知識', '概念性知識', '抽象的分類、原理與關係，例如「哺乳類」。', 'bloom'],
+  ['程序知識', '程序性知識', '有固定步驟的方法與技能，例如四則運算、釣魚的方法、使用量筒。', 'bloom'],
+  ['後設認知知識', '後設認知、後設認知性知識', '對自己認知的知識：策略、任務情境與自我了解，例如考前看考古題抓方向、下班避開塞車路線；哲學上對應存在主義的自我定位。', 'bloom'],
   ['電腦適性測驗', 'CAT、適性測驗', '依學生作答情形動態調整下一題難度，估算真實能力，例如托福、英檢；屬個人化評量。'],
 ];
+const GLOSS_TOPIC = { 鑑別度: 'item', 難度: 'item', 天花板效應: 'skew', 地板效應: 'skew', 原始分數: 'normal', 平均數: 'normal', 中位數: 'normal', 眾數: 'normal', 標準差: 'normal', 變異數: 'normal', 'z 分數': 'normal', 'T 分數': 'normal', 百分等級: 'normal', 百分位數: 'normal', 離差智商: 'normal', 複本信度: 'reliability', 內部一致性信度: 'reliability', 折半信度: 'reliability', 'Cronbach α': 'reliability', 軼事紀錄法: 'observe', 事件取樣: 'observe', 時間取樣: 'observe', 時距紀錄: 'observe', 近側發展區: 'trend', 'Bloom 修訂版': 'bloom', 電腦適性測驗: 'trend' };
+GLOSS_EXTRA.forEach(e => { if (!e[3] && GLOSS_TOPIC[e[0]]) e[3] = GLOSS_TOPIC[e[0]]; });
 const GLOSS = (() => {
   const G = [], clean = x => x.replace(/（.*?）|\(.*?\)/g, '').trim();
   const namesOf = h => { const out = []; h.split('｜')[0].split(/[＝：]/)[0].split(/\s*vs\.\s*|\s*→\s*/).forEach(x => { const c = clean(x); if (c) out.push(c); (x.match(/（(.*?)）/g) || []).forEach(m => m.slice(1, -1).split(/、|，/).forEach(y => y.trim() && out.push(y.trim()))); }); return out; };
   UNITS.forEach(u => namesOf(u.t).forEach(n => { const b = u.b || []; G.push({ names: [n], def: b.find(x => x.includes(n)) || b[0] || '', src: '原理卡｜' + u.t, topic: topicOfUnit(u.id), w: 3 }); }));
   TOPICS.forEach(t => t.pts.forEach(([h, d]) => { const ns = namesOf(h); if (ns.length) G.push({ names: ns, def: d, src: t.title, topic: t.id, w: 2 }); }));
   NUMBERS.filter(n => n.stack).forEach(n => n.rows.forEach(r => G.push({ names: r[1].includes('vs.') ? r[1].split(/\s*vs\.\s*/).map(clean) : namesOf(r[0]), def: n.head.slice(1).map((h, k) => `${h}：${r[k + 1].replace(/[？。]$/, '')}`).join('；') + '。', src: '考前一頁｜' + n.t, topic: n.topic, w: 3 })));
-  GLOSS_EXTRA.forEach(([n, a, d, tp], i) => G.push({ names: [n, ...a.split('、').filter(Boolean)], def: d, src: i < 11 ? '手冊｜代碼與符號總表' : i < 13 ? '原理卡｜試題分析' : i < 15 ? '偏態' : '網站重點整理', topic: tp || (i >= 11 && i < 13 ? 'item' : i >= 13 && i < 15 ? 'skew' : undefined), w: 3 }));
+  GLOSS_EXTRA.forEach(([n, a, d, tp, sx], i) => G.push({ names: [n, ...a.split('、').filter(Boolean)], def: d, src: sx || (i < 11 ? '手冊｜代碼與符號總表' : i < 13 ? '原理卡｜試題分析' : i < 15 ? '偏態' : '網站重點整理'), topic: tp || (i >= 11 && i < 13 ? 'item' : i >= 13 && i < 15 ? 'skew' : undefined), w: 3 }));
   G.forEach(g => { g.norm = g.names.map(fnorm); });
+  // 補充名詞也進一般搜尋結果
+  GLOSS_EXTRA.forEach(([n, al, d, tp], i) => { const doc = { kind: 'topic', id: 'g-' + i, title: `名詞解釋｜${n}`, body: d + (al ? `（又稱：${al}）` : ''), topic: tp }; doc.head = fnorm(doc.title + al); doc.text = fnorm(doc.title + ' ' + al + ' ' + d); FIND_DOCS.push(doc); });
   return G;
 })();
+// 整句問題（例如「信度是什麼？有哪些種類？」）：抓出句子裡認得的名詞，由長到短
+const GLOSS_NAMES = [...new Set(GLOSS.flatMap(e => e.names).map(fnorm).filter(n => n.length >= 2))].sort((a, b) => b.length - a.length);
+function smartTerms(q) {
+  let s = fnorm(q); const out = [];
+  for (const n of GLOSS_NAMES) if (s.includes(n)) { out.push(n); s = s.split(n).join('｜'); }
+  return out.slice(0, 3);
+}
+const isAsk = q => /什麼|哪些|哪幾|種類|類型|不同|差異|差別|比較|是指|意思|[？?]/.test(q);
 function glossFind(q) {
   const g = fterms(q);
-  if (g.length !== 1) return [];
+  if (!g.length) return [];
+  if (g.length > 1 || (isAsk(q) && !GLOSS.some(e => e.norm.includes(g[0][0])))) {
+    const ts = g.length > 1 ? g.map(v => v[0]) : smartTerms(q), out = [];
+    const kinds = /種類|哪些|哪幾|類型/.test(q);
+    ts.forEach(t => [glossFind(t)[0], kinds && glossFind(t + '的種類').find(e => e.norm.includes(fnorm(t + '的種類')))].forEach(pick => { if (pick && !out.includes(pick)) out.push(pick); }));
+    return out.slice(0, 3);
+  }
   const v = g[0];
   const sc = e => Math.max(...e.norm.map(n => v.some(x => x === n) ? 30 : v.some(x => n.startsWith(x) && x.length >= 2) ? 20 : v.some(x => x.length >= 2 && (n.includes(x) || (n.length >= 2 && x.includes(n)))) ? 10 : 0));
   const seen = new Set();
@@ -3429,7 +3455,7 @@ function glossFind(q) {
 }
 function GlossCard({ e, re, onGo }) {
   return html`<article className="gloss-card">
-    <div className="hit-top"><span className="gloss-name">${e.names.join('／')}</span><span className="hit-tag">名詞解釋</span></div>
+    <div className="hit-top"><span className="gloss-name">${e.names.slice(0, 2).join('／')}</span><span className="hit-tag">名詞解釋</span></div>
     <p><${Hl} text=${e.def} re=${re} /></p>
     <div className="hit-acts"><span className="gloss-src">出處：${e.src}</span>${e.topic && html`<button className="btn" onClick=${() => onGo({ kind: 'card', topic: e.topic })}>讀主題 →</button>`}</div>
   </article>`;
@@ -3447,7 +3473,7 @@ function findDocs(q, extra = []) {
     .sort((a, b) => b.s - a.s).map(x => x.d);
   return { groups: g, hits };
 }
-const HOT = ['信度', '效度', '鑑別度', 'PR', '常模參照', '標準參照', '動態評量', '雙向細目表', '評分規準', '偏態', '時距紀錄', '檔案評量'];
+const HOT = ['信度的種類', '效度的種類', '再測信度', '評分者信度', '內容效度', '專家效度', '預測效度', '建構效度', '鑑別度', '試題難易度等級表', '難度', 'PR', 'z 分數', 'T 分數', '標準差', '常模參照', '標準參照', '自我參照', '標準化測驗', '形成性', '診斷性', '最大表現', '典型表現', '偏態', '天花板效應', 'Bloom', '後設認知知識', '程序知識', '雙向細目表', '動態評量', '近側發展區', '實作評量', '檔案評量', '評分規準', '檢核表', '時距紀錄'];
 const FIND_INDEX = TOPICS.map(t => ({ t, terms: [...new Set([...t.pts.map(p => p[0].split('｜')[0].replace(/（.*?）|\(.*?\)/g, '').trim()), ...UNITS.filter(u => topicOfUnit(u.id) === t.id).map(u => u.t)])] }));
 
 function HbHit({ d, re, groups }) {
@@ -3502,7 +3528,14 @@ function Finder({ onClose, onGo }) {
     if (HB_DOCS) return;
     fetch('handbook/pages.json').then(r => r.json()).then(P => { HB_DOCS = P.map(hbDoc); setHb(HB_DOCS); }).catch(() => setHb([]));
   }, []);
-  const { groups, hits } = useMemo(() => findDocs(q, hb || []), [q, hb]);
+  const { groups, hits, used } = useMemo(() => {
+    const r = findDocs(q, hb || []);
+    if (r.hits.length || !q.trim()) return r;
+    const ts = smartTerms(q); if (!ts.length) return r;
+    if (ts.length === 1) { const r2 = findDocs(ts[0], hb || []); return { ...r2, used: ts }; }
+    const parts = ts.map(t => findDocs(t, hb || [])), seen = new Set();
+    return { groups: parts.flatMap(x => x.groups), hits: parts.flatMap(x => x.hits).filter(d => !seen.has(d.id) && seen.add(d.id)), used: ts };
+  }, [q, hb]);
   const gloss = useMemo(() => glossFind(q), [q]);
   const re = useMemo(() => termRe(groups), [groups]);
   const pick = t => { setQ(t); const el = document.querySelector('.finder'); if (el) el.scrollTop = 0; };
@@ -3520,6 +3553,7 @@ function Finder({ onClose, onGo }) {
       ${FIND_INDEX.map(({ t, terms }, i) => html`<section key=${t.id}><h3>${String(i + 1).padStart(2, '0')} ${t.title}</h3><div className="chips">${terms.map(x => html`<button key=${x} onClick=${() => pick(x)}>${x}</button>`)}</div></section>`)}
     </div>` : !hits.length ? html`<p className="finder-empty">找不到「${q}」。試試短一點的詞，或按「清除」回到索引。</p>` : html`
       ${gloss.length > 0 && html`<section className="gloss" aria-label="名詞解釋">${gloss.map((e, i) => html`<${GlossCard} key=${i} e=${e} re=${re} onGo=${onGo} />`)}</section>`}
+      ${used && html`<p className="finder-sum">已從問句抓出關鍵詞來查：${used.join('、')}</p>`}
       <p className="finder-sum" aria-live="polite">共 ${hits.length} 筆，依「速記卡→原理卡→主題重點→數字→手冊→口試→考古題」排列。</p>
       <div className="finder-groups">${by.map(g => html`<button key=${g.k} onClick=${() => { const el = document.getElementById('fg-' + g.k); if (el) el.scrollIntoView({ block: 'start' }); }}>${g.l} ${g.list.length}</button>`)}</div>
       ${by.map(g => { const n = lim[g.k] || 6; return html`<section key=${g.k} id=${'fg-' + g.k}><h3>${g.l}<small>${g.list.length} 筆</small></h3>
